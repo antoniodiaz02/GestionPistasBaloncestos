@@ -34,7 +34,7 @@ public class Main {
         System.out.println(pista1);
         System.out.println(pista2);
         
-     // Crear una fecha para las reservas
+        // Crear una fecha para las reservas
         Date fechaReserva = new Date();
 
         // Prueba de Reserva Individual de Adultos

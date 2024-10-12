@@ -14,55 +14,19 @@ import java.util.Date;
  *  @version 1.0
  */
 public class ReservaIndividualFactory extends ReservaFactory {
-    
-    private String usuarioId;
-    private Date fechaHora;
-    private int duracion;
-    private String pistaId;
-    private float precio;
-    private float descuento;
-    private String tipo; // "adultos", "familia", "infantil"
-    private int numParticipantes; // Para adultos o niños
 
-    public ReservaIndividualFactory(String usuarioId, Date fechaHora, int duracion, String pistaId, float precio, float descuento, String tipo, int numParticipantes) {
-        this.usuarioId = usuarioId;
-        this.fechaHora = fechaHora;
-        this.duracion = duracion;
-        this.pistaId = pistaId;
-        this.precio = precio;
-        this.descuento = descuento;
-        this.tipo = tipo;
-        this.numParticipantes = numParticipantes;
+    @Override
+    public ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
+        return new ReservaInfantil(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
     }
 
     @Override
-    public Reserva crearReserva() {
-        Reserva reserva = null;
+    public ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+        return new ReservaFamiliar(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
+    }
 
-        switch (tipo.toLowerCase()) {
-            case "adultos":
-                reserva = new ReservaAdultos();
-                ((ReservaAdultos) reserva).setNumAdultos(numParticipantes);
-                break;
-            case "familia":
-                reserva = new ReservaFamiliar();
-                ((ReservaFamiliar) reserva).setNumAdultos(numParticipantes); // Debes definir setNumFamilia en ReservaFamiliar
-                break;
-            case "infantil":
-                reserva = new ReservaInfantil();
-                ((ReservaInfantil) reserva).setNumNinos(numParticipantes); // Debes definir setNumNinos en ReservaInfantil
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de reserva no válida");
-        }
-
-        reserva.setUsuarioId(usuarioId);
-        reserva.setFechaHora(fechaHora);
-        reserva.setDuracion(duracion);
-        reserva.setPistaId(pistaId);
-        reserva.setPrecio(precio);
-        reserva.setDescuento(descuento);
-
-        return reserva;
+    @Override
+    public ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
+        return new ReservaAdultos(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
     }
 }

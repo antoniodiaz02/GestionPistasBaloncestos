@@ -1,5 +1,6 @@
 package es.uco.pw.factory;
-import es.uco.pw.data.Reserva;
+import es.uco.pw.data.*;
+import java.util.Date;
 
 /**
  * Clase abstracta que representa una fábrica de reservas.
@@ -14,8 +15,42 @@ import es.uco.pw.data.Reserva;
 public abstract class ReservaFactory {
     
     /**
-     * Método abstracto para crear una reserva.
-     * @return Reserva
+     * Método abstracto para crear una reserva infantil.
+     * @param idUsuario ID del usuario que realiza la reserva
+     * @param fecha Fecha de la reserva
+     * @param duracion Duración de la reserva en horas
+     * @param idPista ID de la pista a reservar
+     * @param precio Precio de la reserva
+     * @param descuento Descuento aplicado a la reserva
+     * @param numeroNinos Número de niños en la reserva
+     * @return ReservaInfantil
      */
-    public abstract Reserva crearReserva();
+    public abstract ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos);
+    
+    /**
+     * Método abstracto para crear una reserva familiar.
+     * @param idUsuario ID del usuario que realiza la reserva
+     * @param fecha Fecha de la reserva
+     * @param duracion Duración de la reserva en horas
+     * @param idPista ID de la pista a reservar
+     * @param precio Precio de la reserva
+     * @param descuento Descuento aplicado a la reserva
+     * @param numeroAdultos Número de adultos en la reserva
+     * @param numeroNinos Número de niños en la reserva
+     * @return ReservaFamiliar
+     */
+    public abstract ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
+    
+    /**
+     * Método abstracto para crear una reserva para adultos.
+     * @param idUsuario ID del usuario que realiza la reserva
+     * @param fecha Fecha de la reserva
+     * @param duracion Duración de la reserva en horas
+     * @param idPista ID de la pista a reservar
+     * @param precio Precio de la reserva
+     * @param descuento Descuento aplicado a la reserva
+     * @param numeroAdultos Número de adultos en la reserva
+     * @return ReservaAdultos
+     */
+    public abstract ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos);
 }
