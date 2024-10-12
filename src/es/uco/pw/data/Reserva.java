@@ -166,6 +166,8 @@ public abstract class Reserva {
         this.descuento = descuento;
     }
 
+    
+    
     /**
      * Muestra la información de la reserva
      * @return String Información de la reserva

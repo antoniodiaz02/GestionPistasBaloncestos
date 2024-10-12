@@ -4,7 +4,7 @@ import es.uco.pw.data.*;
 import java.util.Date;
 
 /**
- * Clase que representa una fábrica para crear reservas individuales.
+ * Clase que representa factory para crear reservas individuales.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
