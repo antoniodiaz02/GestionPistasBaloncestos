@@ -166,7 +166,6 @@ public class Pista {
      */
     @Override
     public String toString() {
-        return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior + 
-               ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + "]";
+        return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior +  ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + "]";
     }
 }

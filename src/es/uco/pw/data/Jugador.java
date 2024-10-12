@@ -114,8 +114,6 @@ public class Jugador {
     @Override
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        return "Jugador [Nombre: " + nombreCompleto + ", Fecha de nacimiento: " + sdf.format(fechaNacimiento) + 
-               ", Fecha de inscripción: " + sdf.format(fechaInscripcion) + ", Correo: " + correoElectronico + 
-               ", Antigüedad: " + calcularAntiguedad() + " años]";
+        return "Jugador [Nombre: " + nombreCompleto + ", Fecha de nacimiento: " + sdf.format(fechaNacimiento) +  ", Fecha de inscripción: " + sdf.format(fechaInscripcion) + ", Correo: " + correoElectronico +  ", Antigüedad: " + calcularAntiguedad() + " años]";
     }
 }
