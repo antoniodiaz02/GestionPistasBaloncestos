@@ -34,6 +34,39 @@ public class Main {
         System.out.println(pista1);
         System.out.println(pista2);
         
+     // Crear una fecha para las reservas
+        Date fechaReserva = new Date();
+
+        // Prueba de Reserva Individual de Adultos
+        ReservaFactory reservaAdultosFactory = new ReservaIndividualFactory("usuario1", fechaReserva, 60, "pista1", 50.0f, 5.0f, "adultos", 4);
+        Reserva reservaAdultos = reservaAdultosFactory.crearReserva();
+        System.out.println(reservaAdultos);
+
+        // Prueba de Reserva Individual Familiar
+        ReservaFactory reservaFamiliarFactory = new ReservaIndividualFactory("usuario2", fechaReserva, 90, "pista2", 70.0f, 10.0f, "familia", 3); // 2 adultos, 1 niño
+        Reserva reservaFamiliar = reservaFamiliarFactory.crearReserva();
+        System.out.println(reservaFamiliar);
+
+        // Prueba de Reserva Individual Infantil
+        ReservaFactory reservaInfantilFactory = new ReservaIndividualFactory("usuario3", fechaReserva, 30, "pista3", 30.0f, 0.0f, "infantil", 5); // 5 niños
+        Reserva reservaInfantil = reservaInfantilFactory.crearReserva();
+        System.out.println(reservaInfantil);
+
+        // Prueba de Reserva Bono de Adultos
+        ReservaFactory reservaBonoAdultosFactory = new ReservaBonoFactory("usuario4", fechaReserva, 60, "pista1", 50.0f, 5.0f, "adultos", 2, "bono123", 1);
+        Reserva reservaBonoAdultos = reservaBonoAdultosFactory.crearReserva();
+        System.out.println(reservaBonoAdultos);
+
+        // Prueba de Reserva Bono Familiar
+        ReservaFactory reservaBonoFamiliarFactory = new ReservaBonoFactory("usuario5", fechaReserva, 120, "pista2", 80.0f, 15.0f, "familia", 4, "bono456", 2);
+        Reserva reservaBonoFamiliar = reservaBonoFamiliarFactory.crearReserva();
+        System.out.println(reservaBonoFamiliar);
+
+        // Prueba de Reserva Bono Infantil
+        ReservaFactory reservaBonoInfantilFactory = new ReservaBonoFactory("usuario6", fechaReserva, 45, "pista3", 25.0f, 0.0f, "infantil", 10, "bono789", 1);
+        Reserva reservaBonoInfantil = reservaBonoInfantilFactory.crearReserva();
+        System.out.println(reservaBonoInfantil);
+        
 
     }
 }

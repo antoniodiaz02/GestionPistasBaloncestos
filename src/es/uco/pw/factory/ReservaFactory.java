@@ -1,9 +1,8 @@
 package es.uco.pw.factory;
-
 import es.uco.pw.data.Reserva;
 
 /**
- * Interfaz que define los métodos para la creación de diferentes tipos de reservas.
+ * Clase abstracta que representa una fábrica de reservas.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -12,21 +11,11 @@ import es.uco.pw.data.Reserva;
  *  @since 12-10-2024
  *  @version 1.0
  */
-public interface ReservaFactory {
-
+public abstract class ReservaFactory {
+    
     /**
-     * Crea una reserva individual.
-     * 
-     * @return Reserva creada del tipo individual
+     * Método abstracto para crear una reserva.
+     * @return Reserva
      */
-    Reserva crearReservaIndividual();
-
-    /**
-     * Crea una reserva utilizando un bono.
-     * 
-     * @param bonoId Identificador del bono
-     * @param numSesion Número de sesiones del bono
-     * @return Reserva creada utilizando el bono
-     */
-    Reserva crearReservaBono(String bonoId, int numSesion);
+    public abstract Reserva crearReserva();
 }
