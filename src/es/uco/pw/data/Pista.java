@@ -50,6 +50,14 @@ public class Pista {
     }
 
     /**
+     * Constructor vacío de la clase Pista
+     */
+    
+    public Pista() {
+    	
+    }
+    
+    /**
      * Constructor parametrizado de la clase Pista
      * 
      * @param nombre Nombre de la pista
@@ -58,6 +66,7 @@ public class Pista {
      * @param tamanoPista Tamaño de la pista
      * @param maxJugadores Máximo de jugadores permitidos
      */
+    
     public Pista(String nombre, boolean disponible, boolean esInterior, TamanoPista tamanoPista, int maxJugadores) {
         this.nombre = nombre;
         this.disponible = disponible;
@@ -148,11 +157,26 @@ public class Pista {
     }
 
     /**
+     * Devuelve el subconjunto de materiales disponible
+     * @return disponibles
+     */
+    public List<Material> consultarMaterialesDisponibles() {
+        List<Material> disponibles = new ArrayList<>();
+        for (Material material : materiales) {
+            if (material.getEstadoMaterial() == Material.EstadoMaterial.DISPONIBLE) {
+                disponibles.add(material);
+            }
+        }
+        return disponibles;
+    }
+
+    
+    /**
      * Añade un material a la pista si cumple las restricciones de uso
      * @param material Material a asociar a la pista
      * @return True si se asoció correctamente, False en caso contrario
      */
-    public boolean asociarMaterial(Material material) {
+    public boolean asociarMaterialAPista(Material material) {
         if (esInterior || (!esInterior && !material.getUsoInterior())) {
             materiales.add(material);
             return true;
@@ -161,11 +185,45 @@ public class Pista {
     }
 
     /**
-     * Muestra la información de la pista
+     * Muestra toda la información de la pista
      * @return String Información de la pista
      */
+    
     @Override
     public String toString() {
-        return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior +  ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + "]";
+        return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior +  ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + ", Materiales: " + materiales.size() + " asociados]";
     }
+
 }
+
+
+// Quizás es mejor hacer la clase asociarMaterialAPista así para sanitizar la cantidad.
+/**
+ * public boolean asociarMaterial(Material material) {
+ * 
+    // Si la pista es exterior solo aceptar materiales de exterior
+    if (!esInterior && material.getUsoInterior()) {
+        return false;
+    }
+
+    // Contar el número de pelotas, canastas y conos ya asociados
+    long pelotas = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.PELOTAS).count();
+    long canastas = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.CANASTAS).count();
+    long conos = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.CONOS).count();
+
+    if (material.getTipoMaterial() == Material.TipoMaterial.PELOTAS && pelotas >= 12) {
+        return false;
+    }
+    if (material.getTipoMaterial() == Material.TipoMaterial.CANASTAS && canastas >= 2) {
+        return false;
+    }
+    if (material.getTipoMaterial() == Material.TipoMaterial.CONOS && conos >= 20) {
+        return false;
+    }
+
+    materiales.add(material);
+    return true;
+}
+ */
+
+

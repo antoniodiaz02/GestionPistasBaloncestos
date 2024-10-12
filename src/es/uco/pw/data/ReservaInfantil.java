@@ -1,4 +1,6 @@
 package es.uco.pw.data;
+import java.util.Date;
+
 
 /**
  * Clase que representa una reserva infantil de una pista.
@@ -21,7 +23,24 @@ public class ReservaInfantil extends Reserva {
      * Constructor vacío de la clase ReservaInfantil
      */
     public ReservaInfantil() {}
-
+   
+    
+    /**
+     * Constructor parametrizable de la subclase ReservaInfantil
+     * @param idUsuario
+     * @param fechaHora
+     * @param duracionMinutos
+     * @param idPista
+     * @param precio
+     * @param descuento
+     * @param numeroNinos
+     */
+    public ReservaInfantil(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroNinos) {
+        super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
+        this.numNinos = numeroNinos;
+    }
+    
+    
     /**
      * Devuelve el número de niños en la reserva
      * @return numNinos Número de niños

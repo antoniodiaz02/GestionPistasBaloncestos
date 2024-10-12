@@ -15,7 +15,7 @@ import java.util.Date;
 public abstract class Reserva {
 
     /**
-     * Identificador del usuario que realiza la reserva
+     * Identificador del usuario que realiza la reserva (previamente registrado)
      */
     private String usuarioId;
 
@@ -30,12 +30,12 @@ public abstract class Reserva {
     private int duracion;
 
     /**
-     * Identificador de la pista reservada
+     * Identificador de la pista reservada (debe existir)
      */
     private String pistaId;
 
     /**
-     * Precio de la reserva
+     * Precio de la reserva (en euros)
      */
     private float precio;
 
@@ -44,6 +44,27 @@ public abstract class Reserva {
      */
     private float descuento;
 
+    
+    
+    /**
+     * Constructor parametrizable de la clase Reserva
+     * @param idUsuario
+     * @param fechaHora
+     * @param duracionMinutos
+     * @param idPista
+     * @param precio
+     * @param descuento
+     */
+    public Reserva(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
+        this.usuarioId = idUsuario;
+        this.fechaHora = fechaHora;
+        this.duracion = duracionMinutos;
+        this.pistaId = idPista;
+        this.precio = precio;
+        this.descuento = descuento;
+    }
+    
+    
     /**
      * Constructor vacío de la clase Reserva
      */

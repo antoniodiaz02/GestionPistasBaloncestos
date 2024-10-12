@@ -37,6 +37,13 @@ public class Jugador {
     private String correoElectronico;
 
     /**
+     * Constructor vacio clase Jugador
+     */
+    public Jugador() {
+    	
+    }
+    
+    /**
      * Constructor parametrizado de la clase Jugador
      * 
      * @param nombreCompleto Nombre y apellidos del jugador
@@ -103,6 +110,11 @@ public class Jugador {
      * @return años de antigüedad
      */
     public int calcularAntiguedad() {
+    	
+    	if (fechaInscripcion == null) {
+    		return 0;
+    	}
+    	
         long diffInMillis = new Date().getTime() - fechaInscripcion.getTime();
         return (int) TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS) / 365;
     }

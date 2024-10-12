@@ -71,6 +71,12 @@ public class Material{
     }
     
     
+    /**
+	 * Constructor vacio de la clase Material
+	 */
+    public Material() {
+    	
+    }
     
     /**
      * Constructor de la clase material
@@ -78,7 +84,7 @@ public class Material{
      * @param tipoMaterial Para el tipo del material
      * @param usoInterior Para indicar el uso interor o exterior
      * @param estadoMaterial Para indicar el estado del material
-     * @return none
+     * 
  	*/
     public Material(int idMaterial, TipoMaterial tipoMaterial, boolean usoInterior, EstadoMaterial estadoMaterial) {
         this.idMaterial = idMaterial;

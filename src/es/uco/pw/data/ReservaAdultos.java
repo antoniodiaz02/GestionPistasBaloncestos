@@ -1,4 +1,5 @@
 package es.uco.pw.data;
+import java.util.Date;
 
 /**
  * Clase que representa una reserva de adultos de una pista.
@@ -22,6 +23,23 @@ public class ReservaAdultos extends Reserva {
      */
     public ReservaAdultos() {}
 
+    
+    /**
+     * Constructor parametrizable de la subclase ReservaAdultos
+     * @param idUsuario
+     * @param fechaHora
+     * @param duracionMinutos
+     * @param idPista
+     * @param precio
+     * @param descuento
+     * @param numeroAdultos
+     */
+    public ReservaAdultos(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos) {
+        super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
+        this.numAdultos = numeroAdultos;
+    }
+    
+    
     /**
      * Devuelve el número de adultos en la reserva
      * @return numAdultos Número de adultos
