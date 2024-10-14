@@ -43,6 +43,16 @@ public abstract class Reserva {
      * Descuento aplicado a la reserva
      */
     private float descuento;
+    
+    /**
+     * Bono de la reserva
+     */
+    private String bonoId;  
+    
+    /**
+     * Numero de sesion del bono
+     */
+    private int sesion; 
 
     
     
@@ -165,6 +175,22 @@ public abstract class Reserva {
     public void setDescuento(float descuento) {
         this.descuento = descuento;
     }
+    
+    public String getBonoId() {
+        return bonoId;
+    }
+
+    public void setBonoId(String bonoId) {
+        this.bonoId = bonoId;
+    }
+
+    public int getSesion() {
+        return sesion;
+    }
+
+    public void setSesion(int sesion) {
+        this.sesion = sesion;
+    }
 
     
     
@@ -174,6 +200,12 @@ public abstract class Reserva {
      */
     @Override
     public String toString() {
-        return "Reserva [Usuario: " + usuarioId + ", Fecha y hora: " + fechaHora + ", Duración: " + duracion + " minutos, Pista: " + pistaId + ", Precio: " + precio + " €, Descuento: " + descuento + " €]";
+        String info = "Reserva [Usuario: " + usuarioId + ", Fecha y hora: " + fechaHora + ", Duración: " + duracion 
+                      + " minutos, Pista: " + pistaId + ", Precio: " + precio + " €, Descuento: " + descuento + " €]";
+        if (bonoId != null) {
+            info += ", Bono: " + bonoId + ", Sesión: " + sesion;
+        }
+        return info;
     }
+
 }
