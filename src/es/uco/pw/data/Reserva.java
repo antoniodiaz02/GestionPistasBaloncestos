@@ -54,8 +54,6 @@ public abstract class Reserva {
      */
     private int sesion; 
 
-    
-    
     /**
      * Constructor parametrizable de la clase Reserva
      * @param idUsuario
@@ -73,7 +71,6 @@ public abstract class Reserva {
         this.precio = precio;
         this.descuento = descuento;
     }
-    
     
     /**
      * Constructor vacío de la clase Reserva
@@ -176,24 +173,38 @@ public abstract class Reserva {
         this.descuento = descuento;
     }
     
+    /**
+     * Devuelve el identificador del bono
+     * @return bonoID Identificador del bono
+     */
     public String getBonoId() {
         return bonoId;
     }
 
+    /**
+     * Modifica el identificador del bono
+     * @param bonoId Identificador del bono
+     */
     public void setBonoId(String bonoId) {
         this.bonoId = bonoId;
     }
 
+    /**
+     * Devuelve el numero de sesion del bono
+     * @return sesion Numero de sesion del bono
+     */
     public int getSesion() {
         return sesion;
     }
 
+    /**
+     * Modifica el numero de sesion del bono
+     * @param sesion numero de sesion del bono
+     */
     public void setSesion(int sesion) {
         this.sesion = sesion;
     }
 
-    
-    
     /**
      * Muestra la información de la reserva
      * @return String Información de la reserva
@@ -207,5 +218,4 @@ public abstract class Reserva {
         }
         return info;
     }
-
 }

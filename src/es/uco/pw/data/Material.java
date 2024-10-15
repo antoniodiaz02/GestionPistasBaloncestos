@@ -70,7 +70,6 @@ public class Material{
         MAL_ESTADO
     }
     
-    
     /**
 	 * Constructor vacio de la clase Material
 	 */
@@ -141,8 +140,23 @@ public class Material{
 	public void setEstadoMaterial(EstadoMaterial estadoMaterial) {
 		this.estadoMaterial = estadoMaterial;
 	}
-
-
+	
+	/**
+	 * Modifica el tipo de material
+	 * @param tipoMaterial Tipo de material
+	 */
+	 public void setTipoMaterial(TipoMaterial tipoMaterial) {
+	        this.tipoMaterial = tipoMaterial;
+	    }
+	 
+	 /**
+		 * Devuelve el tipo de material
+		 * @return Devuelve el tipo de material
+		 */
+	 public TipoMaterial getTipoMaterial() {
+	        return tipoMaterial;
+	    }
+	
 	/*
 	    * Muestra la informacion referente al Material
 	    * @param none

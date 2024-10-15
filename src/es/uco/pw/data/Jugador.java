@@ -114,7 +114,6 @@ public class Jugador {
     	if (fechaInscripcion == null) {
     		return 0;
     	}
-    	
         long diffInMillis = new Date().getTime() - fechaInscripcion.getTime();
         return (int) TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS) / 365;
     }

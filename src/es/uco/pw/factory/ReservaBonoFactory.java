@@ -17,37 +17,84 @@ import es.uco.pw.data.*;
 
 public class ReservaBonoFactory extends ReservaFactory {
 
-    private String bonoId; // Identificador del bono
-    private int sesion; // Número de sesión dentro del bono
+    /**
+     * Identificador del bono
+     */
+    private String bonoId;
+    
+    /**
+     * Numero de sesion dentro del bono
+     */
+    private int sesion;
 
+    /**
+     * Constructor de la clase ReservaBonoFactory
+     * @param bonoId Identificador del bono
+     * @param sesion Numero de sesion dentro del bono
+     */
     public ReservaBonoFactory(String bonoId, int sesion) {
         this.bonoId = bonoId;
         this.sesion = sesion;
     }
     
-
+    /**
+     * Crea una reserva infantil con bono usando parametros personalizados
+     *  @param idUsuario Identificador del usuario
+     *  @param fecha Fecha
+     *  @param duracion Duracion
+     *  @param idPista Identificador de la pista
+     *  @param precio Precio
+     *  @param descuento Descuento 
+     *  @param numeroNinos Numero de ninos
+     *  @return reserva Objeto de tipo ReservaInfantil creado
+     */
+    @Override
     public ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
-        // Creación de reserva infantil con bono usando parámetros personalizados
+        
         ReservaInfantil reserva = new ReservaInfantil(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
-        reserva.setBonoId(bonoId); // Asignar el bono a la reserva
-        reserva.setSesion(sesion); // Establecer la sesión dentro del bono
+        reserva.setBonoId(bonoId); 
+        reserva.setSesion(sesion); 
         return reserva;
     }
 
+    /**
+     * Crea una reserva familiar con bono usando parametros personalizados
+     *  @param idUsuario Identificador del usuario
+     *  @param fecha Fecha
+     *  @param duracion Duracion
+     *  @param idPista Identificador de la pista
+     *  @param precio Precio
+     *  @param descuento Descuento
+     *  @param numeroAdultos Numero de adultos 
+     *  @param numeroNinos Numero de ninos
+     *  @return reserva Objeto de tipo ReservaFamiliar creado
+     */
+    @Override
     public ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
-        // Creación de reserva familiar con bono usando parámetros personalizados
+        
         ReservaFamiliar reserva = new ReservaFamiliar(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
-        reserva.setBonoId(bonoId); // Asignar el bono a la reserva
-        reserva.setSesion(sesion); // Establecer la sesión dentro del bono
+        reserva.setBonoId(bonoId);
+        reserva.setSesion(sesion);
         return reserva;
     }
 
+    /**
+     * Crea una reserva adultos con bono usando parametros personalizados
+     *  @param idUsuario Identificador del usuario
+     *  @param fecha Fecha
+     *  @param duracion Duracion
+     *  @param idPista Identificador de la pista
+     *  @param precio Precio
+     *  @param descuento Descuento
+     *  @param numeroAdultos Numero de adultos 
+     *  @return reserva Objeto de tipo ReservaAdultos creado
+     */
+    @Override
     public ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
-        // Creación de reserva adultos con bono usando parámetros personalizados
+        
         ReservaAdultos reserva = new ReservaAdultos(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
-        reserva.setBonoId(bonoId); // Asignar el bono a la reserva
-        reserva.setSesion(sesion); // Establecer la sesión dentro del bono
+        reserva.setBonoId(bonoId); 
+        reserva.setSesion(sesion); 
         return reserva;
     }
 }
-
