@@ -196,6 +196,11 @@ public class Pista {
     	    if (material.getTipoMaterial() == Material.TipoMaterial.CONOS && conos >= 20) {
     	        return false;
     	    }
+    	    
+    	    // Validar que el material no esté ya asociado
+    	    if (materiales.contains(material)) {
+    	        return false;
+    	    }
 
     	    materiales.add(material);
     	    return true;
