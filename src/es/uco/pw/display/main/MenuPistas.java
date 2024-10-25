@@ -126,7 +126,8 @@ public class MenuPistas {
         String nombrePista = sc.nextLine();
         Pista pista = null;
 
-        for (Pista p : gestor.listarPistasNoDisponibles()) {
+        // Buscamos en todas las pistas (disponibles y no disponibles)
+        for (Pista p : gestor.listarTodasLasPistas()) {
             if (p.getNombre().equalsIgnoreCase(nombrePista)) {
                 pista = p;
                 break;
@@ -134,7 +135,7 @@ public class MenuPistas {
         }
 
         if (pista == null) {
-            System.out.println("Pista no encontrada o no disponible.");
+            System.out.println("Pista no encontrada.");
             return;
         }
 
@@ -154,6 +155,7 @@ public class MenuPistas {
             return;
         }
 
+        // Intenta asociar el material a la pista seleccionada
         if (gestor.asociarMaterialAPista(pista, material)) {
             System.out.println("Material asociado exitosamente.");
         } else {

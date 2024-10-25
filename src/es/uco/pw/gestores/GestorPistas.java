@@ -146,34 +146,68 @@ public class GestorPistas {
      * @return true si se asoció correctamente, false en caso contrario
      */
     public boolean asociarMaterialAPista(Pista pista, Material material) {
-        // Verificar que la pista esté disponible
+        // Verifica que la pista esté disponible en el momento de la asociación
         if (!pista.isDisponible()) {
             System.out.println("La pista no está disponible.");
             return false;
         }
 
-        // Verificar que el material no esté ya asociado a otra pista
+        // Verifica si el material ya está asignado a otra pista
         if (materialYaAsignado(material)) {
             System.out.println("El material ya está asociado a otra pista o está en mantenimiento.");
             return false;
         }
 
-        // Verificar que el tipo de material sea compatible con el tipo de pista
+        // Verifica la compatibilidad entre material y pista
         if (!esMaterialCompatibleConPista(pista, material)) {
             System.out.println("El material no es compatible con el tipo de pista.");
             return false;
         }
 
-        // Si todas las verificaciones pasan, asociar el material a la pista
+        // Si todo está en orden, realiza la asociación
         if (pista.asociarMaterial(material)) {
+        	material.setEstadoMaterial(Material.EstadoMaterial.RESERVADO);
             System.out.println("Material asociado a la pista con éxito.");
+            
+            
+            List<String> lineasArchivo = new ArrayList<>();
+
+            // Leer todas las líneas del archivo y modificar la línea del material
+            try (BufferedReader reader = new BufferedReader(new FileReader(RUTA_ARCHIVO_MATERIALES))) {
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    // Separar la línea para identificar el material
+                    String[] partes = linea.split(";");
+                    int idMaterialArchivo = Integer.parseInt(partes[0]);
+
+                    // Si es el material que buscamos, cambiamos el estado a RESERVADO
+                    if (idMaterialArchivo == material.getIdMaterial()) {
+                        partes[3] = Material.EstadoMaterial.RESERVADO.toString();
+                        linea = String.join(";", partes);
+                    }
+                    
+                    lineasArchivo.add(linea);
+                }
+            } catch (IOException e) {
+                System.err.println("Error al leer el archivo de materiales: " + e.getMessage());
+            }
+
+            // Sobrescribir el archivo con los datos actualizados
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_MATERIALES))) {
+                for (String linea : lineasArchivo) {
+                    writer.write(linea);
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                System.err.println("Error al escribir en el archivo de materiales: " + e.getMessage());
+            }
+            
             return true;
         } else {
             System.out.println("No se pudo asociar el material a la pista.");
             return false;
         }
     }
-
     /**
      * Verifica si un material ya está asignado a otra pista o en mal estado.
      * 
@@ -181,6 +215,10 @@ public class GestorPistas {
      * @return true si el material está asignado, false en caso contrario
      */
     private boolean materialYaAsignado(Material material) {
+        // Verifica si el estado del material no es DISPONIBLE
+        if (material.getEstadoMaterial() != Material.EstadoMaterial.DISPONIBLE) {
+            return true;
+        }
         for (Pista pista : pistas) {
             if (!pista.isDisponible() || pista.consultarMaterialesDisponibles().contains(material)) {
                 return true;
@@ -198,7 +236,13 @@ public class GestorPistas {
      */
     private boolean esMaterialCompatibleConPista(Pista pista, Material material) {
         // Si la pista es exterior, el material no debe ser de uso interior
-        return !(pista.isInterior() && material.getUsoInterior());
+    	if((pista.isInterior() && material.getUsoInterior()) || (!pista.isInterior() && !material.getUsoInterior())) {
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
+    	
     }
     
     /**
@@ -297,4 +341,9 @@ public class GestorPistas {
     public List<Material> getMateriales() {
         return this.materiales;
     }
+    
+    public List<Pista> listarTodasLasPistas() {
+        return pistas;
+    }
+
 }
