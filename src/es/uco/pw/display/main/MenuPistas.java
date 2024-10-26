@@ -1,7 +1,6 @@
 package es.uco.pw.display.main;
 
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
 
 import es.uco.pw.data.Material;
@@ -186,23 +185,15 @@ public class MenuPistas {
     }
 
     /**
-     * Lista las pistas que no están disponibles.
+     * Método para listar y mostrar las pistas que no están disponibles.
      */
     private void listarPistasNoDisponibles() {
-        List<Pista> pistasNoDisponibles = gestor.listarPistasNoDisponibles();
-
-        if (pistasNoDisponibles.isEmpty()) {
-            System.out.println("No hay pistas no disponibles.");
-        } else {
-            System.out.println("Pistas no disponibles:");
-            for (Pista pista : pistasNoDisponibles) {
-                System.out.println(pista);
-            }
-        }
+        // Delegamos la impresión al método imprimirPistasNoDisponibles del gestor
+        gestor.imprimirPistasNoDisponibles();
     }
 
     /**
-     * Buscas las pistas que estan libres.
+     * Método para buscar y mostrar las pistas que están libres.
      */
     private void buscarPistasLibres() {
         System.out.print("Ingrese el número mínimo de jugadores: ");
@@ -211,16 +202,8 @@ public class MenuPistas {
         boolean esInterior = sc.nextBoolean();
         sc.nextLine();
 
-        List<Pista> pistasLibres = gestor.buscarPistasLibres(numeroJugadores, esInterior);
-
-        if (pistasLibres.isEmpty()) {
-            System.out.println("No hay pistas libres que cumplan con los requisitos especificados.");
-        } else {
-            System.out.println("Pistas libres disponibles:");
-            for (Pista pista : pistasLibres) {
-                System.out.println(pista);
-            }
-        }
+        // Llamamos al método imprimirPistasLibres del gestor para realizar la búsqueda e impresión
+        gestor.imprimirPistasLibres(numeroJugadores, esInterior);
     }
 
     /**

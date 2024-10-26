@@ -272,8 +272,15 @@ public class GestorPistas {
             System.out.println("No hay pistas no disponibles en este momento.");
         } else {
             System.out.println("Pistas no disponibles:");
+            System.out.println("----------------------------");
             for (Pista pista : pistasNoDisponibles) {
-                System.out.println(pista);
+                System.out.println("Nombre: " + pista.getNombre());
+                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
+                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
+                System.out.println("Tamaño: " + pista.getTamanoPista());
+                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
+                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
+                System.out.println("----------------------------");
             }
         }
     }
@@ -313,8 +320,15 @@ public class GestorPistas {
             System.out.println("No hay pistas libres que cumplan con los requisitos especificados.");
         } else {
             System.out.println("Pistas libres disponibles para " + numeroJugadores + " jugadores:");
+            System.out.println("----------------------------");
             for (Pista pista : pistasLibres) {
-                System.out.println(pista);
+                System.out.println("Nombre: " + pista.getNombre());
+                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
+                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
+                System.out.println("Tamaño: " + pista.getTamanoPista());
+                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
+                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
+                System.out.println("----------------------------");
             }
         }
     }
@@ -327,8 +341,15 @@ public class GestorPistas {
             System.out.println("No hay pistas registradas.");
         } else {
             System.out.println("Lista de todas las pistas:");
+            System.out.println("----------------------------");
             for (Pista pista : pistas) {
-                System.out.println(pista);
+                System.out.println("Nombre: " + pista.getNombre());
+                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
+                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
+                System.out.println("Tamaño: " + pista.getTamanoPista());
+                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
+                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
+                System.out.println("----------------------------");
             }
         }
     }
