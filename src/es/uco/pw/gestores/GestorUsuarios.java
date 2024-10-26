@@ -69,8 +69,8 @@ public class GestorUsuarios {
             BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo, true));
 
             // Escribimos la información del usuario en una nueva línea
-            writer.write(newJugador.getNombreCompleto() + ", " + 
-                         new SimpleDateFormat("dd/MM/yyyy").format(newJugador.getFechaNacimiento()) + ", " +
+            writer.write(newJugador.getNombreCompleto() + ";" + 
+                         new SimpleDateFormat("dd/MM/yyyy").format(newJugador.getFechaNacimiento()) + ";" +
                          newJugador.getCorreoElectronico());
             writer.newLine(); // Añadir salto de línea
             writer.close(); // Cerrar el archivo
@@ -106,15 +106,15 @@ public class GestorUsuarios {
             // Leemos cada línea del archivo
             while ((linea = reader.readLine()) != null) {
                 // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-                String[] datos = linea.split(", ");
+                String[] datos = linea.split(";");
 
                 if (datos.length == 3) {
                     String correo = datos[2];
 
                     // Si encontramos el usuario, lo actualizamos
                     if (correo.equals(correoElectronico)) {
-                        String nuevaLinea = nuevoJugador.getNombreCompleto() + ", " +
-                                            new SimpleDateFormat("dd/MM/yyyy").format(nuevoJugador.getFechaNacimiento()) + ", " +
+                        String nuevaLinea = nuevoJugador.getNombreCompleto() + ";" +
+                                            new SimpleDateFormat("dd/MM/yyyy").format(nuevoJugador.getFechaNacimiento()) + ";" +
                                             nuevoJugador.getCorreoElectronico();
                         lineas.add(nuevaLinea);
                         usuarioModificado = true;
@@ -170,7 +170,7 @@ public class GestorUsuarios {
             // Leemos cada línea del archivo
             while ((linea = reader.readLine()) != null) {
                 // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-                String[] datos = linea.split(", ");
+                String[] datos = linea.split(";");
 
                 if (datos.length == 3) {
                     hayUsuarios = true; // Se encontró al menos un usuario
@@ -220,7 +220,7 @@ public class GestorUsuarios {
 	        // Leemos cada línea del archivo
 	        while ((linea = reader.readLine()) != null) {
 	            // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-	            String[] datos = linea.split(", ");
+	            String[] datos = linea.split(";");
 
 	            if (datos.length == 3) {
 	                String nombreCompleto = datos[0];
