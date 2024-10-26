@@ -1,1 +1,2 @@
 Baloncesto;true;true;ADULTOS;10
+Baloncesto;true;true;ADULTOS;50

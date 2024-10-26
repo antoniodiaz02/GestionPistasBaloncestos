@@ -32,11 +32,15 @@ public class MenuUsuarios {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Muestra el Menú usuario.
+     */
+    
     public void mostrarMenu() {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("---- Menú Gestión de Usuarios ----");
+            System.out.println("\n---- Menú Gestión de Usuarios ----");
             System.out.println("1. Insertar nuevo usuario");
             System.out.println("2. Listar usuarios");
             System.out.println("3. Modificar usuario");
@@ -71,6 +75,10 @@ public class MenuUsuarios {
         }
     }
 
+    /**
+     * Inserta un usuario al fichero
+     * @throws ParseException Si ocurre un error en la fecha
+     */
     private void insertarUsuario() {
         try {
             System.out.println("Introduce los datos del nuevo usuario:");
@@ -88,38 +96,44 @@ public class MenuUsuarios {
             int codigo = gestor.insertarUsuario(nuevoJugador);
 
             if (codigo == 1) {
-                System.out.println("Usuario añadido correctamente.");
+                System.out.println("\n Usuario añadido correctamente.");
             } else if (codigo == -2) {
-                System.out.println("El usuario ya está registrado.");
+                System.out.println("\n El usuario ya está registrado.");
             } else {
-                System.out.println("Error al añadir el usuario.");
+                System.out.println("\nError al añadir el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("Formato de fecha incorrecto.");
+            System.out.println("\n Formato de fecha incorrecto.");
         }
     }
 
+    /**
+     * Lista los usuarios del fichero usuarios
+     */
     private void listarUsuarios() {
         int resultadoListar = gestor.listarUsuarios();
         if (resultadoListar == -1) {
-            System.out.println("No hay usuarios registrados.");
+            System.out.println("\n No hay usuarios registrados.");
         } else if (resultadoListar == -2) {
-            System.out.println("Error al listar usuarios.");
+            System.out.println("\n Error al listar usuarios.");
         }
     }
 
+    /**
+     * Modifica los datos del usuario a elegir.
+     */
     private void modificarUsuario() {
         try {
-            System.out.print("Introduce el correo del usuario a modificar: ");
+            System.out.print("\n Introduce el correo del usuario a modificar: ");
             String correoModificar = scanner.nextLine();
             Jugador jugadorExistente = gestor.buscarUsuarioPorCorreo(correoModificar);
 
             if (jugadorExistente == null) {
-                System.out.println("Usuario no encontrado.");
+                System.out.println("\n Usuario no encontrado.");
                 return;
             }
 
-            System.out.println("¿Qué deseas modificar?");
+            System.out.println("\n ¿Qué deseas modificar?");
             System.out.println("1. Nombre completo");
             System.out.println("2. Fecha de nacimiento");
             System.out.println("3. Correo electrónico");
@@ -129,42 +143,42 @@ public class MenuUsuarios {
 
             switch (opcionModificar) {
                 case 1:
-                    System.out.print("Introduce el nuevo nombre completo: ");
+                    System.out.print("\n Introduce el nuevo nombre completo: ");
                     String nuevoNombre = scanner.nextLine();
                     jugadorExistente.setNombreCompleto(nuevoNombre);
                     break;
 
                 case 2:
-                    System.out.print("Introduce la nueva fecha de nacimiento (dd/MM/yyyy): ");
+                    System.out.print("\n Introduce la nueva fecha de nacimiento (dd/MM/yyyy): ");
                     String nuevaFechaStr = scanner.nextLine();
                     Date nuevaFecha = sdf.parse(nuevaFechaStr);
                     jugadorExistente.setFechaNacimiento(nuevaFecha);
                     break;
 
                 case 3:
-                    System.out.print("Introduce el nuevo correo electrónico: ");
+                    System.out.print("\n Introduce el nuevo correo electrónico: ");
                     String nuevoCorreo = scanner.nextLine();
                     jugadorExistente.setCorreoElectronico(nuevoCorreo);
                     break;
 
                 default:
-                    System.out.println("Opción no válida.");
+                    System.out.println("\n Opción no válida.");
                     return;
             }
 
             // Llamar al método de modificación
             int resultadoModificar = gestor.modificarUsuario(correoModificar, jugadorExistente);
             if (resultadoModificar == 1) {
-                System.out.println("Usuario modificado correctamente.");
+                System.out.println("\n Usuario modificado correctamente.");
             } else if (resultadoModificar == 0) {
-                System.out.println("Usuario no encontrado.");
+                System.out.println("\n Usuario no encontrado.");
             } else {
-                System.out.println("Error al modificar el usuario.");
+                System.out.println("\n Error al modificar el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("Formato de fecha incorrecto.");
+            System.out.println("\n Formato de fecha incorrecto.");
         } catch (IOException e) {
-            System.out.println("Error al modificar el archivo.");
+            System.out.println("\n Error al modificar el archivo.");
         }
     }
 }

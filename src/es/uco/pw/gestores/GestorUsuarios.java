@@ -84,7 +84,6 @@ public class GestorUsuarios {
         return codigo;
     }
 	
-	
     /**
      * Modifica la información de un usuario existente identificado por su correo electrónico.
      * 
@@ -149,8 +148,7 @@ public class GestorUsuarios {
 
         return codigo;
     }
-    
-
+   
     /**
      * Lista todos los usuarios actualmente registrados en el archivo users.txt.
      * 
@@ -167,9 +165,8 @@ public class GestorUsuarios {
             boolean hayUsuarios = false;
 
             // Verificamos si el archivo contiene usuarios
-            System.out.println("Usuarios registrados:");
+            System.out.println("\n Usuarios registrados:");
             System.out.println("----------------------------");
-
             // Leemos cada línea del archivo
             while ((linea = reader.readLine()) != null) {
                 // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
@@ -247,13 +244,7 @@ public class GestorUsuarios {
 	    } catch (IOException | ParseException e) {
 	        System.out.println("Error al leer el archivo o procesar los datos: " + e.getMessage());
 	    }
-
 	    // Si no se encuentra el usuario
 	    return null;
 	}
-    
-
-
-	
-	
 }

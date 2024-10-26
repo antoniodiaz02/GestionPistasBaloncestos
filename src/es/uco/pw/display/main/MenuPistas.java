@@ -10,7 +10,16 @@ import es.uco.pw.data.Material.TipoMaterial;
 import es.uco.pw.data.Material.EstadoMaterial;
 import es.uco.pw.data.Pista.TamanoPista;
 import es.uco.pw.gestores.GestorPistas;
-
+/**
+ * Menu Pistas dentro del sistema.
+ * 
+ *  @author Antonio Diaz Barbancho
+ *  @author Carlos Marín Rodríguez 
+ *  @author Carlos De la Torre Frias (GM2)
+ *  @author Daniel Grande Rubio (GM2)
+ *  @since 08-10-2024
+ *  @version 1.0
+ */
 public class MenuPistas {
 
     private GestorPistas gestor;
@@ -21,6 +30,9 @@ public class MenuPistas {
         this.sc = new Scanner(System.in);
     }
 
+    /**
+     * Muestra el Menú Pistas.
+     */
     public void mostrarMenu() {
         boolean salir = false;
 
@@ -72,6 +84,9 @@ public class MenuPistas {
         }
     }
 
+    /**
+     * Crea la pista.
+     */
     private void crearPista() {
         System.out.print("Ingrese el nombre de la pista: ");
         String nombre = sc.nextLine();
@@ -96,6 +111,9 @@ public class MenuPistas {
         System.out.println("Pista creada exitosamente.");
     }
 
+    /**
+     * Crea el material.
+     */
     private void crearMaterial() {
         System.out.print("Ingrese el ID del material: ");
         int idMaterial = sc.nextInt();
@@ -121,6 +139,10 @@ public class MenuPistas {
         System.out.println("Material creado exitosamente.");
     }
 
+    
+    /**
+     * Asocia el material a la pista.
+     */
     private void asociarMaterialAPista() {
         System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
         String nombrePista = sc.nextLine();
@@ -163,6 +185,9 @@ public class MenuPistas {
         }
     }
 
+    /**
+     * Lista las pistas que no están disponibles.
+     */
     private void listarPistasNoDisponibles() {
         List<Pista> pistasNoDisponibles = gestor.listarPistasNoDisponibles();
 
@@ -176,6 +201,9 @@ public class MenuPistas {
         }
     }
 
+    /**
+     * Buscas las pistas que estan libres.
+     */
     private void buscarPistasLibres() {
         System.out.print("Ingrese el número mínimo de jugadores: ");
         int numeroJugadores = sc.nextInt();
@@ -195,6 +223,9 @@ public class MenuPistas {
         }
     }
 
+    /**
+     * Muestra todas las pitas
+     */
     private void mostrarTodasLasPistas() {
         gestor.imprimirTodasLasPistas();
     }
