@@ -48,10 +48,10 @@ public class Main {
                 	
                 case 4:
                 	// OPCION 4: Salir del Menu
-                	System.out.println("\n Saliendo del menú...");
+                	System.out.println("\n Saliendo del programa...");
                 	break;
                 default:
-                    System.out.println("\n Opción inválida. Por favor, seleccione una opción válida.");
+                    System.out.println("\n ERROR! Opción no válida. Por favor intente de nuevo.");
             }
         }
         sc.close();

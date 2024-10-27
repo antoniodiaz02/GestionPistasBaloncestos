@@ -37,12 +37,12 @@ public class MenuPistas {
 
         while (!salir) {
             System.out.println("\n===== Menú de Gestión de Pistas =====");
-            System.out.println("1. Crear Pista");
-            System.out.println("2. Crear Material");
-            System.out.println("3. Asociar Material a Pista");
-            System.out.println("4. Listar Pistas No Disponibles");
-            System.out.println("5. Buscar Pistas Libres");
-            System.out.println("6. Mostrar todas las Pistas");
+            System.out.println("  1. Crear Pista");
+            System.out.println("  2. Crear Material");
+            System.out.println("  3. Asociar Material a Pista");
+            System.out.println("  4. Listar Pistas No Disponibles");
+            System.out.println("  5. Buscar Pistas Libres");
+            System.out.println("  6. Mostrar todas las Pistas");
             System.out.println("7. Salir");
             System.out.print("Seleccione una opción: ");
 
@@ -74,7 +74,7 @@ public class MenuPistas {
                         System.out.println("Saliendo del menú...");
                         break;
                     default:
-                        System.out.println("Opción inválida, por favor intente nuevamente.");
+                        System.out.println(" ERROR! Opción no válida. Por favor intente de nuevo.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Por favor ingrese un número válido.");

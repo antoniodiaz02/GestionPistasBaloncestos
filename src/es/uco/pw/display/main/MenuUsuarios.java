@@ -41,9 +41,9 @@ public class MenuUsuarios {
 
         while (!salir) {
             System.out.println("\n---- Menú Gestión de Usuarios ----");
-            System.out.println("1. Insertar nuevo usuario");
-            System.out.println("2. Listar usuarios");
-            System.out.println("3. Modificar usuario");
+            System.out.println("  1. Insertar nuevo usuario");
+            System.out.println("  2. Listar usuarios");
+            System.out.println("  3. Modificar usuario");
             System.out.println("4. Salir");
             System.out.print("Elige una opción: ");
             int opcion = scanner.nextInt();
@@ -68,7 +68,7 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    System.out.println("Opción no válida.");
+                    System.out.println(" ERROR! Opción no válida. Por favor intente de nuevo.");
             }
 
             System.out.println(); // Salto de línea para separar las acciones
@@ -98,12 +98,12 @@ public class MenuUsuarios {
             if (codigo == 1) {
                 System.out.println("\n Usuario añadido correctamente.");
             } else if (codigo == -2) {
-                System.out.println("\n El usuario ya está registrado.");
+                System.out.println("\n ERROR! El usuario ya está registrado.");
             } else {
-                System.out.println("\nError al añadir el usuario.");
+                System.out.println("\n ERROR! Error al añadir el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("\n Formato de fecha incorrecto.");
+            System.out.println("\n ERROR! Formato de fecha incorrecto.");
         }
     }
 
@@ -113,9 +113,9 @@ public class MenuUsuarios {
     private void listarUsuarios() {
         int resultadoListar = gestor.listarUsuarios();
         if (resultadoListar == -1) {
-            System.out.println("\n No hay usuarios registrados.");
+            System.out.println("\n ERROR! No hay usuarios registrados.");
         } else if (resultadoListar == -2) {
-            System.out.println("\n Error al listar usuarios.");
+            System.out.println("\n ERROR! Error al listar usuarios.");
         }
     }
 
@@ -129,14 +129,14 @@ public class MenuUsuarios {
             Jugador jugadorExistente = gestor.buscarUsuarioPorCorreo(correoModificar);
 
             if (jugadorExistente == null) {
-                System.out.println("\n Usuario no encontrado.");
+                System.out.println("\n ERROR! Usuario no encontrado.");
                 return;
             }
 
-            System.out.println("\n ¿Qué deseas modificar?");
-            System.out.println("1. Nombre completo");
-            System.out.println("2. Fecha de nacimiento");
-            System.out.println("3. Correo electrónico");
+            System.out.println("\n  ¿Qué deseas modificar?");
+            System.out.println("    1. Nombre completo");
+            System.out.println("    2. Fecha de nacimiento");
+            System.out.println("    3. Correo electrónico");
             System.out.print("Elige una opción: ");
             int opcionModificar = scanner.nextInt();
             scanner.nextLine(); // Consumir el salto de línea
@@ -162,7 +162,7 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    System.out.println("\n Opción no válida.");
+                    System.out.println("\n ERROR! Opción no válida.");
                     return;
             }
 
@@ -173,12 +173,12 @@ public class MenuUsuarios {
             } else if (resultadoModificar == 0) {
                 System.out.println("\n Usuario no encontrado.");
             } else {
-                System.out.println("\n Error al modificar el usuario.");
+                System.out.println("\n ERROR! Error al modificar el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("\n Formato de fecha incorrecto.");
+            System.out.println("\n ERROR! Formato de fecha incorrecto.");
         } catch (IOException e) {
-            System.out.println("\n Error al modificar el archivo.");
+            System.out.println("\n ERROR! Error al modificar el archivo.");
         }
     }
 }

@@ -50,12 +50,27 @@ public class GestorReservas {
     public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva) {
         Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
-
-        // Si no existe el jugador y la pista devuelve false.
-        // Si la pista no está disponible devuelve false.
-        // Si se intenta reservar la pista 24 horas antes devuelve false.
         
-        if (jugador == null || pista == null || !pista.isDisponible() || plazoExcedido(fechaHora)) return false;
+        // Si no existe el jugador y la pista devuelve false.
+        if (jugador == null) {
+            System.out.println(" ERROR! El usuario no existe.");
+            return false;
+        }
+        if (pista == null) {
+            System.out.println(" ERROR! La pista no existe.");
+            return false;
+        }
+        
+        // Si la pista no está disponible devuelve false.
+        if (!pista.isDisponible()) {
+            System.out.println(" ERROR! La pista no está disponible.");
+            return false;
+        }
+        // Si se intenta reservar la pista 24 horas antes devuelve false.
+        if (plazoExcedido(fechaHora)) {
+            System.out.println(" ERROR! No se puede reservar una pista antes de 24 horas.");
+            return false;
+        }
 
         String id= generarIdentificadorUnico(rutaArchivoReservas);
         String idReserva = 'R' + id.substring(1);
@@ -93,22 +108,40 @@ public class GestorReservas {
 	 * @param numeroNinos Número de niños que acuden.
 	 * @param tipoReserva Clase Reserva que tiene más cantidad de detalles de la reserva como el tipo de reserva, el tamaño de la pista...
 	 * @param bonoId El identificador del bono con el que se va a realizar la reserva.
-	 * @param sesion Número de sesiones restantes del bono.
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
-    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva, String bonoId, int sesion) {
+    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva, String bonoId) {
     	Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
 
         // Si no existe el jugador y la pista devuelve false.
+        if (jugador == null) {
+            System.out.println(" ERROR! El usuario no existe.");
+            return false;
+        }
+        if (pista == null) {
+            System.out.println(" ERROR! La pista no existe.");
+            return false;
+        }
+        
         // Si la pista no está disponible devuelve false.
+        if (!pista.isDisponible()) {
+            System.out.println(" ERROR! La pista no está disponible.");
+            return false;
+        }
         // Si se intenta reservar la pista 24 horas antes devuelve false.
-        if (jugador == null || pista == null || !pista.isDisponible() || plazoExcedido(fechaHora)) return false;
+        if (plazoExcedido(fechaHora)) {
+            System.out.println(" ERROR! No se puede reservar una pista antes de 24 horas.");
+            return false;
+        }
         
         // 1. Comprobacion del bono si está disponible para poder hacer reservas. 
-        if(!comprobarBono(bonoId,correoUsuario,pista.getTamanoPista())) return false;
-        
+        if(!comprobarBono(bonoId,correoUsuario,pista.getTamanoPista())) {
+        	System.out.println(" ERROR! Error al comprobar el bono.");
+        	return false;
+        }        
 
+        int sesion= obtenerSesionesRestantes(bonoId);
         
         // 2. Realización de la reserva.
         String id= generarIdentificadorUnico(rutaArchivoReservas);
@@ -208,6 +241,7 @@ public class GestorReservas {
     			}
     		}
     	} catch (IOException e) {
+    		System.out.println(" ERROR! Error al generar el identificador unico: " + e.getMessage());
     		e.printStackTrace();
     	}
     	
@@ -257,16 +291,16 @@ public class GestorReservas {
 
             // Si la pista no fue encontrada en el archivo original, se puede manejar aquí (si fuera necesario)
             if (!pistaActualizada) {
-                System.out.println("Pista no encontrada para actualizar: " + pista.getNombre());
+                System.out.println(" ERROR! Pista no encontrada para actualizar: " + pista.getNombre());
             }
 
         } catch (IOException e) {
-            System.out.println("Error al actualizar la pista en el archivo: " + e.getMessage());
+            System.out.println(" ERROR! Error al actualizar la pista en el archivo: " + e.getMessage());
         }
 
         // Reemplazar el archivo original con el archivo temporal
         if (!archivoTemp.renameTo(archivo)) {
-            System.out.println("Error al reemplazar el archivo con la actualización.");
+            System.out.println(" ERROR! Error al reemplazar el archivo con la actualización.");
         }
     }
     
@@ -285,7 +319,7 @@ public class GestorReservas {
             case 120:
                 return 40.0f;
             default:
-                throw new IllegalArgumentException("Duración no permitida. Use 60, 90 o 120 minutos.");
+                throw new IllegalArgumentException(" ERROR! Duración no permitida. Use 60, 90 o 120 minutos.");
         }
     }
     
@@ -304,7 +338,7 @@ public class GestorReservas {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";");
-                if (datos[0].equals(correoElectronico)) {
+                if (datos[2].equals(correoElectronico)) {
                     // Ajustamos la conversión de fecha
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Ajusta el formato según cómo esté almacenada la fecha en el archivo
                     Date fechaNacimiento;
@@ -312,16 +346,16 @@ public class GestorReservas {
                     try {
                         fechaNacimiento = sdf.parse(datos[1]);  // Convertimos la fecha de nacimiento a Date
                     } catch (ParseException e) {
-                        System.out.println("Error al parsear la fecha de nacimiento: " + e.getMessage());
+                        System.out.println(" ERROR! Error al parsear la fecha de nacimiento: " + e.getMessage());
                         return null;
                     }
                     
                     // Creamos el objeto Jugador con los datos adaptados
-                    return new Jugador(datos[2], fechaNacimiento, datos[0]); // nombreCompleto, fechaNacimiento, correoElectronico
+                    return new Jugador(datos[0], fechaNacimiento, datos[2]); // nombreCompleto, fechaNacimiento, correoElectronico
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al buscar jugador: " + e.getMessage());
+            System.out.println(" ERROR! Error al buscar jugador: " + e.getMessage());
         }
         return null;
     }
@@ -342,12 +376,12 @@ public class GestorReservas {
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";");
                 if (datos[0].equals(nombre)) {
-                    return new Pista(datos[0], Boolean.parseBoolean(datos[2]), Boolean.parseBoolean(datos[3]), Pista.TamanoPista.valueOf(datos[1]), Integer.parseInt(datos[4]));
+                    return new Pista(datos[0], Boolean.parseBoolean(datos[1]), Boolean.parseBoolean(datos[2]), Pista.TamanoPista.valueOf(datos[3]), Integer.parseInt(datos[4]));
 
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al buscar pista: " + e.getMessage());
+            System.out.println(" ERROR! Error al buscar pista: " + e.getMessage());
         }
         return null;
     }
@@ -381,7 +415,7 @@ public class GestorReservas {
             bw.write(linea);
             bw.newLine();
         } catch (IOException e) {
-            System.out.println("Error al guardar reserva en el archivo: " + e.getMessage());
+            System.out.println(" ERROR! Error al guardar reserva en el archivo: " + e.getMessage());
         }
     }
     
@@ -414,7 +448,7 @@ public class GestorReservas {
     				
     				//Si hay fecha se guarda
     				if (fields.length >= 5) {
-    					SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     					fechaBono = sdf.parse(fields[4].trim());
     				}
     				
@@ -423,6 +457,7 @@ public class GestorReservas {
     				
     				//Comprueba si se realiza una reserva del mismo tamaño de pista que el del bono.
     				if(tamanoBono!=tamano) {
+    					System.out.println(" ERROR! La reserva que se intenta hacer no es del mismo tipo de tamaño de pista que el del bono.");
     					return false;
     				}
     				break;
@@ -430,22 +465,36 @@ public class GestorReservas {
     			
     		}
     	} catch (IOException | ParseException e) {
+    		System.out.println(" ERROR! Error al hacer el parseo.");
     		e.printStackTrace();
     		return false;
     	}
     	
     	// Comprobar que el bono existe, y tiene sesiones disponibles.
-    	if (!bonoFound || sesiones <= 0) return false;
+    	if (!bonoFound) {
+    		System.out.println(" ERROR! El bono ya no existe.");
+    		return false;
+    	}
+    	
+    	if (sesiones == 0) {
+    		System.out.println(" ERROR! El bono ya no le quedan sesiones");
+    	}
     	
     	// Comprobar que el bono pertenece al usuario que intenta acceder a él.
-    	if (!correoPropietario.equals(correoUsuario)) return false;
+    	if (!correoPropietario.equals(correoUsuario)) {
+    		System.out.println(" ERROR! El bono no es del propietario que intenta hacer la reserva.");
+    		return false;
+    	}
     	
     	// Verificar que la fecha del bono no exceda en un año la fecha actual
     	if (fechaBono != null) {
     	    Calendar cal = Calendar.getInstance();
     	    cal.setTime(fechaBono);
     	    cal.add(Calendar.YEAR, 1);
-    	    if (new Date().after(cal.getTime())) return false;
+    	    if (new Date().after(cal.getTime())) {
+    	    	System.out.println(" ERROR! El bono está caducado.");
+    	    	return false;
+    	    }
     	}
     	
     	return true; // El bono es válido
@@ -476,7 +525,7 @@ public class GestorReservas {
 	
 	                // Verificar si es la primera reserva que realiza el bono.
 	                if (sesiones == 5) {
-	                	SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	                	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	                    String fechaActual = sdf.format(new Date());
 	                    writer.println(fields[0] + ";" + fields[1] + ";" + fields[2] + ";" + (sesiones - 1) + ";" + fechaActual);
 	                } else {
@@ -558,13 +607,13 @@ public class GestorReservas {
                     String fechaHoraString = datos[4];
                     
                     try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                         fecha = sdf.parse(fechaHoraString);
                         Date fechaActual = new Date();
                         esFutura = fecha.after(fechaActual);
                     } catch (ParseException e) {
                         System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
-                                           "Formato esperado: dd-MM-yyyy HH:mm:ss.");
+                                           "Formato esperado: dd/MM/yyyy HH:mm.");
                         continue; // Saltar a la siguiente línea en caso de error
                     }
                     
@@ -699,7 +748,7 @@ public class GestorReservas {
 	 */
 	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
 	    int codigo = 0;
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy"); // Solo la fecha, sin hora
+	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Solo la fecha, sin hora
 
 	    // Crear un calendario para establecer el tiempo a medianoche
 	    Calendar calBuscada = Calendar.getInstance();
@@ -735,7 +784,7 @@ public class GestorReservas {
 	                Date fechaReserva;
 	                try {
 	                    // Aquí se asume que la fecha en el archivo incluye la hora
-	                    SimpleDateFormat sdfReserva = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	                    SimpleDateFormat sdfReserva = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	                    fechaReserva = sdfReserva.parse(fechaHoraString);
 
 	                    // Ajustar la fecha de la reserva a medianoche
@@ -813,7 +862,7 @@ public class GestorReservas {
 	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
 	        BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoTemporal));
 	        String linea;
-	        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 	        while ((linea = reader.readLine()) != null) {
 	            String[] datos = linea.split(";");
@@ -867,4 +916,42 @@ public class GestorReservas {
 	    return reservaEliminada;
 	}
 	
+	
+	/**
+	 * Función que obtiene el numero de sesiones restantes de un bono.
+	 * @param bonoId Identificador único del bono a buscar.
+	 * @return sesionesRestantes Es la cantidad de sesiones que le quedan al bono.
+	 */
+	public int obtenerSesionesRestantes(String bonoId) {
+	    File archivoBonos = new File(rutaArchivoBonos);
+	    int sesionesRestantes = -1; // Inicializamos con un valor de error por defecto (-1)
+
+	    try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos))) {
+	        String linea;
+
+	        // Leemos línea por línea
+	        while ((linea = reader.readLine()) != null) {
+	            String[] datos = linea.split(";"); // Asumimos que los campos están separados por ';'
+
+	            if (datos.length >= 4 && datos[0].equals(bonoId)) {
+	                // Si encontramos el bono con el ID correcto
+	                try {
+	                    sesionesRestantes = Integer.parseInt(datos[3].trim()); // El cuarto elemento es el número de sesiones
+	                } catch (NumberFormatException e) {
+	                    System.out.println("ERROR! El formato del número de sesiones no es válido.");
+	                }
+	                break; // Salimos del bucle si encontramos el bono
+	            }
+	        }
+
+	    } catch (IOException e) {
+	        System.out.println(" ERROR! No se pudo leer el archivo de bonos: " + e.getMessage());
+	    }
+
+	    if (sesionesRestantes == -1) {
+	        System.out.println(" ERROR! No se encontró el bono con ID: " + bonoId);
+	    }
+
+	    return sesionesRestantes;
+	}
 }
