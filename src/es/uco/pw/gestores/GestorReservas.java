@@ -216,12 +216,58 @@ public class GestorReservas {
     
     
     /**
-	 * 
-	 * @param pista
-	 * @return 
-	 */
+     * Actualiza la información de una pista en el archivo de pistas.
+     * Crea un archivo temporal, copia cada línea del archivo original al temporal,
+     * y aplica los cambios cuando encuentra la pista específica.
+     * Al finalizar, reemplaza el archivo original por el archivo temporal.
+     *
+     * @param pista La pista a actualizar con su información modificada.
+     */
     private void actualizarPistaEnArchivo(Pista pista) {
-        // Método para actualizar una pista en el archivo (implementación puede variar)
+        File archivo = new File(rutaArchivoPistas);
+        File archivoTemp = new File(rutaArchivoPistas + ".tmp");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(archivo));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(archivoTemp))) {
+
+            String linea;
+            boolean pistaActualizada = false;
+
+            // Leer cada línea y copiarla al archivo temporal con los cambios aplicados
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(";");
+                String nombrePista = datos[0];
+
+                // Si encontramos la pista a actualizar
+                if (nombrePista.equals(pista.getNombre())) {
+                    // Actualizamos la información de la pista
+                    String nuevaLinea = pista.getNombre() + ";" +
+                                        pista.getTamanoPista().toString() + ";" +
+                                        pista.isDisponible() + ";" +
+                                        pista.isInterior() + ";" +
+                                        pista.getMaxJugadores();
+                    writer.write(nuevaLinea);
+                    pistaActualizada = true;
+                } else {
+                    // Copiar la línea original sin cambios
+                    writer.write(linea);
+                }
+                writer.newLine();
+            }
+
+            // Si la pista no fue encontrada en el archivo original, se puede manejar aquí (si fuera necesario)
+            if (!pistaActualizada) {
+                System.out.println("Pista no encontrada para actualizar: " + pista.getNombre());
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error al actualizar la pista en el archivo: " + e.getMessage());
+        }
+
+        // Reemplazar el archivo original con el archivo temporal
+        if (!archivoTemp.renameTo(archivo)) {
+            System.out.println("Error al reemplazar el archivo con la actualización.");
+        }
     }
     
     
@@ -245,10 +291,14 @@ public class GestorReservas {
     
     
     /**
-	 *
-	 * @param correoElectronico 
-	 * @return 
-	 */
+     * Busca y devuelve un objeto Jugador a partir de su correo electrónico.
+     * Lee el archivo de jugadores línea por línea hasta encontrar el correo electrónico solicitado.
+     * Luego, convierte los datos en un objeto Jugador.
+     *
+     * @param correoElectronico Correo electrónico del jugador a buscar.
+     * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
+     *         o si ocurre algún error.
+     */
     private Jugador buscarJugador(String correoElectronico) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
             String linea;
@@ -256,7 +306,7 @@ public class GestorReservas {
                 String[] datos = linea.split(";");
                 if (datos[0].equals(correoElectronico)) {
                     // Ajustamos la conversión de fecha
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy"); // Ajusta el formato según cómo esté almacenada la fecha en el archivo
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Ajusta el formato según cómo esté almacenada la fecha en el archivo
                     Date fechaNacimiento;
                     
                     try {
@@ -278,10 +328,14 @@ public class GestorReservas {
     
     
     /**
-	 * 
-	 * @param nombre 
-	 * @return 
-	 */
+     * Busca y devuelve un objeto Pista a partir de su nombre.
+     * Lee el archivo de pistas línea por línea hasta encontrar el nombre de pista solicitado.
+     * Luego, convierte los datos en un objeto Pista.
+     *
+     * @param nombre Nombre de la pista a buscar.
+     * @return Un objeto Pista si el nombre existe en el archivo, o null si no se encuentra
+     *         o si ocurre algún error.
+     */
     private Pista buscarPista(String nombre) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoPistas))) {
             String linea;

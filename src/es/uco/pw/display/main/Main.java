@@ -42,6 +42,8 @@ public class Main {
                     
                 case 3:
                 	// OPCION 3: LLamar al menú de gestión de reservas
+                    MenuReservas menuReservas = new MenuReservas();
+                    menuReservas.mostrarMenu(); // Llamar al método mostrarMenu de MenuReservas
                     break;
                 	
                 case 4:
