@@ -28,10 +28,25 @@ public class GestorReservas {
     private final String rutaArchivoReservas = "src/es/uco/pw/files/reservas.txt";
     private final String rutaArchivoBonos = "src/es/uco/pw/files/bonos.txt";
 
+    /**
+     * Constructor de la clase GestorReservas.
+     */
     public GestorReservas() {
         // Constructor vacío si no tenemos nada que inicializar
     }
+    
 	
+    /**
+	 * Realiza una reserva individual (sin bono).
+	 * @param correoUsuario Correo del usuario que realiza la reserva.
+	 * @param nombrePista Nombre de la pista a reservar.
+	 * @param fechaHora Día y hora de la reserva de la pista.
+	 * @param duracion Tiempo de duración de la reserva (30, 60 ó 120 mins).
+	 * @param numeroAdultos Número de adultos que acuden.
+	 * @param numeroNinos Número de niños que acuden.
+	 * @param tipoReserva Clase Reserva que tiene más cantidad de detalles de la reserva como el tipo de reserva, el tamaño de la pista...
+	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
+	 */
     public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva) {
         Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
@@ -67,6 +82,20 @@ public class GestorReservas {
         return false;
     }
     
+    
+    /**
+	 * Realiza una reserva con bono.
+	 * @param correoUsuario Correo del usuario que realiza la reserva.
+	 * @param nombrePista Nombre de la pista a reservar.
+	 * @param fechaHora Día y hora de la reserva de la pista.
+	 * @param duracion Tiempo de duración de la reserva (30, 60 ó 120 mins).
+	 * @param numeroAdultos Número de adultos que acuden.
+	 * @param numeroNinos Número de niños que acuden.
+	 * @param tipoReserva Clase Reserva que tiene más cantidad de detalles de la reserva como el tipo de reserva, el tamaño de la pista...
+	 * @param bonoId El identificador del bono con el que se va a realizar la reserva.
+	 * @param sesion Número de sesiones restantes del bono.
+	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
+	 */
     public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva, String bonoId, int sesion) {
     	Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
@@ -77,7 +106,7 @@ public class GestorReservas {
         if (jugador == null || pista == null || !pista.isDisponible() || plazoExcedido(fechaHora)) return false;
         
         // 1. Comprobacion del bono si está disponible para poder hacer reservas. 
-        if(!comprobarBono(bonoId,correoUsuario)) return false;
+        if(!comprobarBono(bonoId,correoUsuario,pista.getTamanoPista())) return false;
         
 
         
@@ -112,6 +141,13 @@ public class GestorReservas {
         
     }	
     
+    
+    /**
+	 * Genera un nuevo bono de usuario.
+	 * @param correoUsuario Correo del usuario que pide el bono.
+	 * @param tamano Tipo de pista a la que asignar el bono.
+	 * @return Devuelve true si el procedimiento de creacion del bono se ha hecho de manera correcta, y false si hay algo que falla.
+	 */
     public boolean hacerNuevoBono(String correoUsuario, TamanoPista tamano){
     	Jugador jugador = buscarJugador(correoUsuario);
     	if (jugador == null) return false;
@@ -135,10 +171,14 @@ public class GestorReservas {
     	
     	// Si todo fue bien, retornamos true
     	return true;
-    	
     }
     
-    // Función para generar el identificador único del bono
+    
+    /**
+	 * Genera un identificador unico respecto al último identificador del archivo.
+	 * @param rutaArchivo El archivo del que coger referencia para generar el identificador único.
+	 * @return Devuelve true si el procedimiento de generar el código único es correcto, y false si ha habido algún error.
+	 */
     private String generarIdentificadorUnico(String rutaArchivo) {
     	String ultimoId = "B_0000";  // Identificador inicial si el archivo está vacío o no existe
     	String patron = "B_(\\d{4})"; // Expresión regular para identificar el formato B_XXXX
@@ -174,10 +214,22 @@ public class GestorReservas {
     	return ultimoId;
     }
     
+    
+    /**
+	 * 
+	 * @param pista
+	 * @return 
+	 */
     private void actualizarPistaEnArchivo(Pista pista) {
         // Método para actualizar una pista en el archivo (implementación puede variar)
     }
     
+    
+    /**
+	 * Función que calcula el precio de reserva respecto al tiempo que se quiere reservar.
+	 * @param duracion Tiempo de duración de la reserva.
+	 * @return Devuelve el precio total de reserva sin descuento respecto al tiempo de reserva.
+	 */
     private float calcularPrecio(int duracion) {
         switch (duracion) {
             case 60:
@@ -190,7 +242,13 @@ public class GestorReservas {
                 throw new IllegalArgumentException("Duración no permitida. Use 60, 90 o 120 minutos.");
         }
     }
-
+    
+    
+    /**
+	 *
+	 * @param correoElectronico 
+	 * @return 
+	 */
     private Jugador buscarJugador(String correoElectronico) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
             String linea;
@@ -217,7 +275,13 @@ public class GestorReservas {
         }
         return null;
     }
-
+    
+    
+    /**
+	 * 
+	 * @param nombre 
+	 * @return 
+	 */
     private Pista buscarPista(String nombre) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoPistas))) {
             String linea;
@@ -234,6 +298,12 @@ public class GestorReservas {
         return null;
     }
     
+    
+    /**
+	 * Guarda la reserva en el archivo reservas.txt
+	 * @param reserva Clase Reserva que tiene todos los datos de la reserva.
+	 * @param idReserva Identificador único de la reserva.
+	 */
     private void guardarReservaEnArchivo(Reserva reserva, String idReserva) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivoReservas, true))) {
             String tipoReserva;
@@ -261,7 +331,16 @@ public class GestorReservas {
         }
     }
     
-    public boolean comprobarBono(String bonoId, String correoUsuario) {
+    
+    /**
+	 * Comprueba si el bono tiene sesiones disponibles, si no está caducado, si el bono es de la persona que intenta aceder a él 
+	 * y si la reserva que se quiere hacer con el bono, es a una pista del mismo tamaño que del bono.
+	 * @param bonoId Identificador único del bono.
+	 * @param idReserva Identificador único de la reserva.
+	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si contradice una de las condiciones
+	 * 		   o si ha habido un error.
+	 */
+    public boolean comprobarBono(String bonoId, String correoUsuario, TamanoPista tamano) {
     	File archivoBonos = new File(rutaArchivoBonos);
     	
     	boolean bonoFound = false;
@@ -283,6 +362,14 @@ public class GestorReservas {
     				if (fields.length >= 5) {
     					SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     					fechaBono = sdf.parse(fields[4].trim());
+    				}
+    				
+    				String tamanoString= fields[2];
+    				TamanoPista tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
+    				
+    				//Comprueba si se realiza una reserva del mismo tamaño de pista que el del bono.
+    				if(tamanoBono!=tamano) {
+    					return false;
     				}
     				break;
     			}
@@ -310,6 +397,12 @@ public class GestorReservas {
     	return true; // El bono es válido
     }
 
+    
+    /**
+	 * Función que decrementa el numero de sesiones del bono y que añade la fecha al final si es la primera reserva del bono.
+	 * @param bonoId Identificador único del bono.
+	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si ha habido algun error.
+	 */
 	public boolean actualizarSesionesBono(String bonoId) {
 	    File archivoBonos = new File(rutaArchivoBonos);
 	    File tempFile = new File(archivoBonos.getAbsolutePath() + ".tmp");
@@ -359,6 +452,12 @@ public class GestorReservas {
 	    return true;
 	}
 	
+	
+	/**
+	 * Función que calcula si se ha excedido el plazo de 24 horas anterior a la reservas.
+	 * @param fechaRecibida Fecha de la reserva que se quiere comprobar.
+	 * @return Devuelve true si se excedió el plazo, y devuelve false si no se ha excedido el plazo. 
+	 */
 	public static boolean plazoExcedido(Date fechaRecibida) {
 
         Date fechaActual = new Date();
@@ -371,6 +470,11 @@ public class GestorReservas {
         return fechaActual.after(cal.getTime());
     }
 	
+	
+	/**
+	 * Función que muestra todos los detalles de las reservas futuras.
+	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
+	 */
 	public int listarReservasFuturas() {
         int codigo = 0;
 
@@ -459,6 +563,13 @@ public class GestorReservas {
         return codigo;
     }
 	
+	
+	/**
+	 * Función que modifica una reserva buscada por identificador único.
+	 * @param idReserva Identificador único de la reserva a modificar.
+	 * @param nuevaReserva Clase Reserva con todos los nuevos detalles modificados.
+	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
+	 */
 	public int modificarReserva(String idReserva, Reserva nuevaReserva) throws IOException {
         int codigo = 0;
         List<String> lineas = new ArrayList<>();
@@ -525,6 +636,13 @@ public class GestorReservas {
         return codigo;
     }
 	
+	
+	/**
+	 * Función que calcula si muestra todos los detalles de las reservas con una fecha y pista exacta.
+	 * @param fechaBuscada Fecha de la reserva a filtrar.
+	 * @param idPista Identificador de la pista a filtrar.
+	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
+	 */
 	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
 	    int codigo = 0;
 	    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy"); // Solo la fecha, sin hora
@@ -601,7 +719,7 @@ public class GestorReservas {
 	                            System.out.println("Número de adultos: " + numAdultos);
 	                        }
 
-	                        System.out.println("----------------------------");
+	                        System.out.println("-----------------------------------");
 	                    }
 	                } catch (ParseException e) {
 	                    System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
@@ -627,6 +745,72 @@ public class GestorReservas {
 	    return codigo;
 	}
 	
+	
+	/**
+	 * Función que cancela una reserva si no se ha excedido el plazo de 24 horas antes.
+	 * @param idReserva Identificador único de la reserva a cancelar.
+	 * @return Devuelve true si consiguió borrar la reserva del fichero correctamente, y devuelve false si hubo algún error.
+	 */
+	public boolean cancelarReserva(String idReserva) {
+	    String rutaArchivoTemporal = "src/es/uco/pw/files/temp.txt"; // Archivo temporal para copiar el contenido
+	    boolean reservaEliminada = false;
+
+	    try {
+	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
+	        BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoTemporal));
+	        String linea;
+	        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+	        while ((linea = reader.readLine()) != null) {
+	            String[] datos = linea.split(";");
+	            if (datos.length >= 9) {
+	                String id = datos[0]; // Identificador de la reserva
+	                String fechaHoraString = datos[4]; // FechaHora de la reserva
+
+	                if (id.equals(idReserva)) {
+	                    try {
+	                        Date fechaReserva = sdf.parse(fechaHoraString);
+
+	                        // Comprobar si la fecha de la reserva es dentro de las últimas 24 horas
+
+	                        if (!plazoExcedido(fechaReserva)) {
+	                            // Si la reserva es válida para eliminar (aún no ha pasado 24 horas antes), no copiar la línea
+	                            reservaEliminada = true;
+	                            System.out.println("<La reserva con ID " + id + " ha sido eliminada.>");
+	                            continue;
+	                        } else {
+	                            // Si ya pasó el plazo de 24 horas, mantenemos la línea en el archivo
+	                            System.out.println("No se puede eliminar la reserva, ya ha pasado el plazo de 24 horas.");
+	                        }
+	                    } catch (ParseException e) {
+	                        System.out.println("Error al parsear la fecha de la reserva: " + fechaHoraString);
+	                        writer.write(linea); // En caso de error en la fecha, no eliminar la reserva
+	                    }
+	                } else {
+	                    // Si no es la reserva buscada, copiamos la línea al archivo temporal
+	                    writer.write(linea);
+	                }
+
+	                writer.newLine(); // Añadir la nueva línea después de escribir en el archivo
+	            }
+	        }
+
+	        reader.close();
+	        writer.close();
+
+	        // Reemplazamos el archivo original con el archivo temporal
+	        File archivoOriginal = new File(rutaArchivoReservas);
+	        File archivoTemporal = new File(rutaArchivoTemporal);
+	        if (archivoOriginal.delete()) {
+	            archivoTemporal.renameTo(archivoOriginal);
+	        }
+
+	    } catch (IOException e) {
+	        System.out.println("Error al procesar el archivo: " + e.getMessage());
+	        return false;
+	    }
+
+	    return reservaEliminada;
+	}
+	
 }
-
-
