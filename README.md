@@ -4,12 +4,12 @@
 Este programa permite la gestión de un sistema de reservas con tres módulos principales, 
 **Menú pistas** , **Menú usuarios** y **Menú reservas**.
 
-Dicho proyecto está programado en Java y cuenta con el código fuente, la documentación Javadoc del mismo y por último un Runnable Java el cual permite la ejecucción del mismo.
+Dicho programa está programado en Java y cuenta con el código fuente, la documentación Javadoc del mismo y por último un Runnable Java el cual permite la ejecucción del mismo.
 
 ## Requisitos para la ejecución.
 
     ● JavaRuntime Environment(JRE) versión 8 o superior.
-    ● Archivo ejecutable.jar proporcionado en el repositorio.
+    ● Archivo ejecutable.jar
 
 ## Instalación y ejecución.
 

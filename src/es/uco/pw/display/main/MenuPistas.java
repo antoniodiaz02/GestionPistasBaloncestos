@@ -10,8 +10,6 @@ import es.uco.pw.data.Material.EstadoMaterial;
 import es.uco.pw.data.Pista.TamanoPista;
 import es.uco.pw.gestores.GestorPistas;
 /**
- * Menu Pistas dentro del sistema.
- * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
  *  @author Carlos De la Torre Frias (GM2)
@@ -19,11 +17,18 @@ import es.uco.pw.gestores.GestorPistas;
  *  @since 08-10-2024
  *  @version 1.0
  */
+
+/**
+* Menu Pistas dentro del sistema.
+ */
 public class MenuPistas {
 
     private GestorPistas gestor;
     private Scanner sc;
 
+    /**
+    * Constructor de la clase MenuPistas
+     */
     public MenuPistas() {
         this.gestor = new GestorPistas();
         this.sc = new Scanner(System.in);
@@ -82,7 +87,6 @@ public class MenuPistas {
             }
         }
     }
-
     /**
      * Crea la pista.
      */
@@ -213,6 +217,13 @@ public class MenuPistas {
         gestor.imprimirTodasLasPistas();
     }
 
+    /**
+     * Método principal que inicia la ejecución del programa.
+     * Este método crea una instancia de la clase MenuPistas y llama
+     * al método mostrarMenu para presentar al usuario el menú.
+     *
+     * @param args Argumentos de línea de comandos.
+     */
     public static void main(String[] args) {
         MenuPistas menu = new MenuPistas();
         menu.mostrarMenu();

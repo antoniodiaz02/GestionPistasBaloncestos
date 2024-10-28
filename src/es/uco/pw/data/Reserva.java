@@ -55,13 +55,13 @@ public abstract class Reserva {
     private int sesion; 
 
     /**
-     * Constructor parametrizable de la clase Reserva
-     * @param idUsuario
-     * @param fechaHora
-     * @param duracionMinutos
-     * @param idPista
-     * @param precio
-     * @param descuento
+     * Constructor parametrizable de la clase Reserva.
+     * @param idUsuario Id del usuario.
+     * @param fechaHora Fecha hora.
+     * @param duracionMinutos Duracion en minutos.
+     * @param idPista Identificador de la pista.
+     * @param precio Precio.
+     * @param descuento Descuento a aplicar.
      */
     public Reserva(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
         this.usuarioId = idUsuario;

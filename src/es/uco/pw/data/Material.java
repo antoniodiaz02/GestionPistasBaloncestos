@@ -33,7 +33,11 @@ public class Material{
 	 */
     private EstadoMaterial estadoMaterial;
 	
-    
+    /**
+     * Enumeración que representa los diferentes estados posibles de un material.
+     * Este enum permite categorizar el estado del material dentro del sistema,
+     * facilitando así la gestión y el control de los recursos disponibles.
+     */
     public enum TipoMaterial {
     	
     	/**
@@ -52,6 +56,10 @@ public class Material{
         CONOS
     }
     
+    /**
+     * Enumeración que representa los diferentes estados posibles de un material.
+     * Esta enumeración permite clasificar el estado del material dentro del sistema.
+     */
     public enum EstadoMaterial {
     	
     	/**
@@ -94,7 +102,6 @@ public class Material{
     
     /**
      * Devuelve el id del material
-     * @param idMaterial Para el identificador del material
      * @return idMaterial El id del material
  	*/
     public int getIdMaterial() {
@@ -119,7 +126,7 @@ public class Material{
 
 	/**
 	 * Modifica el uso del interior
-	 * @param usoMaterial 
+	 * @param usoInterior Uso interior 
 	 */
 	public void setUsoInterior(boolean usoInterior) {
 		this.usoInterior = usoInterior;

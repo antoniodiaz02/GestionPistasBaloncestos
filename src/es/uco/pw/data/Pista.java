@@ -45,8 +45,31 @@ public class Pista {
      */
     private List<Material> materiales;
 
+    /**
+     * Enumeración que representa los diferentes tamaños de las pistas de baloncesto.
+     * Esta enumeración se utiliza para clasificar las pistas según su tamaño y 
+     * el tipo de juego que se puede llevar a cabo en ellas, facilitando la 
+     * gestión y la asignación adecuada de recursos.
+     */
     public enum TamanoPista {
-        MINIBASKET, ADULTOS, TRES_VS_TRES
+        
+        /**
+         * Tamaño de pista destinado a juegos de minibasket, adecuado para 
+         * jugadores jóvenes o principiantes.
+         */
+        MINIBASKET,
+        
+        /**
+         * Tamaño de pista diseñado para jugadores adultos, utilizado en 
+         * partidos y entrenamientos de baloncesto estándar.
+         */
+        ADULTOS,
+        
+        /**
+         * Tamaño de pista destinado a juegos de tres contra tres, 
+         * que permite una dinámica de juego más compacta y rápida.
+         */
+        TRES_VS_TRES
     }
 
     /**

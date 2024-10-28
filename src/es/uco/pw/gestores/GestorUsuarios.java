@@ -1,6 +1,5 @@
 package es.uco.pw.gestores;
 
-
 import java.io.FileReader;
 
 import java.io.IOException;
@@ -16,10 +15,8 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
-
 /**
- * Clase pricipal para gestionar usuarios.
+ * 
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -29,6 +26,9 @@ import java.util.Date;
  *  @version 1.0
  */
 
+/**
+ * Clase pricipal para gestionar usuarios.
+ */
 public class GestorUsuarios {
 	
     /**

@@ -10,7 +10,6 @@ import java.util.Scanner;
 import java.io.IOException;
 
 /**
- * Menu principal para gestionar usuarios.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -20,12 +19,18 @@ import java.io.IOException;
  *  @version 1.0
  */
 
+/**
+* Menu principal para gestionar usuarios.
+*  */
 public class MenuUsuarios {
     
     private GestorUsuarios gestor;
     private SimpleDateFormat sdf;
     private Scanner scanner;
 
+    /**
+    * Constructor de la clase MenuUsuarios
+    *  */
     public MenuUsuarios() {
         this.gestor = new GestorUsuarios();
         this.sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -35,7 +40,6 @@ public class MenuUsuarios {
     /**
      * Muestra el Menú usuario.
      */
-    
     public void mostrarMenu() {
         boolean salir = false;
 

@@ -14,6 +14,13 @@ import java.util.Date;
  */
 public abstract class ReservaFactory {
     
+	/**
+     * Constructor por defecto de la clase ReservaFactory
+     */
+    public ReservaFactory() {
+        // Constructor por defecto
+    }
+	
     /**
      * Método abstracto para crear una reserva infantil.
      * @param idUsuario ID del usuario que realiza la reserva

@@ -27,13 +27,13 @@ public class ReservaInfantil extends Reserva {
     
     /**
      * Constructor parametrizable de la subclase ReservaInfantil
-     * @param idUsuario
-     * @param fechaHora
-     * @param duracionMinutos
-     * @param idPista
-     * @param precio
-     * @param descuento
-     * @param numeroNinos
+     * @param idUsuario Identificador del usuario.
+     * @param fechaHora Fecha hora.
+     * @param duracionMinutos Duracion en minutos.
+     * @param idPista Identificador de la pista.
+     * @param precio Precio.
+     * @param descuento Descuento a aplicar.
+     * @param numeroNinos Nuemero de ninos.
      */
     public ReservaInfantil(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);

@@ -1,8 +1,6 @@
 package es.uco.pw.data;
 import java.util.Date;
 
-
-
 /**
  * Clase que representa una reserva familiar de una pista.
  * 
@@ -31,14 +29,14 @@ public class ReservaFamiliar extends Reserva {
     public ReservaFamiliar() {}
 
     /** Constructor parametrizable de la subclase ReservaFamiliar
-     * @param idUsuario
-     * @param fechaHora
-     * @param duracionMinutos
-     * @param idPista
-     * @param precio
-     * @param descuento
-     * @param numeroAdultos
-     * @param numeroNinos
+     * @param idUsuario Identificador del usuario.
+     * @param fechaHora Fecha hora.
+     * @param duracionMinutos Duracion en minutos.
+     * @param idPista Identificador de la pista.
+     * @param precio Precio.
+     * @param descuento Descuento.
+     * @param numeroAdultos Numero de adultos.
+     * @param numeroNinos Numero de ninos.
      */
     public ReservaFamiliar(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);

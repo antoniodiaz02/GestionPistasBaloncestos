@@ -21,6 +21,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *  @author Antonio Diaz Barbancho
+ *  @author Carlos Marín Rodríguez 
+ *  @author Carlos De la Torre Frias (GM2)
+ *  @author Daniel Grande Rubio (GM2)
+ *  @since 12-10-2024
+ *  @version 1.0
+ */
+
+
+/**
+ * Clase que gestiona las Reservas de las pistas de baloncesto.
+ */
 public class GestorReservas {
 	
     private final String rutaArchivoJugadores = "src/es/uco/pw/files/users.txt";
@@ -424,7 +437,8 @@ public class GestorReservas {
 	 * Comprueba si el bono tiene sesiones disponibles, si no está caducado, si el bono es de la persona que intenta aceder a él 
 	 * y si la reserva que se quiere hacer con el bono, es a una pista del mismo tamaño que del bono.
 	 * @param bonoId Identificador único del bono.
-	 * @param idReserva Identificador único de la reserva.
+	 * @param correoUsuario Correo del usuario
+	 * @param tamano Indica el tamaño de pista.
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si contradice una de las condiciones
 	 * 		   o si ha habido un error.
 	 */
@@ -672,6 +686,7 @@ public class GestorReservas {
 	 * @param idReserva Identificador único de la reserva a modificar.
 	 * @param nuevaReserva Clase Reserva con todos los nuevos detalles modificados.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
+	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
 	 */
 	public int modificarReserva(String idReserva, Reserva nuevaReserva) throws IOException {
         int codigo = 0;

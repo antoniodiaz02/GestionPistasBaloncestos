@@ -15,7 +15,6 @@ import java.util.Scanner;
 import java.io.IOException;
 
 /**
- * Menu principal para gestionar resevas.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -25,10 +24,26 @@ import java.io.IOException;
  *  @version 1.0
  */
 
+
+/**
+ * Menu principal para gestionar resevas.
+ */
 public class MenuReservas {
+	
+	/**
+     * Constructor por defecto de la clase MenuReservas.
+     */
+    public MenuReservas() {
+        // Constructor por defecto
+    }
+	
     private static final GestorReservas gestorReservas = new GestorReservas();
     private static final Scanner scanner = new Scanner(System.in); // Definir Scanner como estático
 
+    /**
+     * Muestra el menú de gestión de reservas al usuario y permite seleccionar 
+     * diferentes opciones para realizar acciones relacionadas con las reservas.
+     */
     public void mostrarMenu() {
         boolean salir = false;
 

@@ -16,6 +16,13 @@ import java.util.Date;
 public class ReservaIndividualFactory extends ReservaFactory {
 
 	/**
+     * Constructor por defecto de la clase ReservaIndividualFactory.
+     */
+    public ReservaIndividualFactory() {
+        // Constructor por defecto
+    }
+	
+	/**
      * Crea una reserva infantil individual usando parametros personalizados
      *  @param idUsuario Identificador del usuario
      *  @param fecha Fecha
@@ -49,15 +56,15 @@ public class ReservaIndividualFactory extends ReservaFactory {
     }
 
     /**
-     * Crea una reserva adultos individual  usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento 
-     *  @param numeroNinos Numero de ninos
-     *  @return reserva Objeto de tipo ReservaAdultos creado
+     * Crea una reserva adultos individual  usando parametros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duracion.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento. 
+     *  @param numeroAdultos Numero de adultos.
+     *  @return reserva Objeto de tipo ReservaAdultos creado.
      */
     @Override
     public ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {

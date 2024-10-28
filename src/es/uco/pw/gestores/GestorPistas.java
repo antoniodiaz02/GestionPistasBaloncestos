@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.io.FileReader;
 
 /**
- * Clase que gestiona las pistas y los materiales asociados a ellas.
- * Se encarga de crear pistas, asignar materiales, listar pistas no disponibles y 
- * buscar pistas libres en función del número de jugadores.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -24,6 +21,11 @@ import java.io.FileReader;
  *  @version 1.0
  */
 
+/**
+ * Clase que gestiona las pistas y los materiales asociados a ellas.
+ * Se encarga de crear pistas, asignar materiales, listar pistas no disponibles y 
+ * buscar pistas libres en función del número de jugadores.
+ */
 public class GestorPistas {
     
     private List<Pista> pistas;
@@ -31,6 +33,9 @@ public class GestorPistas {
     private static final String RUTA_ARCHIVO_PISTAS = "src/es/uco/pw/files/pistas.txt";
     private static final String RUTA_ARCHIVO_MATERIALES = "src/es/uco/pw/files/materiales.txt";
 
+    /**
+     * Constructor de la clase GestorPistas.
+     */
     public GestorPistas() {
         this.pistas = new ArrayList<>();
         this.materiales = new ArrayList<>();
@@ -362,7 +367,11 @@ public class GestorPistas {
     public List<Material> getMateriales() {
         return this.materiales;
     }
-    
+    /**
+     * Lista todas las pistas.
+     * 
+     * @return Lista de pistas.
+     */
     public List<Pista> listarTodasLasPistas() {
         return pistas;
     }

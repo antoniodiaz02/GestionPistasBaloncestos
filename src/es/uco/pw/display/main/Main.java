@@ -3,7 +3,6 @@ package es.uco.pw.display.main;
 import java.util.Scanner;
 
 /**
- * Clase Main dentro del sistema.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -12,8 +11,27 @@ import java.util.Scanner;
  *  @since 08-10-2024
  *  @version 1.0
  */
+
+/**
+ * Clase Main dentro del sistema.
+ */
 public class Main {
 
+	/**
+     * Constructor por defecto de la clase Main.
+     * Este constructor no realiza ninguna acción específica,
+     * ya que la lógica principal se encuentra en el método main.
+     */
+    public Main() {
+        // Constructor por defecto
+    }
+	
+	/**
+	 * Método principal que inicia la ejecución del programa.
+	 * Este método se encarga de recibir la entrada del usuario y gestiona la interacción con el sistema.
+	 * @param args Argumentos de línea de comandos que pueden ser utilizados
+	 *             para inicializar el programa (no se utilizan en esta implementación).
+	 */
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int opcion = 99;

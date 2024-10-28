@@ -1,2 +1,1 @@
-Baloncesto;ADULTOS;false;true;10
-baloncestillo;false;true;ADULTOS;10
+Balon;true;true;ADULTOS;30
