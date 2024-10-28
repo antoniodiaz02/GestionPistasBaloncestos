@@ -41,7 +41,7 @@ public class MenuReservas {
             System.out.println("  5. Cancelar una reserva");
             System.out.println("  6. Listar reservas futuras");
             System.out.println("  7. Listar reservas por fecha y pista");
-            System.out.println("8. Salir");
+            System.out.println("  8. Salir");
             System.out.print("Seleccione una opción: ");
             int opcion = scanner.nextInt();
             scanner.nextLine(); // Limpiar el buffer de entrada
