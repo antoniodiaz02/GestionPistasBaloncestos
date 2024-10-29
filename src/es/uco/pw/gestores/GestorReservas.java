@@ -64,6 +64,13 @@ public class GestorReservas {
         Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
         
+        
+        // Comprobación adicional para evitar reservas en la misma pista y hora
+        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
+            System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
+            return false;
+        }
+        
         // Si no existe el jugador y la pista devuelve false.
         if (jugador == null) {
             System.out.println(" ERROR! El usuario no existe.");
@@ -126,6 +133,13 @@ public class GestorReservas {
     public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva, String bonoId) {
     	Jugador jugador = buscarJugador(correoUsuario);
         Pista pista = buscarPista(nombrePista);
+        
+        
+        // Comprobación adicional para evitar reservas en la misma pista y hora
+        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
+            System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
+            return false;
+        }
 
         // Si no existe el jugador y la pista devuelve false.
         if (jugador == null) {
@@ -692,6 +706,12 @@ public class GestorReservas {
         int codigo = 0;
         List<String> lineas = new ArrayList<>();
         
+        // Comprobación adicional para asegurar que la nueva fecha es futura
+        if (!esReservaFutura(nuevaReserva.getFechaHora())) {
+            System.out.println(" ERROR! No se puede modificar la reserva a una fecha pasada.");
+            return -1; // Código de error indicando que la fecha es pasada
+        }
+        
         if(plazoExcedido(nuevaReserva.getFechaHora())) return -1;
 
         try {
@@ -969,4 +989,43 @@ public class GestorReservas {
 
 	    return sesionesRestantes;
 	}
+	
+	/**
+	 * Verifica si ya existe una reserva para la misma pista y horario.
+	 * @param nombrePista Nombre de la pista a reservar.
+	 * @param fechaHora Día y hora de la reserva de la pista.
+	 * @return Devuelve true si ya existe una reserva para la misma pista y horario, y false si no existe.
+	 */
+	private boolean existeReservaParaPistaYHora(String nombrePista, Date fechaHora) {
+	    try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
+	        String linea;
+	        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+	        while ((linea = reader.readLine()) != null) {
+	            String[] datos = linea.split(";");
+	            String pistaId = datos[3];
+	            Date fechaReserva = new Date(Long.parseLong(datos[4])); // Asume que la fecha es guardada en formato timestamp
+
+	            // Compara la pista y la hora
+	            if (pistaId.equals(nombrePista) && fechaReserva.equals(fechaHora)) {
+	                return true; // Ya existe una reserva para la misma pista y hora
+	            }
+	        }
+	    } catch (IOException e) {
+	        System.out.println(" ERROR! Error al comprobar reservas existentes: " + e.getMessage());
+	    }
+	    return false;
+	}
+	
+	/**
+	 * Verifica si la fecha de la reserva es una fecha futura.
+	 * @param fechaReserva Fecha de la reserva a verificar.
+	 * @return Devuelve true si la fecha es futura, y false si la fecha ya ha pasado.
+	 */
+	private boolean esReservaFutura(Date fechaReserva) {
+	    Date fechaActual = new Date();
+	    return fechaReserva.after(fechaActual);
+	}
+
+
 }
