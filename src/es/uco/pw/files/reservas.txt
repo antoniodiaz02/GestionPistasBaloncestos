@@ -1,1 +1,2 @@
 R_0000;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto;1734024600000;60;20.0;0.0;5
+R_0000;ADULTOS;sdafasd@uco.es;Balon;1738494000000;60;20.0;0.0;12

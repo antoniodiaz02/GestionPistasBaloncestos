@@ -1,1 +1,1 @@
-Balon;true;true;ADULTOS;30
+Balon;ADULTOS;false;true;30
