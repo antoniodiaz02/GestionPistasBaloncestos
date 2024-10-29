@@ -1,1 +1,3 @@
-Balon;true;true;ADULTOS;30
+Balon;ADULTOS;true;true;30
+Baloncesto0;ADULTOS;true;true;10
+Minibasket0;MINIBASKET;true;false;8

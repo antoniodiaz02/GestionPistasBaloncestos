@@ -92,9 +92,8 @@ public class GestorReservas {
             return false;
         }
 
-        String id= generarIdentificadorUnico(rutaArchivoReservas);
-        String idReserva = 'R' + id.substring(1);
-
+        String idReserva= generarIdentificadorUnicoReservas();
+        
         Reserva reserva = null;
         float precio = calcularPrecio(duracion);
         float descuento = jugador.calcularAntiguedad() > 2 ? precio * 0.1f : 0;
@@ -110,10 +109,10 @@ public class GestorReservas {
 
         if (reserva != null) {
             guardarReservaEnArchivo(reserva, idReserva);
-            pista.setDisponible(false);
-            actualizarPistaEnArchivo(pista);
             return true;
         }
+        
+        System.out.println(" ERROR! Tipo incorrecto de reserva.\nADULTOS->Pistas ADULTOS. FAMILIAR-> Pistas MINIBASKET y 3v3. INFANTIL-> Pistas MINIBASKET");
         return false;
     }
     
@@ -164,15 +163,13 @@ public class GestorReservas {
         
         // 1. Comprobacion del bono si está disponible para poder hacer reservas. 
         if(!comprobarBono(bonoId,correoUsuario,pista.getTamanoPista())) {
-        	System.out.println(" ERROR! Error al comprobar el bono.");
         	return false;
         }        
 
         int sesion= obtenerSesionesRestantes(bonoId);
         
         // 2. Realización de la reserva.
-        String id= generarIdentificadorUnico(rutaArchivoReservas);
-        String idReserva = 'R' + id.substring(1);
+        String idReserva= generarIdentificadorUnicoReservas();
         
         Reserva reserva = null;
         ReservaBonoFactory reservaBono = new ReservaBonoFactory(bonoId, sesion);
@@ -193,10 +190,10 @@ public class GestorReservas {
         // 3. Modificacion del número de reservas de bono y adición de la fecha si es su primera reserva.
         if (reserva != null) {                
             guardarReservaEnArchivo(reserva, idReserva);
-            pista.setDisponible(false);
-            actualizarPistaEnArchivo(pista);
             return actualizarSesionesBono(bonoId);
         }
+        
+        System.out.println(" ERROR! Tipo incorrecto de reserva. El tipo del bono es distinto al de la reserva.");
         return false;
         
     }	
@@ -219,7 +216,7 @@ public class GestorReservas {
     	String fechaPrimeraSesion = "";
     	
     	// Generar identificador único para el bono
-    	String bonoId = generarIdentificadorUnico(rutaArchivoBonos);
+    	String bonoId = generarIdentificadorUnicoBonos();
     	
     	try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoBonos, true))) {
     		writer.write(bonoId + ";" + correoUsuario + ";" + tamano.toString() + ";" + sesiones + ";" + fechaPrimeraSesion);
@@ -235,15 +232,14 @@ public class GestorReservas {
     
     
     /**
-	 * Genera un identificador unico respecto al último identificador del archivo.
-	 * @param rutaArchivo El archivo del que coger referencia para generar el identificador único.
+	 * Genera un identificador unico respecto al último identificador del archivo bonos.txt
 	 * @return Devuelve true si el procedimiento de generar el código único es correcto, y false si ha habido algún error.
 	 */
-    private String generarIdentificadorUnico(String rutaArchivo) {
+    private String generarIdentificadorUnicoBonos() {
     	String ultimoId = "B_0000";  // Identificador inicial si el archivo está vacío o no existe
     	String patron = "B_(\\d{4})"; // Expresión regular para identificar el formato B_XXXX
     	
-    	try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo))) {
+    	try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoBonos))) {
     		String linea;
     		String ultimoBono = null;
     		
@@ -277,60 +273,45 @@ public class GestorReservas {
     
     
     /**
-     * Actualiza la información de una pista en el archivo de pistas.
-     * Crea un archivo temporal, copia cada línea del archivo original al temporal,
-     * y aplica los cambios cuando encuentra la pista específica.
-     * Al finalizar, reemplaza el archivo original por el archivo temporal.
-     *
-     * @param pista La pista a actualizar con su información modificada.
-     */
-    private void actualizarPistaEnArchivo(Pista pista) {
-        File archivo = new File(rutaArchivoPistas);
-        File archivoTemp = new File(rutaArchivoPistas + ".tmp");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(archivo));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(archivoTemp))) {
-
-            String linea;
-            boolean pistaActualizada = false;
-
-            // Leer cada línea y copiarla al archivo temporal con los cambios aplicados
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(";");
-                String nombrePista = datos[0];
-
-                // Si encontramos la pista a actualizar
-                if (nombrePista.equals(pista.getNombre())) {
-                    // Actualizamos la información de la pista
-                    String nuevaLinea = pista.getNombre() + ";" +
-                                        pista.getTamanoPista().toString() + ";" +
-                                        pista.isDisponible() + ";" +
-                                        pista.isInterior() + ";" +
-                                        pista.getMaxJugadores();
-                    writer.write(nuevaLinea);
-                    pistaActualizada = true;
-                } else {
-                    // Copiar la línea original sin cambios
-                    writer.write(linea);
-                }
-                writer.newLine();
-            }
-
-            // Si la pista no fue encontrada en el archivo original, se puede manejar aquí (si fuera necesario)
-            if (!pistaActualizada) {
-                System.out.println(" ERROR! Pista no encontrada para actualizar: " + pista.getNombre());
-            }
-
-        } catch (IOException e) {
-            System.out.println(" ERROR! Error al actualizar la pista en el archivo: " + e.getMessage());
-        }
-
-        // Reemplazar el archivo original con el archivo temporal
-        if (!archivoTemp.renameTo(archivo)) {
-            System.out.println(" ERROR! Error al reemplazar el archivo con la actualización.");
-        }
+	 * Genera un identificador unico respecto al último identificador del archivo reservas.txt
+	 * @return Devuelve true si el procedimiento de generar el código único es correcto, y false si ha habido algún error.
+	 */
+    private String generarIdentificadorUnicoReservas() {
+    	String ultimoId = "R_0000";  // Identificador inicial si el archivo está vacío o no existe
+    	String patron = "R_(\\d{4})"; // Expresión regular para identificar el formato B_XXXX
+    	
+    	try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
+    		String linea;
+    		String ultimoBono = null;
+    		
+    		while ((linea = reader.readLine()) != null) {
+    			ultimoBono = linea;
+    		}
+    		
+    		if (ultimoBono != null) {
+    			
+    			String[] partes = ultimoBono.split(";");
+    			String idBonoActual = partes[0];
+    			
+    			
+    			Pattern pattern = Pattern.compile(patron);
+    			Matcher matcher = pattern.matcher(idBonoActual);
+    			
+    			if (matcher.matches()) {
+    				// Extraer el número actual y convertirlo a entero
+    				int numero = Integer.parseInt(matcher.group(1));
+    				// Incrementar en 1 el número y formatearlo como B_XXXX
+    				ultimoId = String.format("R_%04d", numero + 1);
+    			}
+    		}
+    	} catch (IOException e) {
+    		System.out.println(" ERROR! Error al generar el identificador unico: " + e.getMessage());
+    		e.printStackTrace();
+    	}
+    	
+    	return ultimoId;
     }
-    
+
     
     /**
 	 * Función que calcula el precio de reserva respecto al tiempo que se quiere reservar.
@@ -360,7 +341,7 @@ public class GestorReservas {
      * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    private Jugador buscarJugador(String correoElectronico) {
+    public Jugador buscarJugador(String correoElectronico) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -397,13 +378,13 @@ public class GestorReservas {
      * @return Un objeto Pista si el nombre existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    private Pista buscarPista(String nombre) {
+    public Pista buscarPista(String nombre) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoPistas))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";");
                 if (datos[0].equals(nombre)) {
-                    return new Pista(datos[0], Boolean.parseBoolean(datos[1]), Boolean.parseBoolean(datos[2]), Pista.TamanoPista.valueOf(datos[3]), Integer.parseInt(datos[4]));
+                    return new Pista(datos[0], Boolean.parseBoolean(datos[2]), Boolean.parseBoolean(datos[3]), Pista.TamanoPista.valueOf(datos[1]), Integer.parseInt(datos[4]));
 
                 }
             }
@@ -420,6 +401,7 @@ public class GestorReservas {
 	 * @param idReserva Identificador único de la reserva.
 	 */
     private void guardarReservaEnArchivo(Reserva reserva, String idReserva) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivoReservas, true))) {
             String tipoReserva;
             if (reserva instanceof ReservaInfantil) {
@@ -433,10 +415,10 @@ public class GestorReservas {
             }
 
             String linea = idReserva + ";" + tipoReserva + ";" + reserva.getUsuarioId() + ";" + reserva.getPistaId() + ";" 
-                           + reserva.getFechaHora().getTime() + ";" + reserva.getDuracion() + ";" 
+                           + sdf.format(reserva.getFechaHora()) + ";" + reserva.getDuracion() + ";" 
                            + reserva.getPrecio() + ";" + reserva.getDescuento() + ";" 
                            + ((reserva instanceof ReservaInfantil) ? ((ReservaInfantil) reserva).getNumNinos()
-                           : (reserva instanceof ReservaFamiliar) ? ((ReservaFamiliar) reserva).getNumNinos() + ((ReservaFamiliar) reserva).getNumAdultos()
+                           : (reserva instanceof ReservaFamiliar) ? ((ReservaFamiliar) reserva).getNumNinos() + ";" + ((ReservaFamiliar) reserva).getNumAdultos()
                            : ((ReservaAdultos) reserva).getNumAdultos());
 
             bw.write(linea);
@@ -500,7 +482,7 @@ public class GestorReservas {
     	
     	// Comprobar que el bono existe, y tiene sesiones disponibles.
     	if (!bonoFound) {
-    		System.out.println(" ERROR! El bono ya no existe.");
+    		System.out.println(" ERROR! El bono utiizado no existe.");
     		return false;
     	}
     	
@@ -705,6 +687,7 @@ public class GestorReservas {
 	public int modificarReserva(String idReserva, Reserva nuevaReserva) throws IOException {
         int codigo = 0;
         List<String> lineas = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         
         // Comprobación adicional para asegurar que la nueva fecha es futura
         if (!esReservaFutura(nuevaReserva.getFechaHora())) {
@@ -736,8 +719,8 @@ public class GestorReservas {
                                 : (nuevaReserva instanceof ReservaFamiliar) ? "FAMILIAR"
                                 : "ADULTOS")
                         		+ ";" + nuevaReserva.getUsuarioId() + ";" + nuevaReserva.getPistaId() + ";" 
-                                + nuevaReserva.getFechaHora().getTime() + ";" + nuevaReserva.getDuracion() + ";" 
-                                + nuevaReserva.getPrecio() + ";" + nuevaReserva.getDescuento() + ";" 
+                                + sdf.format(nuevaReserva.getFechaHora()) + ";" + nuevaReserva.getDuracion() + ";" 
+                                + calcularPrecio(nuevaReserva.getDuracion()) + ";" + nuevaReserva.getDescuento() + ";" 
                                 + ((nuevaReserva instanceof ReservaInfantil) ? ((ReservaInfantil) nuevaReserva).getNumNinos()
                                 : (nuevaReserva instanceof ReservaFamiliar) ? ((ReservaFamiliar) nuevaReserva).getNumNinos() + ((ReservaFamiliar) nuevaReserva).getNumAdultos()
                                 : ((ReservaAdultos) nuevaReserva).getNumAdultos());
@@ -990,6 +973,7 @@ public class GestorReservas {
 	    return sesionesRestantes;
 	}
 	
+	
 	/**
 	 * Verifica si ya existe una reserva para la misma pista y horario.
 	 * @param nombrePista Nombre de la pista a reservar.
@@ -999,12 +983,21 @@ public class GestorReservas {
 	private boolean existeReservaParaPistaYHora(String nombrePista, Date fechaHora) {
 	    try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
 	        String linea;
-	        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 	        while ((linea = reader.readLine()) != null) {
 	            String[] datos = linea.split(";");
 	            String pistaId = datos[3];
-	            Date fechaReserva = new Date(Long.parseLong(datos[4])); // Asume que la fecha es guardada en formato timestamp
+	            String fechaHoraString = datos[4];
+	            Date fechaReserva;
+	            
+	            try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    fechaReserva = sdf.parse(fechaHoraString);
+                } catch (ParseException e) {
+                    System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
+                                       "Formato esperado: dd/MM/yyyy HH:mm.");
+                    continue; // Saltar a la siguiente línea en caso de error
+                }
 
 	            // Compara la pista y la hora
 	            if (pistaId.equals(nombrePista) && fechaReserva.equals(fechaHora)) {
@@ -1017,6 +1010,7 @@ public class GestorReservas {
 	    return false;
 	}
 	
+	
 	/**
 	 * Verifica si la fecha de la reserva es una fecha futura.
 	 * @param fechaReserva Fecha de la reserva a verificar.
@@ -1027,5 +1021,104 @@ public class GestorReservas {
 	    return fechaReserva.after(fechaActual);
 	}
 
+	
+	/**
+	 * Obtiene el tamaño de pistas del bono. 
+	 * @param bonoId Es el identificador de bono.
+	 * @return Devuelve el string del tamaño del bono.
+	 */
+	public String obtenerTamanoBono(String bonoId) {
+	    
+	    File archivoBonos = new File(rutaArchivoBonos);
+	    
+	    try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos))) {
+	        String linea;
+
+	        // Leer línea por línea
+	        while ((linea = reader.readLine()) != null) {
+	            // Dividir la línea en partes (separadas por ";")
+	            String[] datos = linea.split(";");
+	            
+	            // Verificar que la línea tiene al menos 3 elementos
+	            if (datos.length >= 3) {
+	                // Comparar el id del bono (primer campo) con el bonoId pasado por parámetro
+	                if (datos[0].trim().equals(bonoId)) {
+	                    // Devolver el valor del tamaño de pista (tercer campo)
+	                    return datos[2].trim();
+	                }
+	            }
+	        }
+	    } catch (IOException e) {
+	        System.out.println(" ERROR! No se pudo leer el archivo: " + e.getMessage());
+	    }
+
+	    // Si no se encuentra el bono o ocurre algún error
+	    return " ERROR! Bono no encontrado o archivo inválido.";
+	}
+	
+	
+	
+	public Reserva obtenerReservaPorId(String idReserva) {
+        try {
+            // Abrimos el archivo en modo lectura
+            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
+            String linea;
+
+            // Leemos cada línea del archivo
+            while ((linea = reader.readLine()) != null) {
+                // Cada línea tiene el formato:
+                // R_0000;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto0;30/11/2024 19:30;90;30.0;0.0;10
+                String[] datos = linea.split(";");
+
+                // Comprobar si el identificador de la reserva coincide con el proporcionado
+                if (datos.length >= 9 && datos[0].equals(idReserva)) {
+                    // Extraer los datos de la reserva
+                    String tamanoPista = datos[1];
+                    String usuarioId = datos[2];
+                    String pistaId = datos[3];
+                    String fechaHoraString = datos[4];
+                    int duracion = Integer.parseInt(datos[5]);
+                    float precio = Float.parseFloat(datos[6]);
+                    float descuento = Float.parseFloat(datos[7]);
+                    int particip = Integer.parseInt(datos[8]);
+
+                    // Intentar parsear la fecha y hora
+                    Date fechaHora = null;
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                        fechaHora = sdf.parse(fechaHoraString);
+                    } catch (ParseException e) {
+                        System.out.println(" ERROR! No se pudo parsear la fecha de la reserva: " + fechaHoraString);
+                        continue; // Saltar esta línea si la fecha no es válida
+                    }
+
+                    Reserva reserva;
+                    if(tamanoPista== "ADULTOS") {
+                    	reserva = new ReservaAdultos(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
+                    }
+                    
+                    else if(tamanoPista== "FAMILIAR") {
+                    	int numadultos = Integer.parseInt(datos[9]);
+                    	reserva = new ReservaFamiliar(usuarioId, fechaHora, duracion, pistaId, precio, descuento,numadultos,particip);
+                    }
+                    
+                    else {
+                    	reserva = new ReservaInfantil(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
+                    }
+                    // Crear una nueva instancia de Reserva con los datos
+
+                    reader.close(); // Cerrar el archivo
+                    return reserva; // Devolver la reserva encontrada
+                }
+            }
+
+            reader.close(); // Cerrar el archivo
+            System.out.println(" ERROR! No se encontró ninguna reserva con el ID proporcionado.");
+        } catch (IOException e) {
+            System.out.println(" ERROR! Hubo un problema al acceder al archivo: " + e.getMessage());
+        }
+
+        return null; // Devolver null si no se encontró la reserva
+    }
 
 }
