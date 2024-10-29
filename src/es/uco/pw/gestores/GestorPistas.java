@@ -65,7 +65,7 @@ public class GestorPistas {
      */
     private void guardarPistaEnArchivo(Pista pista) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_PISTAS, true))) {
-            writer.write(pista.getNombre() + ";" + pista.isDisponible() + ";" + pista.isInterior() + ";" + pista.getTamanoPista() + ";" + pista.getMaxJugadores());
+            writer.write(pista.getNombre() + ";" + pista.getTamanoPista() + ";" + pista.isDisponible() + ";" + pista.isInterior() + ";" + pista.getMaxJugadores());
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,9 +81,9 @@ public class GestorPistas {
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(";");
                 String nombre = datos[0];
-                boolean disponible = Boolean.parseBoolean(datos[1]);
-                boolean esInterior = Boolean.parseBoolean(datos[2]);
-                Pista.TamanoPista tamanoPista = Pista.TamanoPista.valueOf(datos[3]);
+                Pista.TamanoPista tamanoPista = Pista.TamanoPista.valueOf(datos[1]);
+                boolean disponible = Boolean.parseBoolean(datos[2]);
+                boolean esInterior = Boolean.parseBoolean(datos[3]);
                 int maxJugadores = Integer.parseInt(datos[4]);
                 
                 Pista pista = new Pista(nombre, disponible, esInterior, tamanoPista, maxJugadores);
