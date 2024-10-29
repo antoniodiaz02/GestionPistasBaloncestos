@@ -21,7 +21,7 @@ Dicho programa está programado en Java y cuenta con el código fuente, la docum
             
         cd GestionPistasBaloncesto
 
-        java -jar Practica1.jar
+        java -jar GestorReservas.jar
 
 Nota: No es necesario pasar parámetros adicionales al programa.
 
