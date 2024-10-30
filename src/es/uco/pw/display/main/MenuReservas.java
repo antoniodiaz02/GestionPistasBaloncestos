@@ -1,14 +1,14 @@
 package es.uco.pw.display.main;
 
 
-import es.uco.pw.gestores.GestorReservas;
-import es.uco.pw.data.Jugador;
-import es.uco.pw.data.Pista;
-import es.uco.pw.data.Pista.TamanoPista;
-import es.uco.pw.data.Reserva;
-import es.uco.pw.data.ReservaAdultos;
-import es.uco.pw.data.ReservaFamiliar;
-import es.uco.pw.data.ReservaInfantil;
+import es.uco.pw.data.dao.GestorReservasDAO;
+import es.uco.pw.data.dto.JugadorDTO;
+import es.uco.pw.data.dto.PistaDTO;
+import es.uco.pw.data.dto.ReservaDTO;
+import es.uco.pw.data.dto.ReservaAdultosDTO;
+import es.uco.pw.data.dto.ReservaFamiliarDTO;
+import es.uco.pw.data.dto.ReservaInfantilDTO;
+import es.uco.pw.data.dto.PistaDTO.TamanoPista;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,7 +39,7 @@ public class MenuReservas {
         // Constructor por defecto
     }
 	
-    private static final GestorReservas gestorReservas = new GestorReservas();
+    private static final GestorReservasDAO gestorReservas = new GestorReservasDAO();
     private static final Scanner scanner = new Scanner(System.in); // Definir Scanner como estático
 
     /**
@@ -107,11 +107,11 @@ public class MenuReservas {
 
         System.out.println("Tipo de reserva: 1. Infantil, 2. Familiar, 3. Adultos");
         int tipo = scanner.nextInt();
-        Class<? extends Reserva> tipoReserva;
+        Class<? extends ReservaDTO> tipoReserva;
         switch (tipo) {
-            case 1 -> tipoReserva = ReservaInfantil.class;
-            case 2 -> tipoReserva = ReservaFamiliar.class;
-            case 3 -> tipoReserva = ReservaAdultos.class;
+            case 1 -> tipoReserva = ReservaInfantilDTO.class;
+            case 2 -> tipoReserva = ReservaFamiliarDTO.class;
+            case 3 -> tipoReserva = ReservaAdultosDTO.class;
             default -> {
                 System.out.println(" ERROR! Tipo no válido.");
                 return;
@@ -151,11 +151,11 @@ public class MenuReservas {
 
         System.out.println("Tipo de reserva: 1. Infantil, 2. Familiar, 3. Adultos");
         int tipo = scanner.nextInt();
-        Class<? extends Reserva> tipoReserva;
+        Class<? extends ReservaDTO> tipoReserva;
         switch (tipo) {
-            case 1 -> tipoReserva = ReservaInfantil.class;
-            case 2 -> tipoReserva = ReservaFamiliar.class;
-            case 3 -> tipoReserva = ReservaAdultos.class;
+            case 1 -> tipoReserva = ReservaInfantilDTO.class;
+            case 2 -> tipoReserva = ReservaFamiliarDTO.class;
+            case 3 -> tipoReserva = ReservaAdultosDTO.class;
             default -> {
                 System.out.println(" ERROR! Tipo no válido.");
                 return;
@@ -228,7 +228,7 @@ public class MenuReservas {
         String idReserva = scanner.nextLine();
         
         // Pedir al usuario que seleccione el tipo de reserva
-        Reserva nuevaReserva= gestorReservas.obtenerReservaPorId(idReserva);
+        ReservaDTO nuevaReserva= gestorReservas.obtenerReservaPorId(idReserva);
         
         boolean modificable= true;
         
@@ -245,7 +245,7 @@ public class MenuReservas {
             case 1:
                 System.out.print("\n Introduce el nuevo correo: ");
                 String correoUsuario = scanner.nextLine();
-                Jugador user= gestorReservas.buscarJugador(correoUsuario);
+                JugadorDTO user= gestorReservas.buscarJugador(correoUsuario);
                 if(user==null) {
                 	modificable= false;
                 	System.out.print(" ERROR! El usuario no existe.");
@@ -267,7 +267,7 @@ public class MenuReservas {
             case 4:
                 System.out.print("\n Introduce la nueva pista: ");
                 String pistaString = scanner.nextLine();
-                Pista pista= gestorReservas.buscarPista(pistaString);
+                PistaDTO pista= gestorReservas.buscarPista(pistaString);
                 
                 if(pista==null) {
                 	System.out.print(" ERROR! No existe la pista que se quiere introducir.");

@@ -1,14 +1,15 @@
-package es.uco.pw.gestores;
+package es.uco.pw.data.dao;
 
 import java.io.FileReader;
 
 import java.io.IOException;
 import java.text.ParseException;
-
-import es.uco.pw.data.Jugador;
-
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import es.uco.pw.data.dto.JugadorDTO;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -29,17 +30,17 @@ import java.util.Date;
 /**
  * Clase pricipal para gestionar usuarios.
  */
-public class GestorUsuarios {
+public class GestorUsuariosDAO {
 	
     /**
      * Lista que almacena los usuarios registrados.
      */
-    private List<Jugador> usuarios;
+    private List<JugadorDTO> usuarios;
 
     /**
      * Constructor de la clase GestorUsuarios. Inicializa la lista de usuarios.
      */
-    public GestorUsuarios() {
+    public GestorUsuariosDAO() {
         usuarios = new ArrayList<>();
     }
 
@@ -48,11 +49,11 @@ public class GestorUsuarios {
 	 * @param newJugador Jugador a añadir
 	 * @return codigo Codigo de salida
 	 */
-    public int insertarUsuario(Jugador newJugador) {
+    public int insertarUsuario(JugadorDTO newJugador) {
         int codigo = 0;
 
         // Comprobar si el usuario ya existe mediante el correo electrónico
-        Jugador jugadorExistente = buscarUsuarioPorCorreo(newJugador.getCorreoElectronico());
+        JugadorDTO jugadorExistente = buscarUsuarioPorCorreo(newJugador.getCorreoElectronico());
         if (jugadorExistente != null) {
             codigo = -2;
             return codigo; // El usuario ya está registrado
@@ -92,7 +93,7 @@ public class GestorUsuarios {
      * @return 1 si se modifica correctamente, 0 si no se encuentra el usuario, -1 si ocurre un error
      * @throws IOException Si ocurre un error al guardar el archivo
      */
-    public int modificarUsuario(String correoElectronico, Jugador nuevoJugador) throws IOException {
+    public int modificarUsuario(String correoElectronico, JugadorDTO nuevoJugador) throws IOException {
         int codigo = 0;
         String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
         List<String> lineas = new ArrayList<>();
@@ -209,7 +210,7 @@ public class GestorUsuarios {
      * @param correoElectronico Correo del jugador a buscar
      * @return Jugador si se encuentra, null si no existe
      */
-	public Jugador buscarUsuarioPorCorreo(String correoElectronico) {
+	public JugadorDTO buscarUsuarioPorCorreo(String correoElectronico) {
 	    String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
 
 	    try {
@@ -233,7 +234,7 @@ public class GestorUsuarios {
 	                    Date fechaNacimiento = new SimpleDateFormat("dd/MM/yyyy").parse(fechaNacimientoStr);
 
 	                    // Crear y devolver el objeto Jugador
-	                    Jugador jugador = new Jugador(nombreCompleto, fechaNacimiento, correo);
+	                    JugadorDTO jugador = new JugadorDTO(nombreCompleto, fechaNacimiento, correo);
 	                    reader.close();
 	                    return jugador;
 	                }

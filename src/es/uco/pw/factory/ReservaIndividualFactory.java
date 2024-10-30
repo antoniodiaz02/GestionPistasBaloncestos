@@ -1,6 +1,10 @@
 package es.uco.pw.factory;
 
 import es.uco.pw.data.*;
+import es.uco.pw.data.dto.ReservaAdultosDTO;
+import es.uco.pw.data.dto.ReservaFamiliarDTO;
+import es.uco.pw.data.dto.ReservaInfantilDTO;
+
 import java.util.Date;
 
 /**
@@ -34,8 +38,8 @@ public class ReservaIndividualFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaInfantil creado
      */
     @Override
-    public ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
-        return new ReservaInfantil(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
+    public ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
+        return new ReservaInfantilDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
     }
 
     /**
@@ -51,8 +55,8 @@ public class ReservaIndividualFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaFamiliar creado
      */
     @Override
-    public ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
-        return new ReservaFamiliar(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
+    public ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+        return new ReservaFamiliarDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
     }
 
     /**
@@ -67,7 +71,7 @@ public class ReservaIndividualFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaAdultos creado.
      */
     @Override
-    public ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
-        return new ReservaAdultos(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
+    public ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
+        return new ReservaAdultosDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
     }
 }

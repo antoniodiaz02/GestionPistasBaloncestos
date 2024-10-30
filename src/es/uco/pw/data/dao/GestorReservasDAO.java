@@ -1,14 +1,12 @@
-package es.uco.pw.gestores;
+package es.uco.pw.data.dao;
 
-import es.uco.pw.data.Jugador;
-
-
-import es.uco.pw.data.Pista;
-import es.uco.pw.data.Pista.TamanoPista;
-import es.uco.pw.data.Reserva;
-import es.uco.pw.data.ReservaAdultos;
-import es.uco.pw.data.ReservaFamiliar;
-import es.uco.pw.data.ReservaInfantil;
+import es.uco.pw.data.dto.JugadorDTO;
+import es.uco.pw.data.dto.PistaDTO;
+import es.uco.pw.data.dto.ReservaDTO;
+import es.uco.pw.data.dto.ReservaAdultosDTO;
+import es.uco.pw.data.dto.ReservaFamiliarDTO;
+import es.uco.pw.data.dto.ReservaInfantilDTO;
+import es.uco.pw.data.dto.PistaDTO.TamanoPista;
 import es.uco.pw.factory.ReservaBonoFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  * Clase que gestiona las Reservas de las pistas de baloncesto.
  */
-public class GestorReservas {
+public class GestorReservasDAO {
 	
     private final String rutaArchivoJugadores = "src/es/uco/pw/files/users.txt";
     private final String rutaArchivoPistas = "src/es/uco/pw/files/pistas.txt";
@@ -44,7 +42,7 @@ public class GestorReservas {
     /**
      * Constructor de la clase GestorReservas.
      */
-    public GestorReservas() {
+    public GestorReservasDAO() {
         // Constructor vacío si no tenemos nada que inicializar
     }
     
@@ -60,9 +58,9 @@ public class GestorReservas {
 	 * @param tipoReserva Clase Reserva que tiene más cantidad de detalles de la reserva como el tipo de reserva, el tamaño de la pista...
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
-    public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva) {
-        Jugador jugador = buscarJugador(correoUsuario);
-        Pista pista = buscarPista(nombrePista);
+    public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva) {
+        JugadorDTO jugador = buscarJugador(correoUsuario);
+        PistaDTO pista = buscarPista(nombrePista);
         
         
         // Comprobación adicional para evitar reservas en la misma pista y hora
@@ -94,17 +92,17 @@ public class GestorReservas {
 
         String idReserva= generarIdentificadorUnicoReservas();
         
-        Reserva reserva = null;
+        ReservaDTO reserva = null;
         float precio = calcularPrecio(duracion);
         float descuento = jugador.calcularAntiguedad() > 2 ? precio * 0.1f : 0;
 
         // Crear la instancia de la reserva de acuerdo con el tipo
-        if (tipoReserva == ReservaInfantil.class && pista.getTamanoPista() == Pista.TamanoPista.MINIBASKET) {
-            reserva = new ReservaInfantil(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroNinos);
-        } else if (tipoReserva == ReservaFamiliar.class && (pista.getTamanoPista() == Pista.TamanoPista.MINIBASKET || pista.getTamanoPista() == Pista.TamanoPista.TRES_VS_TRES)) {
-            reserva = new ReservaFamiliar(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
-        } else if (tipoReserva == ReservaAdultos.class) {
-            reserva = new ReservaAdultos(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
+        if (tipoReserva == ReservaInfantilDTO.class && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) {
+            reserva = new ReservaInfantilDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroNinos);
+        } else if (tipoReserva == ReservaFamiliarDTO.class && (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
+            reserva = new ReservaFamiliarDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
+        } else if (tipoReserva == ReservaAdultosDTO.class) {
+            reserva = new ReservaAdultosDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
         }
 
         if (reserva != null) {
@@ -129,9 +127,9 @@ public class GestorReservas {
 	 * @param bonoId El identificador del bono con el que se va a realizar la reserva.
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
-    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends Reserva> tipoReserva, String bonoId) {
-    	Jugador jugador = buscarJugador(correoUsuario);
-        Pista pista = buscarPista(nombrePista);
+    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, String bonoId) {
+    	JugadorDTO jugador = buscarJugador(correoUsuario);
+        PistaDTO pista = buscarPista(nombrePista);
         
         
         // Comprobación adicional para evitar reservas en la misma pista y hora
@@ -171,18 +169,18 @@ public class GestorReservas {
         // 2. Realización de la reserva.
         String idReserva= generarIdentificadorUnicoReservas();
         
-        Reserva reserva = null;
+        ReservaDTO reserva = null;
         ReservaBonoFactory reservaBono = new ReservaBonoFactory(bonoId, sesion);
     	
         float precio = calcularPrecio(duracion);
         float descuento = 0.05f;
         
         
-        if (tipoReserva == ReservaInfantil.class && pista.getTamanoPista() == Pista.TamanoPista.MINIBASKET) {
+        if (tipoReserva == ReservaInfantilDTO.class && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) {
         	reserva= reservaBono.createReservaInfantil(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroNinos);
-        } else if (tipoReserva == ReservaFamiliar.class && (pista.getTamanoPista() == Pista.TamanoPista.MINIBASKET || pista.getTamanoPista() == Pista.TamanoPista.TRES_VS_TRES)) {
+        } else if (tipoReserva == ReservaFamiliarDTO.class && (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
             reserva= reservaBono.createReservaFamiliar(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
-        } else if (tipoReserva == ReservaAdultos.class) {
+        } else if (tipoReserva == ReservaAdultosDTO.class) {
             reserva= reservaBono.createReservaAdultos(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
         }
         
@@ -206,7 +204,7 @@ public class GestorReservas {
 	 * @return Devuelve true si el procedimiento de creacion del bono se ha hecho de manera correcta, y false si hay algo que falla.
 	 */
     public boolean hacerNuevoBono(String correoUsuario, TamanoPista tamano){
-    	Jugador jugador = buscarJugador(correoUsuario);
+    	JugadorDTO jugador = buscarJugador(correoUsuario);
     	if (jugador == null) return false;
     	
     	// Valor por defecto para las sesiones de un bono nuevo
@@ -341,7 +339,7 @@ public class GestorReservas {
      * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    public Jugador buscarJugador(String correoElectronico) {
+    public JugadorDTO buscarJugador(String correoElectronico) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -359,7 +357,7 @@ public class GestorReservas {
                     }
                     
                     // Creamos el objeto Jugador con los datos adaptados
-                    return new Jugador(datos[0], fechaNacimiento, datos[2]); // nombreCompleto, fechaNacimiento, correoElectronico
+                    return new JugadorDTO(datos[0], fechaNacimiento, datos[2]); // nombreCompleto, fechaNacimiento, correoElectronico
                 }
             }
         } catch (IOException e) {
@@ -378,13 +376,13 @@ public class GestorReservas {
      * @return Un objeto Pista si el nombre existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    public Pista buscarPista(String nombre) {
+    public PistaDTO buscarPista(String nombre) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoPistas))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";");
                 if (datos[0].equals(nombre)) {
-                    return new Pista(datos[0], Boolean.parseBoolean(datos[2]), Boolean.parseBoolean(datos[3]), Pista.TamanoPista.valueOf(datos[1]), Integer.parseInt(datos[4]));
+                    return new PistaDTO(datos[0], Boolean.parseBoolean(datos[2]), Boolean.parseBoolean(datos[3]), PistaDTO.TamanoPista.valueOf(datos[1]), Integer.parseInt(datos[4]));
 
                 }
             }
@@ -400,15 +398,15 @@ public class GestorReservas {
 	 * @param reserva Clase Reserva que tiene todos los datos de la reserva.
 	 * @param idReserva Identificador único de la reserva.
 	 */
-    private void guardarReservaEnArchivo(Reserva reserva, String idReserva) {
+    private void guardarReservaEnArchivo(ReservaDTO reserva, String idReserva) {
     	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivoReservas, true))) {
             String tipoReserva;
-            if (reserva instanceof ReservaInfantil) {
+            if (reserva instanceof ReservaInfantilDTO) {
                 tipoReserva = "INFANTIL";
-            } else if (reserva instanceof ReservaFamiliar) {
+            } else if (reserva instanceof ReservaFamiliarDTO) {
                 tipoReserva = "FAMILIAR";
-            } else if (reserva instanceof ReservaAdultos) {
+            } else if (reserva instanceof ReservaAdultosDTO) {
                 tipoReserva = "ADULTOS";
             } else {
                 throw new IllegalArgumentException("Tipo de reserva desconocido");
@@ -417,9 +415,9 @@ public class GestorReservas {
             String linea = idReserva + ";" + tipoReserva + ";" + reserva.getUsuarioId() + ";" + reserva.getPistaId() + ";" 
                            + sdf.format(reserva.getFechaHora()) + ";" + reserva.getDuracion() + ";" 
                            + reserva.getPrecio() + ";" + reserva.getDescuento() + ";" 
-                           + ((reserva instanceof ReservaInfantil) ? ((ReservaInfantil) reserva).getNumNinos()
-                           : (reserva instanceof ReservaFamiliar) ? ((ReservaFamiliar) reserva).getNumNinos() + ";" + ((ReservaFamiliar) reserva).getNumAdultos()
-                           : ((ReservaAdultos) reserva).getNumAdultos());
+                           + ((reserva instanceof ReservaInfantilDTO) ? ((ReservaInfantilDTO) reserva).getNumNinos()
+                           : (reserva instanceof ReservaFamiliarDTO) ? ((ReservaFamiliarDTO) reserva).getNumNinos() + ";" + ((ReservaFamiliarDTO) reserva).getNumAdultos()
+                           : ((ReservaAdultosDTO) reserva).getNumAdultos());
 
             bw.write(linea);
             bw.newLine();
@@ -684,7 +682,7 @@ public class GestorReservas {
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
 	 */
-	public int modificarReserva(String idReserva, Reserva nuevaReserva) throws IOException {
+	public int modificarReserva(String idReserva, ReservaDTO nuevaReserva) throws IOException {
         int codigo = 0;
         List<String> lineas = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -715,15 +713,15 @@ public class GestorReservas {
                     // Si encontramos la reserva, lo actualizamos
                     if (id.equals(idReserva)) {
                         String nuevaLinea = idReserva + ";" 
-                        		+ ((nuevaReserva instanceof ReservaInfantil) ? "INFANTIL"
-                                : (nuevaReserva instanceof ReservaFamiliar) ? "FAMILIAR"
+                        		+ ((nuevaReserva instanceof ReservaInfantilDTO) ? "INFANTIL"
+                                : (nuevaReserva instanceof ReservaFamiliarDTO) ? "FAMILIAR"
                                 : "ADULTOS")
                         		+ ";" + nuevaReserva.getUsuarioId() + ";" + nuevaReserva.getPistaId() + ";" 
                                 + sdf.format(nuevaReserva.getFechaHora()) + ";" + nuevaReserva.getDuracion() + ";" 
                                 + calcularPrecio(nuevaReserva.getDuracion()) + ";" + nuevaReserva.getDescuento() + ";" 
-                                + ((nuevaReserva instanceof ReservaInfantil) ? ((ReservaInfantil) nuevaReserva).getNumNinos()
-                                : (nuevaReserva instanceof ReservaFamiliar) ? ((ReservaFamiliar) nuevaReserva).getNumNinos() + ((ReservaFamiliar) nuevaReserva).getNumAdultos()
-                                : ((ReservaAdultos) nuevaReserva).getNumAdultos());
+                                + ((nuevaReserva instanceof ReservaInfantilDTO) ? ((ReservaInfantilDTO) nuevaReserva).getNumNinos()
+                                : (nuevaReserva instanceof ReservaFamiliarDTO) ? ((ReservaFamiliarDTO) nuevaReserva).getNumNinos() + ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos()
+                                : ((ReservaAdultosDTO) nuevaReserva).getNumAdultos());
                         lineas.add(nuevaLinea);
                         reservaModificada = true;
                     } else {
@@ -1058,7 +1056,7 @@ public class GestorReservas {
 	
 	
 	
-	public Reserva obtenerReservaPorId(String idReserva) {
+	public ReservaDTO obtenerReservaPorId(String idReserva) {
         try {
             // Abrimos el archivo en modo lectura
             BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
@@ -1092,18 +1090,18 @@ public class GestorReservas {
                         continue; // Saltar esta línea si la fecha no es válida
                     }
 
-                    Reserva reserva;
+                    ReservaDTO reserva;
                     if(tamanoPista== "ADULTOS") {
-                    	reserva = new ReservaAdultos(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
+                    	reserva = new ReservaAdultosDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
                     }
                     
                     else if(tamanoPista== "FAMILIAR") {
                     	int numadultos = Integer.parseInt(datos[9]);
-                    	reserva = new ReservaFamiliar(usuarioId, fechaHora, duracion, pistaId, precio, descuento,numadultos,particip);
+                    	reserva = new ReservaFamiliarDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,numadultos,particip);
                     }
                     
                     else {
-                    	reserva = new ReservaInfantil(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
+                    	reserva = new ReservaInfantilDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
                     }
                     // Crear una nueva instancia de Reserva con los datos
 

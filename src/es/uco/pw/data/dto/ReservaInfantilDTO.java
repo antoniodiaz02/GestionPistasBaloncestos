@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 import java.util.Date;
 
 
@@ -12,7 +12,7 @@ import java.util.Date;
  *  @since 12-10-2024
  *  @version 1.0
  */
-public class ReservaInfantil extends Reserva {
+public class ReservaInfantilDTO extends ReservaDTO {
 
     /**
      * Número de niños en la reserva
@@ -22,7 +22,7 @@ public class ReservaInfantil extends Reserva {
     /**
      * Constructor vacío de la clase ReservaInfantil
      */
-    public ReservaInfantil() {}
+    public ReservaInfantilDTO() {}
    
     
     /**
@@ -35,7 +35,7 @@ public class ReservaInfantil extends Reserva {
      * @param descuento Descuento a aplicar.
      * @param numeroNinos Nuemero de ninos.
      */
-    public ReservaInfantil(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroNinos) {
+    public ReservaInfantilDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
         this.numNinos = numeroNinos;
     }

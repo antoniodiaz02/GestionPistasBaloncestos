@@ -1,8 +1,9 @@
 package es.uco.pw.display.main;
 
-import es.uco.pw.data.Jugador;
-import es.uco.pw.gestores.GestorUsuarios;
+import es.uco.pw.data.dao.GestorUsuariosDAO;
+import es.uco.pw.data.dto.JugadorDTO;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +25,7 @@ import java.io.IOException;
 *  */
 public class MenuUsuarios {
     
-    private GestorUsuarios gestor;
+    private GestorUsuariosDAO gestor;
     private SimpleDateFormat sdf;
     private Scanner scanner;
 
@@ -32,7 +33,7 @@ public class MenuUsuarios {
     * Constructor de la clase MenuUsuarios
     *  */
     public MenuUsuarios() {
-        this.gestor = new GestorUsuarios();
+        this.gestor = new GestorUsuariosDAO();
         this.sdf = new SimpleDateFormat("dd/MM/yyyy");
         this.scanner = new Scanner(System.in);
     }
@@ -96,7 +97,7 @@ public class MenuUsuarios {
             System.out.print("Correo electrónico: ");
             String correo = scanner.nextLine();
 
-            Jugador nuevoJugador = new Jugador(nombre, fechaNacimiento, correo);
+            JugadorDTO nuevoJugador = new JugadorDTO(nombre, fechaNacimiento, correo);
             int codigo = gestor.insertarUsuario(nuevoJugador);
 
             if (codigo == 1) {
@@ -130,7 +131,7 @@ public class MenuUsuarios {
         try {
             System.out.print("\n Introduce el correo del usuario a modificar: ");
             String correoModificar = scanner.nextLine();
-            Jugador jugadorExistente = gestor.buscarUsuarioPorCorreo(correoModificar);
+            JugadorDTO jugadorExistente = gestor.buscarUsuarioPorCorreo(correoModificar);
 
             if (jugadorExistente == null) {
                 System.out.println("\n ERROR! Usuario no encontrado.");

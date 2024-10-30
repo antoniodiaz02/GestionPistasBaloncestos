@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 
 import java.util.Date;
 
@@ -12,7 +12,7 @@ import java.util.Date;
  *  @since -10-2024
  *  @version 1.0
  */
-public abstract class Reserva {
+public abstract class ReservaDTO {
 
     /**
      * Identificador del usuario que realiza la reserva (previamente registrado)
@@ -63,7 +63,7 @@ public abstract class Reserva {
      * @param precio Precio.
      * @param descuento Descuento a aplicar.
      */
-    public Reserva(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
+    public ReservaDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
         this.usuarioId = idUsuario;
         this.fechaHora = fechaHora;
         this.duracion = duracionMinutos;
@@ -75,7 +75,7 @@ public abstract class Reserva {
     /**
      * Constructor vacío de la clase Reserva
      */
-    public Reserva() {}
+    public ReservaDTO() {}
 
     /**
      * Devuelve el identificador del usuario

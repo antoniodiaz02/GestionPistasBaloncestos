@@ -2,6 +2,9 @@ package es.uco.pw.factory;
 
 import java.util.Date;
 import es.uco.pw.data.*;
+import es.uco.pw.data.dto.ReservaAdultosDTO;
+import es.uco.pw.data.dto.ReservaFamiliarDTO;
+import es.uco.pw.data.dto.ReservaInfantilDTO;
 
 /**
  * Factory concreta para crear reservas bono con parámetros
@@ -49,9 +52,9 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaInfantil creado
      */
     @Override
-    public ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
+    public ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
         
-        ReservaInfantil reserva = new ReservaInfantil(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
+        ReservaInfantilDTO reserva = new ReservaInfantilDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
         reserva.setBonoId(bonoId); 
         reserva.setSesion(sesion); 
         return reserva;
@@ -70,9 +73,9 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaFamiliar creado
      */
     @Override
-    public ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+    public ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         
-        ReservaFamiliar reserva = new ReservaFamiliar(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
+        ReservaFamiliarDTO reserva = new ReservaFamiliarDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
         reserva.setBonoId(bonoId);
         reserva.setSesion(sesion);
         return reserva;
@@ -90,9 +93,9 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaAdultos creado
      */
     @Override
-    public ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
+    public ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
         
-        ReservaAdultos reserva = new ReservaAdultos(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
+        ReservaAdultosDTO reserva = new ReservaAdultosDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
         reserva.setBonoId(bonoId); 
         reserva.setSesion(sesion); 
         return reserva;

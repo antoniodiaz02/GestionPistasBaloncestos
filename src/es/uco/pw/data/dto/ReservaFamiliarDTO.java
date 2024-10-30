@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 import java.util.Date;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Date;
  *  @since 08-10-2024
  *  @version 1.0
  */
-public class ReservaFamiliar extends Reserva {
+public class ReservaFamiliarDTO extends ReservaDTO {
 
     /**
      * Número de adultos en la reserva
@@ -26,7 +26,7 @@ public class ReservaFamiliar extends Reserva {
     /**
      * Constructor vacío de la clase ReservaFamiliar
      */
-    public ReservaFamiliar() {}
+    public ReservaFamiliarDTO() {}
 
     /** Constructor parametrizable de la subclase ReservaFamiliar
      * @param idUsuario Identificador del usuario.
@@ -38,7 +38,7 @@ public class ReservaFamiliar extends Reserva {
      * @param numeroAdultos Numero de adultos.
      * @param numeroNinos Numero de ninos.
      */
-    public ReservaFamiliar(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+    public ReservaFamiliarDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
         this.numAdultos = numeroAdultos;
         this.numNinos = numeroNinos;

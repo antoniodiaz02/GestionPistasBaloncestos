@@ -1,5 +1,9 @@
 package es.uco.pw.factory;
 import es.uco.pw.data.*;
+import es.uco.pw.data.dto.ReservaAdultosDTO;
+import es.uco.pw.data.dto.ReservaFamiliarDTO;
+import es.uco.pw.data.dto.ReservaInfantilDTO;
+
 import java.util.Date;
 
 /**
@@ -32,7 +36,7 @@ public abstract class ReservaFactory {
      * @param numeroNinos Número de niños en la reserva
      * @return ReservaInfantil
      */
-    public abstract ReservaInfantil createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos);
+    public abstract ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva familiar.
@@ -46,7 +50,7 @@ public abstract class ReservaFactory {
      * @param numeroNinos Número de niños en la reserva
      * @return ReservaFamiliar
      */
-    public abstract ReservaFamiliar createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
+    public abstract ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva para adultos.
@@ -59,5 +63,5 @@ public abstract class ReservaFactory {
      * @param numeroAdultos Número de adultos en la reserva
      * @return ReservaAdultos
      */
-    public abstract ReservaAdultos createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos);
+    public abstract ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos);
 }

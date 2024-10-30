@@ -3,34 +3,26 @@ package es.uco.pw.display.main;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import es.uco.pw.data.Material;
-import es.uco.pw.data.Pista;
-import es.uco.pw.data.Material.TipoMaterial;
-import es.uco.pw.data.Material.EstadoMaterial;
-import es.uco.pw.data.Pista.TamanoPista;
-import es.uco.pw.gestores.GestorPistas;
-/**
- *  @author Antonio Diaz Barbancho
- *  @author Carlos Marín Rodríguez 
- *  @author Carlos De la Torre Frias (GM2)
- *  @author Daniel Grande Rubio (GM2)
- *  @since 08-10-2024
- *  @version 1.0
- */
+import es.uco.pw.data.dao.GestorPistasDAO;
+import es.uco.pw.data.dto.MaterialDTO;
+import es.uco.pw.data.dto.PistaDTO;
+import es.uco.pw.data.dto.MaterialDTO.EstadoMaterial;
+import es.uco.pw.data.dto.MaterialDTO.TipoMaterial;
+import es.uco.pw.data.dto.PistaDTO.TamanoPista;
 
 /**
 * Menu Pistas dentro del sistema.
  */
 public class MenuPistas {
 
-    private GestorPistas gestor;
+    private GestorPistasDAO gestor;
     private Scanner sc;
 
     /**
     * Constructor de la clase MenuPistas
      */
     public MenuPistas() {
-        this.gestor = new GestorPistas();
+        this.gestor = new GestorPistasDAO();
         this.sc = new Scanner(System.in);
     }
 
@@ -149,10 +141,10 @@ public class MenuPistas {
     private void asociarMaterialAPista() {
         System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
         String nombrePista = sc.nextLine();
-        Pista pista = null;
+        PistaDTO pista = null;
 
         // Buscamos en todas las pistas (disponibles y no disponibles)
-        for (Pista p : gestor.listarTodasLasPistas()) {
+        for (PistaDTO p : gestor.listarTodasLasPistas()) {
             if (p.getNombre().equalsIgnoreCase(nombrePista)) {
                 pista = p;
                 break;
@@ -166,9 +158,9 @@ public class MenuPistas {
 
         System.out.print("Ingrese el ID del material a asociar: ");
         int idMaterial = sc.nextInt();
-        Material material = null;
+        MaterialDTO material = null;
 
-        for (Material m : gestor.getMateriales()) {
+        for (MaterialDTO m : gestor.getMateriales()) {
             if (m.getIdMaterial() == idMaterial) {
                 material = m;
                 break;

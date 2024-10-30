@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  *  @since 08-10-2024
  *  @version 1.0
  */
-public class Jugador {
+public class JugadorDTO {
 
     /**
      * Nombre y apellidos del jugador
@@ -39,7 +39,7 @@ public class Jugador {
     /**
      * Constructor vacio clase Jugador
      */
-    public Jugador() {
+    public JugadorDTO() {
     	
     }
     
@@ -50,7 +50,7 @@ public class Jugador {
      * @param fechaNacimiento Fecha de nacimiento del jugador
      * @param correoElectronico Correo electrónico del jugador
      */
-    public Jugador(String nombreCompleto, Date fechaNacimiento, String correoElectronico) {
+    public JugadorDTO(String nombreCompleto, Date fechaNacimiento, String correoElectronico) {
         this.nombreCompleto = nombreCompleto;
         this.fechaNacimiento = fechaNacimiento;
         this.correoElectronico = correoElectronico;

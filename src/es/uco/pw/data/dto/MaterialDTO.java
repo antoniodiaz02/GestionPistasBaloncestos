@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 
 /**
  * Clase que representa el material que puede ser reservado junto a la pista .
@@ -11,7 +11,7 @@ package es.uco.pw.data;
  * @version 1.0
  */
 
-public class Material{
+public class MaterialDTO{
 	
 	/**
 	 * Identificador del material a reservar
@@ -81,7 +81,7 @@ public class Material{
     /**
 	 * Constructor vacio de la clase Material
 	 */
-    public Material() {
+    public MaterialDTO() {
     	
     }
     
@@ -93,7 +93,7 @@ public class Material{
      * @param estadoMaterial Para indicar el estado del material
      * 
  	*/
-    public Material(int idMaterial, TipoMaterial tipoMaterial, boolean usoInterior, EstadoMaterial estadoMaterial) {
+    public MaterialDTO(int idMaterial, TipoMaterial tipoMaterial, boolean usoInterior, EstadoMaterial estadoMaterial) {
         this.idMaterial = idMaterial;
         this.tipoMaterial = tipoMaterial;
         this.usoInterior = usoInterior;

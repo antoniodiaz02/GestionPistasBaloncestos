@@ -1,1 +1,5 @@
-R_0000;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto;1734024600000;60;20.0;0.0;5
+R_0000;INFANTIL;carlosdelatorrefrias@gmail.com;Baloncesto0;21/12/2024 11:00;90;30.0;0.0;10
+R_0002;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto0;21/12/2024 15:00;60;20.0;0.05;10
+R_0003;INFANTIL;sdafasd@uco.es;Minibasket0;01/01/2025 20:00;60;20.0;0.05;8
+R_0004;FAMILIAR;carlosdelatorrefrias@gmail.com;Minibasket0;12/08/2025 11:00;60;20.0;0.0;10
+R_0005;FAMILIAR;carlosdelatorrefrias@gmail.com;Minibasket0;21/02/2025 11:00;60;20.0;0.0;5;5

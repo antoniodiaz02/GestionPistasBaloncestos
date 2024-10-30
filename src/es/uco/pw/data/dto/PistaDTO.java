@@ -1,4 +1,4 @@
-package es.uco.pw.data;
+package es.uco.pw.data.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  *  @since 08-10-2024
  *  @version 1.0
  */
-public class Pista {
+public class PistaDTO {
 
     /**
      * Nombre de la pista
@@ -43,7 +43,7 @@ public class Pista {
     /**
      * Lista de materiales asociados a la pista
      */
-    private List<Material> materiales;
+    private List<MaterialDTO> materiales;
 
     /**
      * Enumeración que representa los diferentes tamaños de las pistas de baloncesto.
@@ -76,7 +76,7 @@ public class Pista {
      * Constructor vacío de la clase Pista
      */
     
-    public Pista() {
+    public PistaDTO() {
     	
     }
     
@@ -90,7 +90,7 @@ public class Pista {
      * @param maxJugadores Máximo de jugadores permitidos
      */
     
-    public Pista(String nombre, boolean disponible, boolean esInterior, TamanoPista tamanoPista, int maxJugadores) {
+    public PistaDTO(String nombre, boolean disponible, boolean esInterior, TamanoPista tamanoPista, int maxJugadores) {
         this.nombre = nombre;
         this.disponible = disponible;
         this.esInterior = esInterior;
@@ -183,10 +183,10 @@ public class Pista {
      * Devuelve el subconjunto de materiales disponible
      * @return disponibles
      */
-    public List<Material> consultarMaterialesDisponibles() {
-        List<Material> disponibles = new ArrayList<>();
-        for (Material material : materiales) {
-            if (material.getEstadoMaterial() == Material.EstadoMaterial.DISPONIBLE) {
+    public List<MaterialDTO> consultarMaterialesDisponibles() {
+        List<MaterialDTO> disponibles = new ArrayList<>();
+        for (MaterialDTO material : materiales) {
+            if (material.getEstadoMaterial() == MaterialDTO.EstadoMaterial.DISPONIBLE) {
                 disponibles.add(material);
             }
         }
@@ -198,7 +198,7 @@ public class Pista {
      * @param material Material a asociar a la pista
      * @return True si se asoció correctamente, False en caso contrario
      */
-    public boolean asociarMaterial(Material material) {
+    public boolean asociarMaterial(MaterialDTO material) {
     	  
     	    // Si la pista es exterior solo aceptar materiales de exterior
     	    if (!esInterior && material.getUsoInterior()) {
@@ -206,17 +206,17 @@ public class Pista {
     	    }
 
     	    // Contar el número de pelotas, canastas y conos ya asociados
-    	    long pelotas = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.PELOTAS).count();
-    	    long canastas = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.CANASTAS).count();
-    	    long conos = materiales.stream().filter(m -> m.getTipoMaterial() == Material.TipoMaterial.CONOS).count();
+    	    long pelotas = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.PELOTAS).count();
+    	    long canastas = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.CANASTAS).count();
+    	    long conos = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.CONOS).count();
 
-    	    if (material.getTipoMaterial() == Material.TipoMaterial.PELOTAS && pelotas >= 12) {
+    	    if (material.getTipoMaterial() == MaterialDTO.TipoMaterial.PELOTAS && pelotas >= 12) {
     	        return false;
     	    }
-    	    if (material.getTipoMaterial() == Material.TipoMaterial.CANASTAS && canastas >= 2) {
+    	    if (material.getTipoMaterial() == MaterialDTO.TipoMaterial.CANASTAS && canastas >= 2) {
     	        return false;
     	    }
-    	    if (material.getTipoMaterial() == Material.TipoMaterial.CONOS && conos >= 20) {
+    	    if (material.getTipoMaterial() == MaterialDTO.TipoMaterial.CONOS && conos >= 20) {
     	        return false;
     	    }
     	    
