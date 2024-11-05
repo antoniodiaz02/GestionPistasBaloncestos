@@ -1,5 +1,0 @@
-B_0000;carlosdelatorrefrias@gmail.com;ADULTOS;4;29/10/2024 12:58
-B_0001;danielgranderubio@gmail.com;TRES_VS_TRES;5;
-B_0002;carlosdelatorrefrias@gmail.com;ADULTOS;5;
-B_0003;sdafasd@uco.es;MINIBASKET;4;29/10/2024 13:10
-B_0004;carlosdelatorrefrias@gmail.com;MINIBASKET;5;

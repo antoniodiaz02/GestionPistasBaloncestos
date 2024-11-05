@@ -1,4 +1,4 @@
-package es.uco.pw.data.dto;
+package es.uco.pw.business.dto;
 
 /**
  * Clase que representa el material que puede ser reservado junto a la pista .

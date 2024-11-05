@@ -3,8 +3,8 @@ package es.uco.pw.data.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.uco.pw.data.dto.MaterialDTO;
-import es.uco.pw.data.dto.PistaDTO;
+import es.uco.pw.business.dto.MaterialDTO;
+import es.uco.pw.business.dto.PistaDTO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

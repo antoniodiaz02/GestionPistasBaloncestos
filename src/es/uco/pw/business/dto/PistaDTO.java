@@ -1,4 +1,4 @@
-package es.uco.pw.data.dto;
+package es.uco.pw.business.dto;
 
 import java.util.ArrayList;
 import java.util.List;

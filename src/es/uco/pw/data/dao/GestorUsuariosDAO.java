@@ -4,11 +4,10 @@ import java.io.FileReader;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.uco.pw.data.dto.JugadorDTO;
+import es.uco.pw.business.dto.JugadorDTO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

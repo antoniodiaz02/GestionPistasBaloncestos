@@ -1,10 +1,10 @@
 package es.uco.pw.factory;
 
 import java.util.Date;
-import es.uco.pw.data.*;
-import es.uco.pw.data.dto.ReservaAdultosDTO;
-import es.uco.pw.data.dto.ReservaFamiliarDTO;
-import es.uco.pw.data.dto.ReservaInfantilDTO;
+
+import es.uco.pw.business.dto.ReservaAdultosDTO;
+import es.uco.pw.business.dto.ReservaFamiliarDTO;
+import es.uco.pw.business.dto.ReservaInfantilDTO;
 
 /**
  * Factory concreta para crear reservas bono con parámetros
