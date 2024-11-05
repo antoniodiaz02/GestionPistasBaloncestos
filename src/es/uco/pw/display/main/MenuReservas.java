@@ -2,13 +2,13 @@ package es.uco.pw.display.main;
 
 
 import es.uco.pw.data.dao.GestorReservasDAO;
-import es.uco.pw.data.dto.JugadorDTO;
-import es.uco.pw.data.dto.PistaDTO;
-import es.uco.pw.data.dto.ReservaDTO;
-import es.uco.pw.data.dto.ReservaAdultosDTO;
-import es.uco.pw.data.dto.ReservaFamiliarDTO;
-import es.uco.pw.data.dto.ReservaInfantilDTO;
-import es.uco.pw.data.dto.PistaDTO.TamanoPista;
+import es.uco.pw.business.dto.JugadorDTO;
+import es.uco.pw.business.dto.PistaDTO;
+import es.uco.pw.business.dto.ReservaDTO;
+import es.uco.pw.business.dto.ReservaAdultosDTO;
+import es.uco.pw.business.dto.ReservaFamiliarDTO;
+import es.uco.pw.business.dto.ReservaInfantilDTO;
+import es.uco.pw.business.dto.PistaDTO.TamanoPista;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
