@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `Usuarios` (
   `fechaNacimiento` DATE NOT NULL,
   `fechaInscripcion` DATE NOT NULL,
   `correoElectronico` VARCHAR(100) NOT NULL UNIQUE,
-  `antiguedad` INT(11) GENERATED ALWAYS AS (YEAR(CURDATE()) - YEAR(`fechaInscripcion`)),
+  -- La antigüedad se calcula mediante una consulta, no como columna generada
   PRIMARY KEY (`idUsuario`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `Reservas` (
   `descuento` BOOLEAN NOT NULL,
   `tipoReserva` ENUM('infantil', 'familiar', 'adultos') NOT NULL,
   PRIMARY KEY (`idReserva`),
-  FOREIGN KEY (`usuarioId`) REFERENCES `Usuarios`(`idUsuario`),
-  FOREIGN KEY (`pistaId`) REFERENCES `Pistas`(`idPista`)
+  KEY `usuarioId` (`usuarioId`),
+  KEY `pistaId` (`pistaId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- Tabla: Bonos
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `Bonos` (
   `fechaCaducidad` DATE NOT NULL,
   `tipoPista` ENUM('minibasket', 'adultos', '3vs3') NOT NULL,
   PRIMARY KEY (`idBono`),
-  FOREIGN KEY (`usuarioId`) REFERENCES `Usuarios`(`idUsuario`)
+  KEY `usuarioId` (`usuarioId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- Tabla intermedia: Material_Pista (relación N:M)
@@ -70,6 +70,6 @@ CREATE TABLE IF NOT EXISTS `Material_Pista` (
   `idPista` INT(11) NOT NULL,
   `idMaterial` INT(11) NOT NULL,
   PRIMARY KEY (`idPista`, `idMaterial`),
-  FOREIGN KEY (`idPista`) REFERENCES `Pistas`(`idPista`),
-  FOREIGN KEY (`idMaterial`) REFERENCES `Materiales`(`idMaterial`)
+  KEY `idPista` (`idPista`),
+  KEY `idMaterial` (`idMaterial`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
