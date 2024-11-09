@@ -4,6 +4,7 @@ import es.uco.pw.common.DBConnection;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.ResultSetMetaData;
 
 public class TestConexionDB {
 
@@ -23,14 +24,27 @@ public class TestConexionDB {
                 // Creamos un Statement para ejecutar consultas SQL
                 Statement statement = connection.createStatement();
                 
-                // Ejecutamos una consulta para obtener las tablas de la base de datos
-                String sql = "SHOW TABLES"; // Para MySQL. Si usas otro DBMS, cambia la consulta
+                // Ejecutamos una consulta para obtener todos los registros de la tabla Pistas
+                String sql = "SELECT * FROM Pistas;";
                 ResultSet resultSet = statement.executeQuery(sql);
 
-                // Imprimimos las tablas
-                System.out.println("Tablas en la base de datos:");
+                // Obtenemos la metadata para saber cuántas columnas tiene la tabla
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Imprimir encabezados de las columnas
+                System.out.println("Datos de la tabla Pistas:");
+                for (int i = 1; i <= columnCount; i++) {
+                    System.out.print(metaData.getColumnName(i) + "\t");
+                }
+                System.out.println();
+
+                // Iterar sobre cada fila en el ResultSet e imprimir sus valores
                 while (resultSet.next()) {
-                    System.out.println(resultSet.getString(1)); // Imprime el nombre de cada tabla
+                    for (int i = 1; i <= columnCount; i++) {
+                        System.out.print(resultSet.getString(i) + "\t");
+                    }
+                    System.out.println(); // Salto de línea entre registros
                 }
                 
                 // Cerramos el ResultSet y Statement
