@@ -8,7 +8,7 @@ import es.uco.pw.business.DTOs.ReservaDTO;
 import es.uco.pw.business.DTOs.ReservaFamiliarDTO;
 import es.uco.pw.business.DTOs.ReservaInfantilDTO;
 import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
-import es.uco.pw.business.Gestores.GestorReservasDAO;
+import es.uco.pw.business.Gestores.GestorReservas;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,7 +39,7 @@ public class MenuReservas {
         // Constructor por defecto
     }
 	
-    private static final GestorReservasDAO gestorReservas = new GestorReservasDAO();
+    private static final GestorReservas gestorReservas = new GestorReservas();
     private static final Scanner scanner = new Scanner(System.in); // Definir Scanner como estático
 
     /**

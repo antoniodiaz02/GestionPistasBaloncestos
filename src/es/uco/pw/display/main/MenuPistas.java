@@ -9,21 +9,21 @@ import es.uco.pw.business.DTOs.PistaDTO;
 import es.uco.pw.business.DTOs.MaterialDTO.EstadoMaterial;
 import es.uco.pw.business.DTOs.MaterialDTO.TipoMaterial;
 import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
-import es.uco.pw.business.Gestores.GestorPistasDAO;
+import es.uco.pw.business.Gestores.GestorPistas;
 
 /**
  * Menú de Gestión de Pistas dentro del sistema.
  */
 public class MenuPistas {
 
-    private GestorPistasDAO gestor;
+    private GestorPistas gestor;
     private Scanner sc;
 
     /**
      * Constructor de la clase MenuPistas
      */
     public MenuPistas() {
-        this.gestor = new GestorPistasDAO();
+        this.gestor = new GestorPistas();
         this.sc = new Scanner(System.in);
     }
 

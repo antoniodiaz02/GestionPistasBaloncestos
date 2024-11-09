@@ -8,7 +8,10 @@ import es.uco.pw.business.DTOs.MaterialDTO;
 import es.uco.pw.data.DAOs.MaterialDAO;
 import es.uco.pw.data.DAOs.PistaDAO;
 
-public class GestorPistasDAO {
+/**
+ * Clase que gestiona las pistas.
+ */
+public class GestorPistas {
 
     // Instanciación de los DAOs para acceder a las bases de datos correspondientes
     MaterialDAO daoMaterial = new MaterialDAO();
@@ -17,7 +20,7 @@ public class GestorPistasDAO {
     /**
      * Constructor de la clase GestorPistasDAO.
      */
-    public GestorPistasDAO() {}
+    public GestorPistas() {}
 
     /**
      * Método para crear una nueva pista y guardarla.

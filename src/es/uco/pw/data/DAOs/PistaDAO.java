@@ -11,14 +11,20 @@ import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * Clase que gestiona las pistas en la base de datos.
+ */
 public class PistaDAO {
 
     private Connection connection;
     private Properties properties;
 
+    /**
+     * Constructor que inicializa la conexión con base de datos.
+     */
     public PistaDAO() {
         properties = new Properties();
-        try (FileInputStream input = new FileInputStream("sql.properties")) {
+        try (FileInputStream input = new FileInputStream("src/sql.properties")) {
             properties.load(input);
         } catch (IOException e) {
             System.err.println("Error loading SQL properties file: " + e.getMessage());

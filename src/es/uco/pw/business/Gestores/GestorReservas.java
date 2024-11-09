@@ -33,7 +33,7 @@ import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
 /**
  * Clase que gestiona las Reservas de las pistas de baloncesto.
  */
-public class GestorReservasDAO {
+public class GestorReservas {
 	
     private final String rutaArchivoJugadores = "src/es/uco/pw/files/users.txt";
     private final String rutaArchivoPistas = "src/es/uco/pw/files/pistas.txt";
@@ -43,7 +43,7 @@ public class GestorReservasDAO {
     /**
      * Constructor de la clase GestorReservas.
      */
-    public GestorReservasDAO() {
+    public GestorReservas() {
         // Constructor vacío si no tenemos nada que inicializar
     }
     

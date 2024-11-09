@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * Clase pricipal para gestionar usuarios.
  */
-public class GestorUsuariosDAO {
+public class GestorUsuarios {
 	
     /**
      * Lista que almacena los usuarios registrados.
@@ -39,7 +39,7 @@ public class GestorUsuariosDAO {
     /**
      * Constructor de la clase GestorUsuarios. Inicializa la lista de usuarios.
      */
-    public GestorUsuariosDAO() {
+    public GestorUsuarios() {
         usuarios = new ArrayList<>();
     }
 

@@ -1,7 +1,7 @@
 package es.uco.pw.display.main;
 
 import es.uco.pw.business.DTOs.JugadorDTO;
-import es.uco.pw.business.Gestores.GestorUsuariosDAO;
+import es.uco.pw.business.Gestores.GestorUsuarios;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -25,7 +25,7 @@ import java.io.IOException;
 *  */
 public class MenuUsuarios {
     
-    private GestorUsuariosDAO gestor;
+    private GestorUsuarios gestor;
     private SimpleDateFormat sdf;
     private Scanner scanner;
 
@@ -33,7 +33,7 @@ public class MenuUsuarios {
     * Constructor de la clase MenuUsuarios
     *  */
     public MenuUsuarios() {
-        this.gestor = new GestorUsuariosDAO();
+        this.gestor = new GestorUsuarios();
         this.sdf = new SimpleDateFormat("dd/MM/yyyy");
         this.scanner = new Scanner(System.in);
     }
