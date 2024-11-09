@@ -1,10 +1,10 @@
-package es.uco.pw.factory;
-
-import es.uco.pw.business.dto.ReservaAdultosDTO;
-import es.uco.pw.business.dto.ReservaFamiliarDTO;
-import es.uco.pw.business.dto.ReservaInfantilDTO;
+package es.uco.pw.business;
 
 import java.util.Date;
+
+import es.uco.pw.business.DTOs.ReservaAdultosDTO;
+import es.uco.pw.business.DTOs.ReservaFamiliarDTO;
+import es.uco.pw.business.DTOs.ReservaInfantilDTO;
 
 /**
  * Clase abstracta que representa una fábrica de reservas.

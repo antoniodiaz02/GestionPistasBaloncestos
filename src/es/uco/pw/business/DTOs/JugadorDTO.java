@@ -1,4 +1,4 @@
-package es.uco.pw.business.dto;
+package es.uco.pw.business.DTOs;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;

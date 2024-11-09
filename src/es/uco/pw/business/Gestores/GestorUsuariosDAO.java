@@ -1,4 +1,4 @@
-package es.uco.pw.data.dao;
+package es.uco.pw.business.Gestores;
 
 import java.io.FileReader;
 
@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.uco.pw.business.dto.JugadorDTO;
+import es.uco.pw.business.DTOs.JugadorDTO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

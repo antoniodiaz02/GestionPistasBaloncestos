@@ -3,12 +3,12 @@ package es.uco.pw.display.main;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import es.uco.pw.data.dao.GestorPistasDAO;
-import es.uco.pw.business.dto.MaterialDTO;
-import es.uco.pw.business.dto.PistaDTO;
-import es.uco.pw.business.dto.MaterialDTO.EstadoMaterial;
-import es.uco.pw.business.dto.MaterialDTO.TipoMaterial;
-import es.uco.pw.business.dto.PistaDTO.TamanoPista;
+import es.uco.pw.business.DTOs.MaterialDTO;
+import es.uco.pw.business.DTOs.PistaDTO;
+import es.uco.pw.business.DTOs.MaterialDTO.EstadoMaterial;
+import es.uco.pw.business.DTOs.MaterialDTO.TipoMaterial;
+import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
+import es.uco.pw.business.Gestores.GestorPistasDAO;
 
 /**
 * Menu Pistas dentro del sistema.

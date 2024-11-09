@@ -1,10 +1,10 @@
-package es.uco.pw.data.dao;
+package es.uco.pw.business.Gestores;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import es.uco.pw.business.dto.MaterialDTO;
-import es.uco.pw.business.dto.PistaDTO;
+import es.uco.pw.business.DTOs.MaterialDTO;
+import es.uco.pw.business.DTOs.PistaDTO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

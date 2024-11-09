@@ -1,7 +1,7 @@
 package es.uco.pw.display.main;
 
-import es.uco.pw.data.dao.GestorUsuariosDAO;
-import es.uco.pw.business.dto.JugadorDTO;
+import es.uco.pw.business.DTOs.JugadorDTO;
+import es.uco.pw.business.Gestores.GestorUsuariosDAO;
 
 import java.sql.SQLException;
 import java.text.ParseException;
