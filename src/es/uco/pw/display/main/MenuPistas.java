@@ -1,6 +1,7 @@
 package es.uco.pw.display.main;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 import es.uco.pw.business.DTOs.MaterialDTO;
@@ -11,7 +12,7 @@ import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
 import es.uco.pw.business.Gestores.GestorPistasDAO;
 
 /**
-* Menu Pistas dentro del sistema.
+ * Menú de Gestión de Pistas dentro del sistema.
  */
 public class MenuPistas {
 
@@ -19,7 +20,7 @@ public class MenuPistas {
     private Scanner sc;
 
     /**
-    * Constructor de la clase MenuPistas
+     * Constructor de la clase MenuPistas
      */
     public MenuPistas() {
         this.gestor = new GestorPistasDAO();
@@ -40,7 +41,7 @@ public class MenuPistas {
             System.out.println("  4. Listar Pistas No Disponibles");
             System.out.println("  5. Buscar Pistas Libres");
             System.out.println("  6. Mostrar todas las Pistas");
-            System.out.println("7. Salir");
+            System.out.println("  7. Salir");
             System.out.print("Seleccione una opción: ");
 
             try {
@@ -54,9 +55,9 @@ public class MenuPistas {
                     case 2:
                         crearMaterial();
                         break;
-                    case 3:
-                        asociarMaterialAPista();
-                        break;
+//                    case 3:
+//                        asociarMaterialAPista();
+//                        break;
                     case 4:
                         listarPistasNoDisponibles();
                         break;
@@ -79,6 +80,7 @@ public class MenuPistas {
             }
         }
     }
+
     /**
      * Crea la pista.
      */
@@ -102,8 +104,15 @@ public class MenuPistas {
         int maxJugadores = sc.nextInt();
         sc.nextLine();
 
-        gestor.crearPista(nombre, disponible, esInterior, tamanoPista, maxJugadores);
-        System.out.println("Pista creada exitosamente.");
+        // Crear objeto PistaDTO
+        PistaDTO nuevaPista = new PistaDTO(nombre, disponible, esInterior, tamanoPista, maxJugadores);
+
+        // Crear pista utilizando el GestorPistasDAO
+        if (gestor.crearPista(nuevaPista)) {
+            System.out.println("Pista creada exitosamente.");
+        } else {
+            System.out.println("Error al crear la pista.");
+        }
     }
 
     /**
@@ -130,62 +139,59 @@ public class MenuPistas {
         EstadoMaterial estadoMaterial = EstadoMaterial.valueOf(sc.next().toUpperCase());
         sc.nextLine();
 
-        gestor.crearMaterial(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
-        System.out.println("Material creado exitosamente.");
-    }
+        // Crear objeto MaterialDTO
+        MaterialDTO nuevoMaterial = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
 
-    
-    /**
-     * Asocia el material a la pista.
-     */
-    private void asociarMaterialAPista() {
-        System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
-        String nombrePista = sc.nextLine();
-        PistaDTO pista = null;
-
-        // Buscamos en todas las pistas (disponibles y no disponibles)
-        for (PistaDTO p : gestor.listarTodasLasPistas()) {
-            if (p.getNombre().equalsIgnoreCase(nombrePista)) {
-                pista = p;
-                break;
-            }
-        }
-
-        if (pista == null) {
-            System.out.println("Pista no encontrada.");
-            return;
-        }
-
-        System.out.print("Ingrese el ID del material a asociar: ");
-        int idMaterial = sc.nextInt();
-        MaterialDTO material = null;
-
-        for (MaterialDTO m : gestor.getMateriales()) {
-            if (m.getIdMaterial() == idMaterial) {
-                material = m;
-                break;
-            }
-        }
-
-        if (material == null) {
-            System.out.println("Material no encontrado.");
-            return;
-        }
-
-        // Intenta asociar el material a la pista seleccionada
-        if (gestor.asociarMaterialAPista(pista, material)) {
-            System.out.println("Material asociado exitosamente.");
+        // Aquí debes agregar la lógica para guardar el material utilizando el Gestor
+        if (gestor.crearMaterial(nuevoMaterial)) {
+            System.out.println("Material creado exitosamente.");
         } else {
-            System.out.println("No se pudo asociar el material a la pista.");
+            System.out.println("Error al crear el material.");
         }
     }
+
+//    /**
+//     * Asocia el material a la pista.
+//     */
+//    private void asociarMaterialAPista() {
+//        System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
+//        String nombrePista = sc.nextLine();
+//        PistaDTO pista = gestor.buscarPistaPorNombre(nombrePista);
+//
+//        if (pista == null) {
+//            System.out.println("Pista no encontrada.");
+//            return;
+//        }
+//
+//        System.out.print("Ingrese el ID del material a asociar: ");
+//        int idMaterial = sc.nextInt();
+//        MaterialDTO material = gestor.buscarMaterialPorId(idMaterial);
+//
+//        if (material == null) {
+//            System.out.println("Material no encontrado.");
+//            return;
+//        }
+//
+//        // Intentar asociar el material a la pista
+//        if (gestor.asociarMaterialAPista(pista, material)) {
+//            System.out.println("Material asociado exitosamente.");
+//        } else {
+//            System.out.println("No se pudo asociar el material a la pista.");
+//        }
+//    }
 
     /**
      * Método para listar y mostrar las pistas que no están disponibles.
      */
     private void listarPistasNoDisponibles() {
-        // Delegamos la impresión al método imprimirPistasNoDisponibles del gestor
-        gestor.imprimirPistasNoDisponibles();
+        List<PistaDTO> pistasNoDisponibles = gestor.listarPistasNoDisponibles();
+        if (pistasNoDisponibles.isEmpty()) {
+            System.out.println("No hay pistas no disponibles.");
+        } else {
+            for (PistaDTO pista : pistasNoDisponibles) {
+                System.out.println(pista);
+            }
+        }
     }
 
     /**
@@ -198,15 +204,28 @@ public class MenuPistas {
         boolean esInterior = sc.nextBoolean();
         sc.nextLine();
 
-        // Llamamos al método imprimirPistasLibres del gestor para realizar la búsqueda e impresión
-        gestor.imprimirPistasLibres(numeroJugadores, esInterior);
+        List<PistaDTO> pistasLibres = gestor.buscarPistasLibres(numeroJugadores, esInterior);
+        if (pistasLibres.isEmpty()) {
+            System.out.println("No hay pistas libres que cumplan con los requisitos.");
+        } else {
+            for (PistaDTO pista : pistasLibres) {
+                System.out.println(pista);
+            }
+        }
     }
 
     /**
-     * Muestra todas las pitas
+     * Muestra todas las pistas.
      */
     private void mostrarTodasLasPistas() {
-        gestor.imprimirTodasLasPistas();
+        List<PistaDTO> todasLasPistas = gestor.listarPistas();
+        if (todasLasPistas.isEmpty()) {
+            System.out.println("No hay pistas disponibles.");
+        } else {
+            for (PistaDTO pista : todasLasPistas) {
+                System.out.println(pista);
+            }
+        }
     }
 
     /**

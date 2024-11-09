@@ -3,308 +3,144 @@ package es.uco.pw.business.Gestores;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.uco.pw.business.DTOs.MaterialDTO;
 import es.uco.pw.business.DTOs.PistaDTO;
+import es.uco.pw.business.DTOs.MaterialDTO;
+import es.uco.pw.data.DAOs.MaterialDAO;
+import es.uco.pw.data.DAOs.PistaDAO;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.FileReader;
-
-/**
- * 
- *  @author Antonio Diaz Barbancho
- *  @author Carlos Marín Rodríguez 
- *  @author Carlos De la Torre Frias (GM2)
- *  @author Daniel Grande Rubio (GM2)
- *  @since 22-10-2024
- *  @version 1.0
- */
-
-/**
- * Clase que gestiona las pistas y los materiales asociados a ellas.
- * Se encarga de crear pistas, asignar materiales, listar pistas no disponibles y 
- * buscar pistas libres en función del número de jugadores.
- */
 public class GestorPistasDAO {
-    
-    private List<PistaDTO> pistas;
-    private List<MaterialDTO> materiales;
-    private static final String RUTA_ARCHIVO_PISTAS = "src/es/uco/pw/files/pistas.txt";
-    private static final String RUTA_ARCHIVO_MATERIALES = "src/es/uco/pw/files/materiales.txt";
+
+    // Instanciación de los DAOs para acceder a las bases de datos correspondientes
+    MaterialDAO daoMaterial = new MaterialDAO();
+    PistaDAO daoPista = new PistaDAO();
 
     /**
-     * Constructor de la clase GestorPistas.
+     * Constructor de la clase GestorPistasDAO.
      */
-    public GestorPistasDAO() {
-        this.pistas = new ArrayList<>();
-        this.materiales = new ArrayList<>();
-        cargarPistasDesdeArchivo();
-        cargarMaterialesDesdeArchivo();
-    }
+    public GestorPistasDAO() {}
 
     /**
-     * Método para crear una nueva pista y guardarla en el archivo pistas.txt.
+     * Método para crear una nueva pista y guardarla.
      * 
-     * @param nombre Nombre de la pista
-     * @param disponible Estado de la pista (disponible o no)
-     * @param esInterior Tipo de pista (interior/exterior)
-     * @param tamanoPista Tamaño de la pista
-     * @param maxJugadores Máximo de jugadores permitidos
+     * @param pista PistaDTO con los datos de la pista a crear
+     * @return int Código de respuesta (0: éxito, 1: error)
      */
-    public void crearPista(String nombre, boolean disponible, boolean esInterior, PistaDTO.TamanoPista tamanoPista, int maxJugadores) {
-        PistaDTO nuevaPista = new PistaDTO(nombre, disponible, esInterior, tamanoPista, maxJugadores);
-        pistas.add(nuevaPista);
-        guardarPistaEnArchivo(nuevaPista);
-    }
-
-    /**
-     * Método para guardar una pista en el archivo pistas.txt.
-     * 
-     * @param pista Pista a guardar
-     */
-    private void guardarPistaEnArchivo(PistaDTO pista) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_PISTAS, true))) {
-            writer.write(pista.getNombre() + ";" + pista.getTamanoPista() + ";" + pista.isDisponible() + ";" + pista.isInterior() + ";" + pista.getMaxJugadores());
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Método para cargar las pistas desde el archivo pistas.txt.
-     */
-    private void cargarPistasDesdeArchivo() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(RUTA_ARCHIVO_PISTAS))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(";");
-                String nombre = datos[0];
-                PistaDTO.TamanoPista tamanoPista = PistaDTO.TamanoPista.valueOf(datos[1]);
-                boolean disponible = Boolean.parseBoolean(datos[2]);
-                boolean esInterior = Boolean.parseBoolean(datos[3]);
-                int maxJugadores = Integer.parseInt(datos[4]);
-                
-                PistaDTO pista = new PistaDTO(nombre, disponible, esInterior, tamanoPista, maxJugadores);
-                pistas.add(pista);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Método para crear un nuevo material y guardarlo en el archivo materiales.txt.
-     * 
-     * @param idMaterial Identificador del material
-     * @param tipoMaterial Tipo del material
-     * @param usoInterior Indica si es para uso interior
-     * @param estadoMaterial Estado del material
-     */
-    public void crearMaterial(int idMaterial, MaterialDTO.TipoMaterial tipoMaterial, boolean usoInterior, MaterialDTO.EstadoMaterial estadoMaterial) {
-        MaterialDTO nuevoMaterial = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
-        materiales.add(nuevoMaterial);
-        guardarMaterialEnArchivo(nuevoMaterial);
-    }
-
-    /**
-     * Método para guardar un material en el archivo materiales.txt.
-     * 
-     * @param material Material a guardar
-     */
-    private void guardarMaterialEnArchivo(MaterialDTO material) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_MATERIALES, true))) {
-            writer.write(material.getIdMaterial() + ";" + material.getTipoMaterial() + ";" + material.getUsoInterior() + ";" + material.getEstadoMaterial());
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Método para cargar los materiales desde el archivo materiales.txt.
-     */
-    private void cargarMaterialesDesdeArchivo() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(RUTA_ARCHIVO_MATERIALES))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(";");
-                int idMaterial = Integer.parseInt(datos[0]);
-                MaterialDTO.TipoMaterial tipoMaterial = MaterialDTO.TipoMaterial.valueOf(datos[1]);
-                boolean usoInterior = Boolean.parseBoolean(datos[2]);
-                MaterialDTO.EstadoMaterial estadoMaterial = MaterialDTO.EstadoMaterial.valueOf(datos[3]);
-                
-                MaterialDTO material = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
-                materiales.add(material);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public boolean crearPista(PistaDTO pista) {
+        // Insertar la nueva pista a través del DAO
+        return daoPista.insertPista(pista);
     }
     
+    public boolean crearMaterial(MaterialDTO material) {
+        // Insertar la nueva pista a través del DAO
+        return daoMaterial.insertMaterial(material);
+    }
+
     /**
-     * Método para asociar un material a una pista, cumpliendo las restricciones.
+     * Método para listar todas las pistas disponibles.
      * 
-     * @param pista La pista a la que se desea asociar el material
-     * @param material El material a asociar
-     * @return true si se asoció correctamente, false en caso contrario
+     * @return List<PistaDTO> Lista de pistas
+     */
+    public List<PistaDTO> listarPistas() {
+        // Obtener todas las pistas a través del DAO
+        return daoPista.findAllPistas();
+    }
+
+    /**
+     * Método para buscar una pista por nombre.
+     * 
+     * @param nombre Nombre de la pista a buscar
+     * @return PistaDTO Pista encontrada
+     */
+    public PistaDTO buscarPistaPorNombre(String nombre) {
+        // Buscar la pista por nombre a través del DAO
+        return daoPista.findPistaByNombre(nombre);
+    }
+
+    /**
+     * Método para actualizar los datos de una pista.
+     * 
+     * @param pista PistaDTO con los datos actualizados
+     * @return int Código de respuesta (0: éxito, 1: error)
+     */
+    public boolean actualizarPista(PistaDTO pista) {
+        // Actualizar la pista a través del DAO
+        return daoPista.updatePista(pista);
+    }
+
+    /**
+     * Método para eliminar una pista.
+     * 
+     * @param idPista ID de la pista a eliminar
+     * @return int Código de respuesta (0: éxito, 1: error)
+     */
+    public boolean eliminarPista(String nombrePista) {
+        // Eliminar la pista a través del DAO
+        return daoPista.deletePista(nombrePista);
+    }
+
+    /**
+     * Método para asociar un material a una pista, si es posible.
+     * 
+     * @param pista PistaDTO a la que se quiere asociar el material
+     * @param material MaterialDTO a asociar
+     * @return boolean True si la asociación fue exitosa, False si no.
      */
     public boolean asociarMaterialAPista(PistaDTO pista, MaterialDTO material) {
-        // Verifica que la pista esté disponible en el momento de la asociación
+        // Comprobar si el material está disponible para asociarse a la pista
+        if (material.getEstadoMaterial() != MaterialDTO.EstadoMaterial.DISPONIBLE) {
+            System.out.println("El material no está disponible.");
+            return false;
+        }
+        
+        // Verificar que la pista está disponible
         if (!pista.isDisponible()) {
             System.out.println("La pista no está disponible.");
             return false;
         }
-
-        // Verifica si el material ya está asignado a otra pista
-        if (materialYaAsignado(material)) {
-            System.out.println("El material ya está asociado a otra pista o está en mantenimiento.");
-            return false;
-        }
-
-        // Verifica la compatibilidad entre material y pista
-        if (!esMaterialCompatibleConPista(pista, material)) {
-            System.out.println("El material no es compatible con el tipo de pista.");
-            return false;
-        }
-
-        // Si todo está en orden, realiza la asociación
+        
+        // Asociar el material a la pista (a través del método en la PistaDTO)
         if (pista.asociarMaterial(material)) {
-        	material.setEstadoMaterial(MaterialDTO.EstadoMaterial.RESERVADO);
+            material.setEstadoMaterial(MaterialDTO.EstadoMaterial.RESERVADO);
+            // Actualizar el estado del material en el sistema
+            daoMaterial.updateMaterial(material);
             System.out.println("Material asociado a la pista con éxito.");
-            
-            
-            List<String> lineasArchivo = new ArrayList<>();
-
-            // Leer todas las líneas del archivo y modificar la línea del material
-            try (BufferedReader reader = new BufferedReader(new FileReader(RUTA_ARCHIVO_MATERIALES))) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    // Separar la línea para identificar el material
-                    String[] partes = linea.split(";");
-                    int idMaterialArchivo = Integer.parseInt(partes[0]);
-
-                    // Si es el material que buscamos, cambiamos el estado a RESERVADO
-                    if (idMaterialArchivo == material.getIdMaterial()) {
-                        partes[3] = MaterialDTO.EstadoMaterial.RESERVADO.toString();
-                        linea = String.join(";", partes);
-                    }
-                    
-                    lineasArchivo.add(linea);
-                }
-            } catch (IOException e) {
-                System.err.println("Error al leer el archivo de materiales: " + e.getMessage());
-            }
-
-            // Sobrescribir el archivo con los datos actualizados
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_MATERIALES))) {
-                for (String linea : lineasArchivo) {
-                    writer.write(linea);
-                    writer.newLine();
-                }
-            } catch (IOException e) {
-                System.err.println("Error al escribir en el archivo de materiales: " + e.getMessage());
-            }
-            
             return true;
         } else {
             System.out.println("No se pudo asociar el material a la pista.");
             return false;
         }
     }
-    /**
-     * Verifica si un material ya está asignado a otra pista o en mal estado.
-     * 
-     * @param material El material a verificar
-     * @return true si el material está asignado, false en caso contrario
-     */
-    private boolean materialYaAsignado(MaterialDTO material) {
-        // Verifica si el estado del material no es DISPONIBLE
-        if (material.getEstadoMaterial() != MaterialDTO.EstadoMaterial.DISPONIBLE) {
-            return true;
-        }
-        for (PistaDTO pista : pistas) {
-            if (!pista.isDisponible() || pista.consultarMaterialesDisponibles().contains(material)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
-     * Verifica si un material es compatible con el tipo de pista.
+     * Método para listar las pistas que no están disponibles.
      * 
-     * @param pista La pista a verificar
-     * @param material El material a verificar
-     * @return true si son compatibles, false en caso contrario
-     */
-    private boolean esMaterialCompatibleConPista(PistaDTO pista, MaterialDTO material) {
-        // Si la pista es exterior, el material no debe ser de uso interior
-    	if((pista.isInterior() && material.getUsoInterior()) || (!pista.isInterior() && !material.getUsoInterior())) {
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    	
-    }
-    
-    /**
-     * Método para listar todas las pistas que no están disponibles.
-     * 
-     * @return Una lista de pistas no disponibles.
+     * @return List<PistaDTO> Lista de pistas no disponibles
      */
     public List<PistaDTO> listarPistasNoDisponibles() {
         List<PistaDTO> pistasNoDisponibles = new ArrayList<>();
-
-        for (PistaDTO pista : pistas) {
+        
+        // Recorrer las pistas y verificar si no están disponibles
+        for (PistaDTO pista : daoPista.findAllPistas()) {
             if (!pista.isDisponible()) {
                 pistasNoDisponibles.add(pista);
             }
         }
-
+        
         return pistasNoDisponibles;
     }
 
     /**
-     * Método para imprimir la información de las pistas no disponibles en la consola.
-     */
-    public void imprimirPistasNoDisponibles() {
-        List<PistaDTO> pistasNoDisponibles = listarPistasNoDisponibles();
-
-        if (pistasNoDisponibles.isEmpty()) {
-            System.out.println("No hay pistas no disponibles en este momento.");
-        } else {
-            System.out.println("Pistas no disponibles:");
-            System.out.println("----------------------------");
-            for (PistaDTO pista : pistasNoDisponibles) {
-                System.out.println("Nombre: " + pista.getNombre());
-                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
-                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
-                System.out.println("Tamaño: " + pista.getTamanoPista());
-                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
-                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
-                System.out.println("----------------------------");
-            }
-        }
-    }
-    
-
-    /**
-     * Método para buscar pistas libres que tengan al menos el número de jugadores requerido
-     * y del tipo de pista especificado.
-     *
-     * @param numeroJugadores Número mínimo de jugadores que deben caber en la pista.
-     * @param esInterior True si se busca una pista interior, False si es exterior.
-     * @return Una lista de pistas libres que cumplen los requisitos.
+     * Método para buscar pistas libres según el número de jugadores y tipo de pista.
+     * 
+     * @param numeroJugadores Número de jugadores que caben en la pista
+     * @param esInterior Si la pista debe ser interior o exterior
+     * @return List<PistaDTO> Lista de pistas libres
      */
     public List<PistaDTO> buscarPistasLibres(int numeroJugadores, boolean esInterior) {
         List<PistaDTO> pistasLibres = new ArrayList<>();
 
-        for (PistaDTO pista : pistas) {
-            // Comprobar si la pista está disponible y si su capacidad mínima se cumple
+        // Verificar pistas disponibles y cumplir requisitos de capacidad y tipo
+        for (PistaDTO pista : daoPista.findAllPistas()) {
             if (pista.isDisponible() && pista.getMaxJugadores() >= numeroJugadores && pista.isInterior() == esInterior) {
                 pistasLibres.add(pista);
             }
@@ -312,69 +148,4 @@ public class GestorPistasDAO {
 
         return pistasLibres;
     }
-
-    /**
-     * Método para imprimir la información de las pistas libres que cumplen los requisitos.
-     *
-     * @param numeroJugadores Número mínimo de jugadores.
-     * @param esInterior True si se busca una pista interior, False si es exterior.
-     */
-    public void imprimirPistasLibres(int numeroJugadores, boolean esInterior) {
-        List<PistaDTO> pistasLibres = buscarPistasLibres(numeroJugadores, esInterior);
-
-        if (pistasLibres.isEmpty()) {
-            System.out.println("No hay pistas libres que cumplan con los requisitos especificados.");
-        } else {
-            System.out.println("Pistas libres disponibles para " + numeroJugadores + " jugadores:");
-            System.out.println("----------------------------");
-            for (PistaDTO pista : pistasLibres) {
-                System.out.println("Nombre: " + pista.getNombre());
-                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
-                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
-                System.out.println("Tamaño: " + pista.getTamanoPista());
-                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
-                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
-                System.out.println("----------------------------");
-            }
-        }
-    }
-    
-    /**
-     * Método para imprimir la información de todas las pistas.
-     */
-    public void imprimirTodasLasPistas() {
-        if (pistas.isEmpty()) {
-            System.out.println("No hay pistas registradas.");
-        } else {
-            System.out.println("Lista de todas las pistas:");
-            System.out.println("----------------------------");
-            for (PistaDTO pista : pistas) {
-                System.out.println("Nombre: " + pista.getNombre());
-                System.out.println("Disponible: " + (pista.isDisponible() ? "Sí" : "No"));
-                System.out.println("Interior: " + (pista.isInterior() ? "Sí" : "No"));
-                System.out.println("Tamaño: " + pista.getTamanoPista());
-                System.out.println("Máximo de Jugadores: " + pista.getMaxJugadores());
-                System.out.println("Materiales Asociados: " + pista.consultarMaterialesDisponibles().size());
-                System.out.println("----------------------------");
-            }
-        }
-    }
-    
-    /**
-     * Método para obtener la lista de materiales.
-     * 
-     * @return Lista de materiales.
-     */
-    public List<MaterialDTO> getMateriales() {
-        return this.materiales;
-    }
-    /**
-     * Lista todas las pistas.
-     * 
-     * @return Lista de pistas.
-     */
-    public List<PistaDTO> listarTodasLasPistas() {
-        return pistas;
-    }
-
 }
