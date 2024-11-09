@@ -174,41 +174,40 @@ public class PistaDAO {
         return respuesta;
     }
 
-    /**
-     * Recupera todas las pistas de la base de datos.
-     *
-     * @return Una lista de objetos PistaDTO.
-     */
-    public List<PistaDTO> findAllPistas() {
-        List<PistaDTO> pistas = new ArrayList<>();
-        String query = properties.getProperty("find_all_pistas");
 
+   
+    public List<PistaDTO> listarPistas() {
+        List<PistaDTO> todasLasPistas = new ArrayList<>();
+        String query = properties.getProperty("listar_todas_las_pistas");
+
+        // Obtener la conexión utilizando DBConnection
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                String nombre = resultSet.getString("nombre");
-                boolean disponible = resultSet.getBoolean("disponible");
-                boolean esInterior = resultSet.getBoolean("esInterior");
-                PistaDTO.TamanoPista tamanoPista = PistaDTO.TamanoPista.valueOf(resultSet.getString("tamanoPista"));
-                int maxJugadores = resultSet.getInt("maxJugadores");
-
-                PistaDTO pista = new PistaDTO(nombre, disponible, esInterior, tamanoPista, maxJugadores);
-
-                // Recuperar materiales asociados de la misma forma que en findPistaByNombre
-                // Esto depende de la estructura de la base de datos.
-                
-                pistas.add(pista);
+                PistaDTO.TamanoPista tamanoPista = PistaDTO.TamanoPista.valueOf(resultSet.getString("tamano").toUpperCase());
+                PistaDTO pista = new PistaDTO(
+                    resultSet.getString("nombre"),
+                    resultSet.getBoolean("estado"),
+                    resultSet.getString("tipo").equalsIgnoreCase("INTERIOR"),
+                    tamanoPista,
+                    resultSet.getInt("numMaxJugadores")
+                );
+                todasLasPistas.add(pista);
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving pistas: " + e.getMessage());
+            System.err.println("Error listing pistas: " + e.getMessage());
             e.printStackTrace();
         } finally {
+            // Cerrar la conexión después de usarla
             db.closeConnection();
         }
-        return pistas;
+
+        return todasLasPistas;
     }
+
+
 }

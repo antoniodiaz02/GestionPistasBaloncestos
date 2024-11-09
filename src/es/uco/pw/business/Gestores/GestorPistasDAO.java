@@ -42,7 +42,7 @@ public class GestorPistasDAO {
      */
     public List<PistaDTO> listarPistas() {
         // Obtener todas las pistas a través del DAO
-        return daoPista.findAllPistas();
+        return daoPista.listarPistas();
     }
 
     /**
@@ -120,7 +120,7 @@ public class GestorPistasDAO {
         List<PistaDTO> pistasNoDisponibles = new ArrayList<>();
         
         // Recorrer las pistas y verificar si no están disponibles
-        for (PistaDTO pista : daoPista.findAllPistas()) {
+        for (PistaDTO pista : daoPista.listarPistas()) {
             if (!pista.isDisponible()) {
                 pistasNoDisponibles.add(pista);
             }
@@ -140,7 +140,7 @@ public class GestorPistasDAO {
         List<PistaDTO> pistasLibres = new ArrayList<>();
 
         // Verificar pistas disponibles y cumplir requisitos de capacidad y tipo
-        for (PistaDTO pista : daoPista.findAllPistas()) {
+        for (PistaDTO pista : daoPista.listarPistas()) {
             if (pista.isDisponible() && pista.getMaxJugadores() >= numeroJugadores && pista.isInterior() == esInterior) {
                 pistasLibres.add(pista);
             }

@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS `Materiales` (
   `tipo` ENUM('pelotas', 'canastas', 'conos') NOT NULL,
   `uso` BOOLEAN NOT NULL,
   `estado` ENUM('disponible', 'reservado', 'mal estado') NOT NULL,
-  `cantidadMaxima` INT(11) NOT NULL,
   PRIMARY KEY (`idMaterial`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
