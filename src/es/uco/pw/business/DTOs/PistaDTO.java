@@ -229,6 +229,11 @@ public class PistaDTO {
     	    return true;
     	}
     
+    
+    public void setMateriales(List<MaterialDTO> materiales) {
+        this.materiales = materiales;
+    }
+    
     /**
      * Muestra toda la información de la pista
      * @return String Información de la pista
