@@ -56,9 +56,9 @@ public class MenuPistas {
                     case 2:
                         crearMaterial();
                         break;
-//                    case 3:
-//                        asociarMaterialAPista();
-//                        break;
+                    case 3:
+                        asociarMaterialAPista();
+                        break;
                     case 4:
                         listarPistasNoDisponibles();
                         break;
@@ -157,35 +157,35 @@ public class MenuPistas {
     /**
      * Asocia el material a la pista.
      */
-//    private void asociarMaterialAPista() {
-//        System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
-//        String nombrePista = sc.nextLine();
-//        PistaDTO pista = gestor.buscarPistaPorNombre(nombrePista);
-//
-//        if (pista == null) {
-//            System.out.println("Pista no encontrada.");
-//            return;
-//        }
-//
-//        System.out.print("Ingrese el ID del material a asociar: ");
-//        int idMaterial = sc.nextInt();
-//        sc.nextLine();  // Limpiar buffer de entrada
-//     // In MenuPistas.java
-//        MaterialDTO material = gestor.getDaoMaterial().findMaterialById(idMaterial);
-//
-//
-//        if (material == null) {
-//            System.out.println("Material no encontrado.");
-//            return;
-//        }
-//
-//        // Intentar asociar el material a la pista
-//        if (gestor.asociarMaterialAPista(pista, material)) {
-//            System.out.println("Material asociado exitosamente.");
-//        } else {
-//            System.out.println("No se pudo asociar el material a la pista.");
-//        }
-//    }
+    private void asociarMaterialAPista() {
+        System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
+        String nombrePista = sc.nextLine();
+        PistaDTO pista = gestor.buscarPistaPorNombre(nombrePista);
+
+        if (pista == null) {
+            System.out.println("Pista no encontrada.");
+            return;
+        }
+
+        System.out.print("Ingrese el ID del material a asociar: ");
+        int idMaterial = sc.nextInt();
+        sc.nextLine();  // Limpiar buffer de entrada
+     // In MenuPistas.java
+        MaterialDTO material = gestor.getDaoMaterial().findMaterialById(idMaterial);
+
+
+        if (material == null) {
+            System.out.println("Material no encontrado.");
+            return;
+        }
+
+        // Intentar asociar el material a la pista
+        if (gestor.asociarMaterialAPista(pista.getNombre(), material.getIdMaterial())) {
+            System.out.println("Material asociado exitosamente.");
+        } else {
+            System.out.println("No se pudo asociar el material a la pista.");
+        }
+    }
 
     /**
      * Método para listar y mostrar las pistas que no están disponibles.

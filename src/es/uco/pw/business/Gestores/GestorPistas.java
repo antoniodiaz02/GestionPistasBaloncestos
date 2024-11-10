@@ -102,33 +102,12 @@ public class GestorPistas {
      * @param material MaterialDTO a asociar.
      * @return boolean True si la asociación fue exitosa, False si no.
      */
-//    public boolean asociarMaterialAPista(PistaDTO pista, MaterialDTO material) {
-//        // Comprobar si el material está disponible para asociarse a la pista.
-//        if (material.getEstadoMaterial() != MaterialDTO.EstadoMaterial.DISPONIBLE) {
-//            System.out.println("El material no está disponible.");
-//            return false;
-//        }
-//
-//        // Verificar que la pista está disponible.
-//        if (!pista.isDisponible()) {
-//            System.out.println("La pista no está disponible.");
-//            return false;
-//        }
-//
-//        // Intentar realizar la asociación de material a pista a través de PistaDAO.
-//        boolean exito = daoPista.asociarMaterialAPista(pista.getNombre(), material.getIdMaterial());
-//
-//        if (exito) {
-//            // Actualizar el estado del material a RESERVADO y guardarlo en la base de datos.
-//            material.setEstadoMaterial(MaterialDTO.EstadoMaterial.RESERVADO);
-//            daoMaterial.updateMaterial(material);
-//            System.out.println("Material asociado a la pista con éxito.");
-//            return true;
-//        } else {
-//            System.out.println("No se pudo asociar el material a la pista.");
-//            return false;
-//        }
-//    }
+    public boolean asociarMaterialAPista(String nombrePista, int idMaterial) {
+        // Crear una instancia de PistaDAO y llamar al método asociarMaterialAPista
+        return daoPista.asociarMaterialAPista(nombrePista, idMaterial);
+    }
+
+
 
     /**
      * Método para listar las pistas que no están disponibles.

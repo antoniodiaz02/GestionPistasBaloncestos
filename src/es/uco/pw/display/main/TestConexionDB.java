@@ -24,7 +24,7 @@ public class TestConexionDB {
                 Statement statement = connection.createStatement();
                 
                 // Ejecutamos una consulta para obtener las tablas de la base de datos
-                String sql = " describe Material_Pista"; // Para MySQL. Si usas otro DBMS, cambia la consulta
+                String sql = " select * from Material"; // Para MySQL. Si usas otro DBMS, cambia la consulta
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 // Imprimimos las tablas

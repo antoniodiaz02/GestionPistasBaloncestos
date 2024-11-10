@@ -73,19 +73,28 @@ public class MaterialDAO {
         MaterialDTO material = null;
         String query = properties.getProperty("find_material_by_id");
 
+        // Verificación adicional para ver si la consulta se cargó correctamente
+        if (query == null) {
+            System.err.println("La consulta SQL para 'find_material_by_id' no se cargó correctamente.");
+            return null;
+        }
+
         DBConnection db = new DBConnection();
-        connection = db.getConnection();
+        Connection connection = db.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, idMaterial);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                TipoMaterial tipoMaterial = TipoMaterial.valueOf(resultSet.getString("tipoMaterial"));
-                boolean usoInterior = resultSet.getBoolean("usoInterior");
-                EstadoMaterial estadoMaterial = EstadoMaterial.valueOf(resultSet.getString("estadoMaterial"));
+                // Ajuste de nombres de columna para coincidir con la base de datos
+                TipoMaterial tipoMaterial = TipoMaterial.valueOf(resultSet.getString("tipo"));
+                boolean usoInterior = resultSet.getBoolean("uso");
+                EstadoMaterial estadoMaterial = EstadoMaterial.valueOf(resultSet.getString("estado"));
 
                 material = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
+            } else {
+                System.out.println("Material no encontrado para el ID: " + idMaterial);
             }
         } catch (SQLException e) {
             System.err.println("Error finding material by ID: " + e.getMessage());
@@ -95,6 +104,7 @@ public class MaterialDAO {
         }
         return material;
     }
+
 
     /**
      * Actualiza la información de un material en la base de datos.

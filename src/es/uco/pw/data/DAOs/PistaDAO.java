@@ -1,7 +1,6 @@
 package es.uco.pw.data.DAOs;
 
 import es.uco.pw.business.DTOs.PistaDTO;
-import es.uco.pw.business.DTOs.MaterialDTO;
 import es.uco.pw.common.DBConnection;
 
 import java.sql.*;
@@ -191,6 +190,37 @@ public class PistaDAO {
 
         return todasLasPistas;
     }
+    
+    
+    public boolean asociarMaterialAPista(String nombrePista, int idMaterial) {
+        boolean respuesta = false;
+        String query = properties.getProperty("insertar_material_a_pista");
+        
+        DBConnection db = new DBConnection();
+        Connection connection = db.getConnection();
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, nombrePista);
+            pstmt.setInt(2, idMaterial);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            respuesta = rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error al asociar material a pista: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error al cerrar la conexión: " + e.getMessage());
+            }
+        }
+        
+        return respuesta;
+    }
+
+
 
 
 }
