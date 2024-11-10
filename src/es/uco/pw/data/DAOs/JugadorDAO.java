@@ -4,6 +4,8 @@ import es.uco.pw.business.DTOs.JugadorDTO;
 import es.uco.pw.common.DBConnection;
 
 import java.sql.*;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -76,9 +78,62 @@ public class JugadorDAO {
     }
 
 
-    
-    
-    
+    /**
+     * Lista los usuarios de la base de datos.
+     *
+     *
+     * @return true si la operación es exitosa, false de lo contrario.
+     */
+    public int listarUsuarios() {
+        String query = properties.getProperty("listar_usuarios");
+        int codigo = 0; // Código 0 indica éxito, -1 indica error
+
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            System.out.println("---- Lista de Usuarios ----");
+
+            // Verificar si el ResultSet tiene registros
+            boolean hasUsers = false; // Variable para verificar si hay usuarios
+
+            while (resultSet.next()) {
+                hasUsers = true; // Hay al menos un usuario en el ResultSet
+
+                // Extraer los valores de cada columna según la estructura de UsuarioDTO
+                String nombre = resultSet.getString("nombre");
+                String apellidos = resultSet.getString("apellidos");
+                Date fechaNacimiento = resultSet.getDate("fechaNacimiento");
+                Date fechaInscripcion = resultSet.getDate("fechaInscripcion");
+                String correoElectronico = resultSet.getString("correoElectronico");
+
+                // Imprimir los datos del usuario en la consola
+                System.out.printf("Nombre: %s %s\n", nombre, apellidos);
+                System.out.printf("Fecha de Nacimiento: %s\n", fechaNacimiento);
+                System.out.printf("Fecha de Inscripción: %s\n", fechaInscripcion);
+                System.out.printf("Correo Electrónico: %s\n", correoElectronico);
+                System.out.println("-------------------------");
+            }
+
+            // Si no se encontraron usuarios
+            if (!hasUsers) {
+            	codigo = 2;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error listando usuarios: " + e.getMessage());
+            codigo = -1; // Error al listar usuarios
+        } finally {
+            db.closeConnection();
+        }
+
+        return codigo; // Retorna 0 si fue exitoso, -1 en caso de error
+    }
+
+        
+        
     
     
     

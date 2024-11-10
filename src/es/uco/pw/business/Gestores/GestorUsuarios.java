@@ -31,9 +31,16 @@ import java.util.Date;
  */
 public class GestorUsuarios {
 	
-	// Instanciación de los DAOs para acceder a las bases de datos correspondientes
+	// Instanciación de los DAOs para acceder a la base de datos.
     JugadorDAO daoJugador = new JugadorDAO();
 	
+    /**
+     * Constructor de la clase GestorUsuarios. Inicializa la lista de usuarios.
+     */
+    public GestorUsuarios() {
+        usuarios = new ArrayList<>();
+    }
+    
     /**
 	 * Añade un nuevo usuario
 	 * @param newJugador Jugador a añadir
@@ -41,6 +48,15 @@ public class GestorUsuarios {
 	 */
     public int insertarUsuario(JugadorDTO jugador) {
         return daoJugador.insertJugador(jugador);
+    }
+
+    /**
+	 * Lista usuarios en la base de datos.
+	 * 
+	 * @return codigo Codigo de salida.
+	 */
+    public int listarUsuarios() {
+        return daoJugador.listarUsuarios();
     }
 
     
@@ -53,12 +69,7 @@ public class GestorUsuarios {
      */
     private List<JugadorDTO> usuarios;
 
-    /**
-     * Constructor de la clase GestorUsuarios. Inicializa la lista de usuarios.
-     */
-    public GestorUsuarios() {
-        usuarios = new ArrayList<>();
-    }
+    
 
     
     
@@ -129,59 +140,7 @@ public class GestorUsuarios {
         return codigo;
     }
    
-    /**
-     * Lista todos los usuarios actualmente registrados en el archivo users.txt.
-     * 
-     * @return 1 si se listan correctamente, -1 si no hay usuarios registrados, -2 si ocurre un error
-     */
-    public int listarUsuarios() {
-        int codigo = 0;
-        String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
-
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
-            String linea;
-            boolean hayUsuarios = false;
-
-            // Verificamos si el archivo contiene usuarios
-            System.out.println("\n Usuarios registrados:");
-            System.out.println("----------------------------");
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-                String[] datos = linea.split(";");
-
-                if (datos.length == 3) {
-                    hayUsuarios = true; // Se encontró al menos un usuario
-
-                    String nombreCompleto = datos[0];
-                    String fechaNacimiento = datos[1];
-                    String correoElectronico = datos[2];
-
-                    // Mostramos la información del usuario
-                    System.out.println("Nombre completo: " + nombreCompleto);
-                    System.out.println("Fecha de nacimiento: " + fechaNacimiento);
-                    System.out.println("Correo electrónico: " + correoElectronico);
-                    System.out.println("----------------------------");
-                }
-            }
-
-            reader.close(); // Cerramos el archivo
-
-            if (!hayUsuarios) {
-                codigo = -1; // No hay usuarios registrados
-                System.out.println("No hay usuarios registrados.");
-            } else {
-                codigo = 1; // Usuarios listados correctamente
-            }
-        } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
-            codigo = -2; // Error al intentar listar usuarios
-        }
-
-        return codigo;
-    }
+    
     
     /**
      * Busca un usuario por su correo electrónico en la lista de usuarios.
@@ -268,4 +227,58 @@ public class GestorUsuarios {
         return codigo;
     }
  */
+
+
+
+
+/*
+    public int listarUsuarios() {
+        int codigo = 0;
+        String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
+
+        try {
+            // Abrimos el archivo en modo lectura
+            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
+            String linea;
+            boolean hayUsuarios = false;
+
+            // Verificamos si el archivo contiene usuarios
+            System.out.println("\n Usuarios registrados:");
+            System.out.println("----------------------------");
+            // Leemos cada línea del archivo
+            while ((linea = reader.readLine()) != null) {
+                // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
+                String[] datos = linea.split(";");
+
+                if (datos.length == 3) {
+                    hayUsuarios = true; // Se encontró al menos un usuario
+
+                    String nombreCompleto = datos[0];
+                    String fechaNacimiento = datos[1];
+                    String correoElectronico = datos[2];
+
+                    // Mostramos la información del usuario
+                    System.out.println("Nombre completo: " + nombreCompleto);
+                    System.out.println("Fecha de nacimiento: " + fechaNacimiento);
+                    System.out.println("Correo electrónico: " + correoElectronico);
+                    System.out.println("----------------------------");
+                }
+            }
+
+            reader.close(); // Cerramos el archivo
+
+            if (!hayUsuarios) {
+                codigo = -1; // No hay usuarios registrados
+                System.out.println("No hay usuarios registrados.");
+            } else {
+                codigo = 1; // Usuarios listados correctamente
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+            codigo = -2; // Error al intentar listar usuarios
+        }
+
+        return codigo;
+    }*/
+
 

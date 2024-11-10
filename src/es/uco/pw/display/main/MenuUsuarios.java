@@ -113,17 +113,18 @@ public class MenuUsuarios {
         }
     }
 
-
-
     /**
      * Lista los usuarios del fichero usuarios
      */
     private void listarUsuarios() {
-        int resultadoListar = gestor.listarUsuarios();
-        if (resultadoListar == -1) {
-            System.out.println("\n ERROR! No hay usuarios registrados.");
-        } else if (resultadoListar == -2) {
-            System.out.println("\n ERROR! Error al listar usuarios.");
+        int codigo = gestor.listarUsuarios();
+        
+        if (codigo == -1) {
+            System.out.println("\n ERROR! Ha ocurrido un error a la hora de listar los usuarios.");
+        } else if(codigo == 2){
+        	System.out.println("\n ADVERTENCIA! No se han encontrado usuarios en la baes de datos.");
+        }else{
+        	System.out.println("\n Se han listado los usuarios correctamente.");
         }
     }
 
