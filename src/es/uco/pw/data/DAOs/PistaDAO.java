@@ -63,64 +63,41 @@ public class PistaDAO {
         return respuesta;
     }
 
-    /**
-     * Busca una pista por su nombre.
-     *
-     * @param nombre El nombre de la pista que se desea buscar.
-     * @return Un objeto PistaDTO si se encuentra, null en caso contrario.
-     */
     public PistaDTO findPistaByNombre(String nombre) {
         PistaDTO pista = null;
-        String query = properties.getProperty("find_pista_by_nombre");
+        String query = properties.getProperty("find_pista_by_nombre");  // Asegúrate de que esta propiedad esté definida en el archivo de propiedades.
 
+        // Obtener la conexión utilizando DBConnection
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
+            // Establecer el parámetro para la consulta
             statement.setString(1, nombre);
 
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                boolean disponible = resultSet.getBoolean("disponible");
-                boolean esInterior = resultSet.getBoolean("esInterior");
-                PistaDTO.TamanoPista tamanoPista = PistaDTO.TamanoPista.valueOf(resultSet.getString("tamanoPista"));
-                int maxJugadores = resultSet.getInt("maxJugadores");
-
-                // Crear la pista DTO
-                pista = new PistaDTO(nombre, disponible, esInterior, tamanoPista, maxJugadores);
-
-                // Recuperar materiales asociados
-                // Esto dependería de cómo estén almacenados los materiales relacionados con la pista.
-                // Supongo que tienes una tabla intermedia que asocia materiales a las pistas.
-
-                List<MaterialDTO> materiales = new ArrayList<>();
-                // Supongamos que tenemos una consulta para obtener los materiales asociados
-                String materialQuery = "SELECT * FROM materiales WHERE pista_nombre = ?";
-                try (PreparedStatement materialStatement = connection.prepareStatement(materialQuery)) {
-                    materialStatement.setString(1, nombre);
-                    ResultSet materialResultSet = materialStatement.executeQuery();
-                    while (materialResultSet.next()) {
-                        // Suponemos que MaterialDTO tiene un constructor que recibe un ResultSet o que puedes 
-                        // recuperarlo de manera similar a como se hace en el MaterialDAO.
-                        MaterialDTO material = new MaterialDTO(
-                                materialResultSet.getInt("idMaterial"),
-                                MaterialDTO.TipoMaterial.valueOf(materialResultSet.getString("tipoMaterial")),
-                                materialResultSet.getBoolean("usoInterior"),
-                                MaterialDTO.EstadoMaterial.valueOf(materialResultSet.getString("estadoMaterial"))
-                        );
-                        materiales.add(material);
-                    }
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    PistaDTO.TamanoPista tamanoPista = PistaDTO.TamanoPista.valueOf(resultSet.getString("tamano").toUpperCase());
+                    pista = new PistaDTO(
+                        resultSet.getString("nombre"),
+                        resultSet.getBoolean("estado"),
+                        resultSet.getString("tipo").equalsIgnoreCase("INTERIOR"),
+                        tamanoPista,
+                        resultSet.getInt("numMaxJugadores")
+                    );
                 }
-                pista.setMateriales(materiales);  // Asocia los materiales a la pista
             }
         } catch (SQLException e) {
             System.err.println("Error finding pista by nombre: " + e.getMessage());
             e.printStackTrace();
         } finally {
+            // Cerrar la conexión después de usarla
             db.closeConnection();
         }
+
         return pista;
     }
+
 
     /**
      * Actualiza la información de una pista en la base de datos.

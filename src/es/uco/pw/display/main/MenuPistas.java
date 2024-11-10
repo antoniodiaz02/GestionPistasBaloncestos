@@ -41,7 +41,8 @@ public class MenuPistas {
             System.out.println("  4. Listar Pistas No Disponibles");
             System.out.println("  5. Buscar Pistas Libres");
             System.out.println("  6. Mostrar todas las Pistas");
-            System.out.println("  7. Salir");
+            System.out.println("  7. Buscar Pista por Nombre");
+            System.out.println("  8. Salir");
             System.out.print("Seleccione una opción: ");
 
             try {
@@ -68,6 +69,9 @@ public class MenuPistas {
                         mostrarTodasLasPistas();
                         break;
                     case 7:
+                        buscarPistaPorNombre();
+                        break;
+                    case 8:
                         salir = true;
                         System.out.println("Saliendo del menú...");
                         break;
@@ -150,9 +154,9 @@ public class MenuPistas {
         }
     }
 
-//    /**
-//     * Asocia el material a la pista.
-//     */
+    /**
+     * Asocia el material a la pista.
+     */
 //    private void asociarMaterialAPista() {
 //        System.out.print("Ingrese el nombre de la pista a la que desea asociar el material: ");
 //        String nombrePista = sc.nextLine();
@@ -165,7 +169,10 @@ public class MenuPistas {
 //
 //        System.out.print("Ingrese el ID del material a asociar: ");
 //        int idMaterial = sc.nextInt();
-//        MaterialDTO material = gestor.buscarMaterialPorId(idMaterial);
+//        sc.nextLine();  // Limpiar buffer de entrada
+//     // In MenuPistas.java
+//        MaterialDTO material = gestor.getDaoMaterial().findMaterialById(idMaterial);
+//
 //
 //        if (material == null) {
 //            System.out.println("Material no encontrado.");
@@ -227,7 +234,24 @@ public class MenuPistas {
             }
         }
     }
+    
+    
+    
+    private void buscarPistaPorNombre() {
+        System.out.print("Ingrese el nombre de la pista que desea buscar: ");
+        String nombrePista = sc.nextLine();
+        
+        // Llamar al gestor para buscar la pista por nombre
+        PistaDTO pista = gestor.buscarPistaPorNombre(nombrePista);
 
+        if (pista == null) {
+            System.out.println("No se encontró una pista con el nombre ingresado.");
+        } else {
+            // Mostrar los detalles de la pista
+            System.out.println("Pista encontrada: ");
+            System.out.println(pista);
+        }
+    }
     /**
      * Método principal que inicia la ejecución del programa.
      * Este método crea una instancia de la clase MenuPistas y llama
