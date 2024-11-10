@@ -68,11 +68,8 @@ public class JugadorDTO {
         this.fechaNacimiento = fechaNacimiento;
         this.correoElectronico = correoElectronico;
         this.fechaInscripcion = new Date(); // Hora actual del sistema
-
-        // Separar nombre completo en nombre y apellidos
-        String[] partes = nombreCompleto.split(" ");
-        this.nombre = partes[0];  // Primer nombre
-        this.apellidos = String.join(" ", Arrays.copyOfRange(partes, 1, partes.length));  // El resto son los apellidos
+        
+        separarNombreYApellidos(nombreCompleto);
     }
 
 
@@ -170,4 +167,28 @@ public class JugadorDTO {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         return "Jugador [Nombre: " + nombreCompleto + ", Fecha de nacimiento: " + sdf.format(fechaNacimiento) +  ", Fecha de inscripción: " + sdf.format(fechaInscripcion) + ", Correo: " + correoElectronico +  ", Antigüedad: " + calcularAntiguedad() + " años]";
     }
+    
+    /**
+     * Separa el nombre y apellidos de NombreCompleto.
+     * @param nombreCompleto Nombre Completo del usuario.
+     */
+    private void separarNombreYApellidos(String nombreCompleto) {
+        String[] partes = nombreCompleto.split(" ");
+
+        if (partes.length == 2 || partes.length == 3) {
+            // Si hay 2 o 3 partes: El primer término es el nombre, el resto son apellidos
+            this.nombre = partes[0];
+            this.apellidos = String.join(" ", Arrays.copyOfRange(partes, 1, partes.length));
+        } else if (partes.length == 4) {
+            // Si hay 4 partes: Los dos primeros son el nombre, el resto son los apellidos
+            this.nombre = partes[0] + " " + partes[1]; // Nombre completo con primer y segundo nombre
+            this.apellidos = partes[2] + " " + partes[3]; // Los dos últimos son los apellidos
+        } else {
+            // Para otros casos
+            this.nombre = partes[0]; // Solo hay un nombre
+            this.apellidos = partes.length > 1 ? String.join(" ", Arrays.copyOfRange(partes, 1, partes.length)) : "";
+        }
+    }
+    
+    
 }
