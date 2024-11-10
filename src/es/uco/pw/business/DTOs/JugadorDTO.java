@@ -3,6 +3,8 @@ package es.uco.pw.business.DTOs;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+
 
 /**
  * Clase que representa a una persona que va a hacer uso de las instalaciones deportivas.
@@ -21,6 +23,17 @@ public class JugadorDTO {
      */
     private String nombreCompleto;
 
+    /**
+     * Nombre del jugador
+     */
+    private String nombre;
+    
+    /**
+     * Apellidos del jugador
+     */
+    private String apellidos;
+    
+    
     /**
      * Fecha de nacimiento del jugador
      */
@@ -55,14 +68,44 @@ public class JugadorDTO {
         this.fechaNacimiento = fechaNacimiento;
         this.correoElectronico = correoElectronico;
         this.fechaInscripcion = new Date(); // Hora actual del sistema
+
+        // Separar nombre completo en nombre y apellidos
+        String[] partes = nombreCompleto.split(" ");
+        this.nombre = partes[0];  // Primer nombre
+        this.apellidos = String.join(" ", Arrays.copyOfRange(partes, 1, partes.length));  // El resto son los apellidos
     }
 
+
+    /**
+     * Devuelve la fecha de inscripcion.
+     * @return nombreCompleto Nombre del jugador
+     */
+    public Date getFechaInscripcion() {
+        return fechaInscripcion;
+    }
+    
     /**
      * Devuelve el nombre completo del jugador
      * @return nombreCompleto Nombre del jugador
      */
     public String getNombreCompleto() {
         return nombreCompleto;
+    }
+    
+    /**
+     * Devuelve el nombre del jugador.
+     * @return nombre Nombre del jugador.
+     */
+    public String getNombre() {
+        return nombre;
+    }
+    
+    /**
+     * Devuelve los apellidos del jugador.
+     * @return apellidos Apellidos del jugador.
+     */
+    public String getApellidos() {
+        return apellidos;
     }
 
     /**

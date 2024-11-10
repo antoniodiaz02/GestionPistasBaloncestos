@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.uco.pw.business.DTOs.JugadorDTO;
+import es.uco.pw.data.DAOs.JugadorDAO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,12 +26,28 @@ import java.util.Date;
  *  @since 12-10-2024
  *  @version 1.0
  */
-
 /**
  * Clase pricipal para gestionar usuarios.
  */
 public class GestorUsuarios {
 	
+	// Instanciación de los DAOs para acceder a las bases de datos correspondientes
+    JugadorDAO daoJugador = new JugadorDAO();
+	
+    /**
+	 * Añade un nuevo usuario
+	 * @param newJugador Jugador a añadir
+	 * @return codigo Codigo de salida
+	 */
+    public int insertarUsuario(JugadorDTO jugador) {
+        return daoJugador.insertJugador(jugador);
+    }
+
+    
+    
+    
+    
+    
     /**
      * Lista que almacena los usuarios registrados.
      */
@@ -43,46 +60,9 @@ public class GestorUsuarios {
         usuarios = new ArrayList<>();
     }
 
-	/**
-	 * Añade un nuevo usuario
-	 * @param newJugador Jugador a añadir
-	 * @return codigo Codigo de salida
-	 */
-    public int insertarUsuario(JugadorDTO newJugador) {
-        int codigo = 0;
-
-        // Comprobar si el usuario ya existe mediante el correo electrónico
-        JugadorDTO jugadorExistente = buscarUsuarioPorCorreo(newJugador.getCorreoElectronico());
-        if (jugadorExistente != null) {
-            codigo = -2;
-            return codigo; // El usuario ya está registrado
-        }
-
-        try {
-            // Añadir el nuevo jugador a la lista en memoria
-            usuarios.add(newJugador);
-
-            // Guardar el nuevo jugador en el archivo users.txt
-            String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
-
-            // Abrimos el archivo en modo append para añadir al final
-            BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo, true));
-
-            // Escribimos la información del usuario en una nueva línea
-            writer.write(newJugador.getNombreCompleto() + ";" + 
-                         new SimpleDateFormat("dd/MM/yyyy").format(newJugador.getFechaNacimiento()) + ";" +
-                         newJugador.getCorreoElectronico());
-            writer.newLine(); // Añadir salto de línea
-            writer.close(); // Cerrar el archivo
-
-            codigo = 1; // Usuario añadido correctamente
-        } catch (IOException e) {
-            System.out.println("Error al escribir en el archivo: " + e.getMessage());
-            codigo = -1; // Error al añadir el usuario
-        }
-
-        return codigo;
-    }
+    
+    
+   
 	
     /**
      * Modifica la información de un usuario existente identificado por su correo electrónico.
@@ -248,3 +228,44 @@ public class GestorUsuarios {
 	    return null;
 	}
 }
+
+
+/* FUNCION DE INSERTAR
+ 
+    public int insertarUsuario(JugadorDTO newJugador) {
+        int codigo = 0;
+
+        // Comprobar si el usuario ya existe mediante el correo electrónico
+        JugadorDTO jugadorExistente = buscarUsuarioPorCorreo(newJugador.getCorreoElectronico());
+        if (jugadorExistente != null) {
+            codigo = -2;
+            return codigo; // El usuario ya está registrado
+        }
+
+        try {
+            // Añadir el nuevo jugador a la lista en memoria
+            usuarios.add(newJugador);
+
+            // Guardar el nuevo jugador en el archivo users.txt
+            String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
+
+            // Abrimos el archivo en modo append para añadir al final
+            BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo, true));
+
+            // Escribimos la información del usuario en una nueva línea
+            writer.write(newJugador.getNombreCompleto() + ";" + 
+                         new SimpleDateFormat("dd/MM/yyyy").format(newJugador.getFechaNacimiento()) + ";" +
+                         newJugador.getCorreoElectronico());
+            writer.newLine(); // Añadir salto de línea
+            writer.close(); // Cerrar el archivo
+
+            codigo = 1; // Usuario añadido correctamente
+        } catch (IOException e) {
+            System.out.println("Error al escribir en el archivo: " + e.getMessage());
+            codigo = -1; // Error al añadir el usuario
+        }
+
+        return codigo;
+    }
+ */
+

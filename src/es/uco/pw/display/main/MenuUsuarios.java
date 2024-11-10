@@ -98,6 +98,7 @@ public class MenuUsuarios {
             String correo = scanner.nextLine();
 
             JugadorDTO nuevoJugador = new JugadorDTO(nombre, fechaNacimiento, correo);
+
             int codigo = gestor.insertarUsuario(nuevoJugador);
 
             if (codigo == 1) {
@@ -111,6 +112,8 @@ public class MenuUsuarios {
             System.out.println("\n ERROR! Formato de fecha incorrecto.");
         }
     }
+
+
 
     /**
      * Lista los usuarios del fichero usuarios
