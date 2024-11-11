@@ -34,16 +34,28 @@ public class MenuPistas {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n===== Menú de Gestión de Pistas =====");
+            System.out.println("\n======= Menú de Gestión de Pistas =======");
+            System.out.println("Seleccione una opción:");
+            System.out.println("────────────────────────────────────────");
+
+            System.out.println("■ GESTIÓN DE PISTAS");
             System.out.println("  1. Crear Pista");
-            System.out.println("  2. Crear Material");
-            System.out.println("  3. Asociar Material a Pista");
+            System.out.println("  2. Mostrar todas las Pistas");
+            System.out.println("  3. Buscar Pista por Nombre");
             System.out.println("  4. Listar Pistas No Disponibles");
             System.out.println("  5. Buscar Pistas Libres");
-            System.out.println("  6. Mostrar todas las Pistas");
-            System.out.println("  7. Buscar Pista por Nombre");
+
+            System.out.println("────────────────────────────────────────");
+
+            System.out.println("■ GESTIÓN DE MATERIALES");
+            System.out.println("  6. Crear Material");
+            System.out.println("  7. Asociar Material a Pista");
+
+            System.out.println("────────────────────────────────────────");
+
             System.out.println("  8. Salir");
-            System.out.print("Seleccione una opción: ");
+
+            System.out.print("\nIngrese su opción: ");
 
             try {
                 int opcion = sc.nextInt();
@@ -54,10 +66,10 @@ public class MenuPistas {
                         crearPista();
                         break;
                     case 2:
-                        crearMaterial();
+                        mostrarTodasLasPistas();
                         break;
                     case 3:
-                        asociarMaterialAPista();
+                        buscarPistaPorNombre();
                         break;
                     case 4:
                         listarPistasNoDisponibles();
@@ -66,17 +78,17 @@ public class MenuPistas {
                         buscarPistasLibres();
                         break;
                     case 6:
-                        mostrarTodasLasPistas();
+                        crearMaterial();
                         break;
                     case 7:
-                        buscarPistaPorNombre();
+                        asociarMaterialAPista();
                         break;
                     case 8:
                         salir = true;
                         System.out.println("Saliendo del menú...");
                         break;
                     default:
-                        System.out.println(" ERROR! Opción no válida. Por favor intente de nuevo.");
+                        System.out.println("ERROR! Opción no válida. Por favor intente de nuevo.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Por favor ingrese un número válido.");
@@ -146,7 +158,7 @@ public class MenuPistas {
         // Crear objeto MaterialDTO
         MaterialDTO nuevoMaterial = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
 
-        // Aquí debes agregar la lógica para guardar el material utilizando el Gestor
+        // Crear material utilizando el gestor
         if (gestor.crearMaterial(nuevoMaterial)) {
             System.out.println("Material creado exitosamente.");
         } else {
@@ -170,9 +182,8 @@ public class MenuPistas {
         System.out.print("Ingrese el ID del material a asociar: ");
         int idMaterial = sc.nextInt();
         sc.nextLine();  // Limpiar buffer de entrada
-     // In MenuPistas.java
-        MaterialDTO material = gestor.getDaoMaterial().findMaterialById(idMaterial);
 
+        MaterialDTO material = gestor.getDaoMaterial().findMaterialById(idMaterial);
 
         if (material == null) {
             System.out.println("Material no encontrado.");
@@ -197,7 +208,6 @@ public class MenuPistas {
         } else {
             for (PistaDTO pista : pistasNoDisponibles) {
                 System.out.println(pista);
-                // Obtener y mostrar los materiales asociados a la pista
                 List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
                 if (materiales.isEmpty()) {
                     System.out.println("  No hay materiales asociados a esta pista.");
@@ -227,7 +237,6 @@ public class MenuPistas {
         } else {
             for (PistaDTO pista : pistasLibres) {
                 System.out.println(pista);
-                // Obtener y mostrar los materiales asociados a la pista
                 List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
                 if (materiales.isEmpty()) {
                     System.out.println("  No hay materiales asociados a esta pista.");
@@ -238,9 +247,7 @@ public class MenuPistas {
                     }
                 }
             }
-            
         }
-        
     }
 
     /**
@@ -253,8 +260,6 @@ public class MenuPistas {
         } else {
             for (PistaDTO pista : todasLasPistas) {
                 System.out.println(pista);
-
-                // Obtener y mostrar los materiales asociados a la pista
                 List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
                 if (materiales.isEmpty()) {
                     System.out.println("  No hay materiales asociados a esta pista.");
@@ -268,23 +273,20 @@ public class MenuPistas {
         }
     }
 
-    
-    
-    
+    /**
+     * Busca una pista por su nombre y muestra los detalles.
+     */
     private void buscarPistaPorNombre() {
         System.out.print("Ingrese el nombre de la pista que desea buscar: ");
         String nombrePista = sc.nextLine();
         
-        // Llamar al gestor para buscar la pista por nombre
         PistaDTO pista = gestor.buscarPistaPorNombre(nombrePista);
 
         if (pista == null) {
             System.out.println("No se encontró una pista con el nombre ingresado.");
         } else {
-            // Mostrar los detalles de la pista
             System.out.println("Pista encontrada: ");
             System.out.println(pista);
-            // Obtener y mostrar los materiales asociados a la pista
             List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
             if (materiales.isEmpty()) {
                 System.out.println("  No hay materiales asociados a esta pista.");
@@ -296,12 +298,9 @@ public class MenuPistas {
             }
         }
     }
+
     /**
      * Método principal que inicia la ejecución del programa.
-     * Este método crea una instancia de la clase MenuPistas y llama
-     * al método mostrarMenu para presentar al usuario el menú.
-     *
-     * @param args Argumentos de línea de comandos.
      */
     public static void main(String[] args) {
         MenuPistas menu = new MenuPistas();
