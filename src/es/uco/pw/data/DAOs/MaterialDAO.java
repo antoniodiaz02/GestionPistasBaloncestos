@@ -195,4 +195,40 @@ public class MaterialDAO {
         }
         return materials;
     }
+    
+    public List<MaterialDTO> obtenerMaterialesPorPista(String nombrePista) {
+        List<MaterialDTO> materiales = new ArrayList<>();
+        String query = "SELECT m.idMaterial, m.tipo, m.uso, m.estado " +
+                "FROM Materiales m " +
+                "JOIN Material_Pista mp ON m.idMaterial = mp.idMaterial " +
+                "WHERE mp.nombrePista = ?";
+
+
+
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, nombrePista);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int idMaterial = resultSet.getInt("idMaterial");
+                TipoMaterial tipoMaterial = TipoMaterial.valueOf(resultSet.getString("tipo").toUpperCase());
+                boolean usoInterior = resultSet.getBoolean("uso");
+                EstadoMaterial estadoMaterial = EstadoMaterial.valueOf(resultSet.getString("estado").toUpperCase());
+
+                MaterialDTO material = new MaterialDTO(idMaterial, tipoMaterial, usoInterior, estadoMaterial);
+                materiales.add(material);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error obteniendo materiales de la pista: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.closeConnection();
+        }
+
+        return materiales;
+    }
+
 }

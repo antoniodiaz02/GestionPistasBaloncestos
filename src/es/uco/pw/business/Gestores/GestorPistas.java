@@ -54,6 +54,10 @@ public class GestorPistas {
         // Obtener todas las pistas a través del DAO
         return daoPista.listarPistas();
     }
+    
+    public List<MaterialDTO> obtenerMaterialesDePista(String nombrePista) {
+        return daoMaterial.obtenerMaterialesPorPista(nombrePista);
+    }
 
     /**
      * Método para buscar una pista por nombre.
