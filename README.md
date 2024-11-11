@@ -41,7 +41,7 @@ Cada uno de estos menús cuenta con su sistema de gestión en especifico para re
 
 Antonio Diaz Barbancho [antoniodiaz02AntonioDiazBarbancho](https://github.com/antoniodiaz02)
 
-Carlos Marín Rodríguez [MaestroKeseroKesero](https://github.com/MaestroKesero)
+Carlos Marín Rodríguez [k3sero](https://github.com/k3sero)
 
 Carlos De la Torre Frias [CarlosDT191](https://github.com/CarlosDT191)
 
