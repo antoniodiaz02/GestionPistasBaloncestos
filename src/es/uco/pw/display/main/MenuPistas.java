@@ -197,6 +197,16 @@ public class MenuPistas {
         } else {
             for (PistaDTO pista : pistasNoDisponibles) {
                 System.out.println(pista);
+                // Obtener y mostrar los materiales asociados a la pista
+                List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
+                if (materiales.isEmpty()) {
+                    System.out.println("  No hay materiales asociados a esta pista.");
+                } else {
+                    System.out.println("  Materiales asociados:");
+                    for (MaterialDTO material : materiales) {
+                        System.out.println("    " + material);
+                    }
+                }
             }
         }
     }
@@ -217,8 +227,20 @@ public class MenuPistas {
         } else {
             for (PistaDTO pista : pistasLibres) {
                 System.out.println(pista);
+                // Obtener y mostrar los materiales asociados a la pista
+                List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
+                if (materiales.isEmpty()) {
+                    System.out.println("  No hay materiales asociados a esta pista.");
+                } else {
+                    System.out.println("  Materiales asociados:");
+                    for (MaterialDTO material : materiales) {
+                        System.out.println("    " + material);
+                    }
+                }
             }
+            
         }
+        
     }
 
     /**
@@ -262,6 +284,16 @@ public class MenuPistas {
             // Mostrar los detalles de la pista
             System.out.println("Pista encontrada: ");
             System.out.println(pista);
+            // Obtener y mostrar los materiales asociados a la pista
+            List<MaterialDTO> materiales = gestor.obtenerMaterialesDePista(pista.getNombre());
+            if (materiales.isEmpty()) {
+                System.out.println("  No hay materiales asociados a esta pista.");
+            } else {
+                System.out.println("  Materiales asociados:");
+                for (MaterialDTO material : materiales) {
+                    System.out.println("    " + material);
+                }
+            }
         }
     }
     /**

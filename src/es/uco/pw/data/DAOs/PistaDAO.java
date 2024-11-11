@@ -64,14 +64,12 @@ public class PistaDAO {
 
     public PistaDTO findPistaByNombre(String nombre) {
         PistaDTO pista = null;
-        String query = properties.getProperty("find_pista_by_nombre");  // Asegúrate de que esta propiedad esté definida en el archivo de propiedades.
+        String query = properties.getProperty("find_pista_by_nombre");
 
-        // Obtener la conexión utilizando DBConnection
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            // Establecer el parámetro para la consulta
             statement.setString(1, nombre);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -90,7 +88,6 @@ public class PistaDAO {
             System.err.println("Error finding pista by nombre: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            // Cerrar la conexión después de usarla
             db.closeConnection();
         }
 
@@ -156,13 +153,10 @@ public class PistaDAO {
         return respuesta;
     }
 
-
-   
     public List<PistaDTO> listarPistas() {
         List<PistaDTO> todasLasPistas = new ArrayList<>();
         String query = properties.getProperty("listar_todas_las_pistas");
 
-        // Obtener la conexión utilizando DBConnection
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
@@ -184,20 +178,18 @@ public class PistaDAO {
             System.err.println("Error listing pistas: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            // Cerrar la conexión después de usarla
             db.closeConnection();
         }
 
         return todasLasPistas;
     }
     
-    
     public boolean asociarMaterialAPista(String nombrePista, int idMaterial) {
         boolean respuesta = false;
         String query = properties.getProperty("insertar_material_a_pista");
         
         DBConnection db = new DBConnection();
-        Connection connection = db.getConnection();
+        connection = db.getConnection();
         
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, nombrePista);
@@ -208,19 +200,9 @@ public class PistaDAO {
         } catch (SQLException e) {
             System.out.println("Error al asociar material a pista: " + e.getMessage());
         } finally {
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error al cerrar la conexión: " + e.getMessage());
-            }
+            db.closeConnection();
         }
         
         return respuesta;
     }
-
-
-
-
 }

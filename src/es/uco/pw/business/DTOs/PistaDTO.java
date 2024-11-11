@@ -240,6 +240,6 @@ public class PistaDTO {
      */
     @Override
     public String toString() {
-        return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior +  ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + ", Materiales: " + materiales.size() + " asociados]";
+    	return "Pista [Nombre: " + nombre + ", Disponible: " + disponible + ", Interior: " + esInterior + ", Tamaño: " + tamanoPista + ", Max Jugadores: " + maxJugadores + "]";
     }
 }
