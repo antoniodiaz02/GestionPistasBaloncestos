@@ -50,7 +50,9 @@ public class MenuReservas {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n--- Menú de Gestión de Reservas ---");
+        	System.out.println("\n───────────────────────────────────────");
+            System.out.println("----- Menú de Gestión de Reservas -----");
+            System.out.println("───────────────────────────────────────");
             System.out.println("  1. Crear nuevo bono");
             System.out.println("  2. Hacer reserva individual");
             System.out.println("  3. Hacer reserva con bono");
@@ -58,8 +60,10 @@ public class MenuReservas {
             System.out.println("  5. Cancelar una reserva");
             System.out.println("  6. Listar reservas futuras");
             System.out.println("  7. Listar reservas por fecha y pista");
+            System.out.println("───────────────────────────────────────");
             System.out.println("  8. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("───────────────────────────────────────");
+            System.out.print("\n Seleccione una opción: ");
             int opcion = scanner.nextInt();
             scanner.nextLine(); // Limpiar el buffer de entrada
 

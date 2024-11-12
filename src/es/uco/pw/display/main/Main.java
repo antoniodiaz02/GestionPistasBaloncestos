@@ -37,12 +37,16 @@ public class Main {
         int opcion = 99;
 
         while (opcion != 4) {
-            System.out.println("\n===== Menú Principal =====");
+        	System.out.println("\n────────────────────────────");
+            System.out.println("====== Menú Principal ======");
+            System.out.println("────────────────────────────");
             System.out.println("1. Menú de Usuarios");
             System.out.println("2. Menú de Pistas");
             System.out.println("3. Menú de Reservas");
+            System.out.println("────────────────────────────");
             System.out.println("4. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("────────────────────────────");
+            System.out.print("\n Seleccione una opción: ");
             opcion = Integer.parseInt(sc.nextLine());
 
             switch (opcion) {

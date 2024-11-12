@@ -34,8 +34,8 @@ public class MenuPistas {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n======= Menú de Gestión de Pistas =======");
-            System.out.println("Seleccione una opción:");
+        	System.out.println("\n────────────────────────────────────────");
+            System.out.println("======= Menú de Gestión de Pistas ======");
             System.out.println("────────────────────────────────────────");
 
             System.out.println("■ GESTIÓN DE PISTAS");
@@ -52,9 +52,9 @@ public class MenuPistas {
             System.out.println("  7. Asociar Material a Pista");
 
             System.out.println("────────────────────────────────────────");
-
             System.out.println("  8. Salir");
-
+            System.out.println("────────────────────────────────────────");
+            
             System.out.print("\nIngrese su opción: ");
 
             try {
@@ -85,7 +85,7 @@ public class MenuPistas {
                         break;
                     case 8:
                         salir = true;
-                        System.out.println("Saliendo del menú...");
+                        System.out.println("\nSaliendo del menú...");
                         break;
                     default:
                         System.out.println("ERROR! Opción no válida. Por favor intente de nuevo.");

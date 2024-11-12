@@ -142,7 +142,9 @@ public class JugadorDAO {
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
-            System.out.println("---- Lista de Usuarios ----");
+        	System.out.println("\n───────────────────────────────────────");
+            System.out.println("---------- Lista de Usuarios ----------");
+            System.out.println("───────────────────────────────────────");
 
             // Verificar si el ResultSet tiene registros
             boolean hasUsers = false; // Variable para verificar si hay usuarios
@@ -162,7 +164,7 @@ public class JugadorDAO {
                 System.out.printf("Fecha de Nacimiento: %s\n", fechaNacimiento);
                 System.out.printf("Fecha de Inscripción: %s\n", fechaInscripcion);
                 System.out.printf("Correo Electrónico: %s\n", correoElectronico);
-                System.out.println("-------------------------");
+                System.out.println("───────────────────────────────────────");
             }
 
             // Si no se encontraron usuarios

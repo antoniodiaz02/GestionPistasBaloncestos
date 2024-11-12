@@ -44,12 +44,16 @@ public class MenuUsuarios {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n---- Menú Gestión de Usuarios ----");
+        	System.out.println("\n───────────────────────────────────────");
+        	System.out.println("===== Menú de Gestión de Usuarios =====");
+        	System.out.println("───────────────────────────────────────");
             System.out.println("  1. Insertar nuevo usuario");
             System.out.println("  2. Listar usuarios");
             System.out.println("  3. Modificar usuario");
-            System.out.println("4. Salir");
-            System.out.print("Elige una opción: ");
+            System.out.println("───────────────────────────────────────");
+            System.out.println("  4. Salir");
+            System.out.println("───────────────────────────────────────");
+            System.out.print("\n Elige una opción: ");
             int opcion = scanner.nextInt();
             scanner.nextLine(); // Consumir el salto de línea
 
@@ -85,7 +89,7 @@ public class MenuUsuarios {
      */
     private void insertarUsuario() {
         try {
-            System.out.println("Introduce los datos del nuevo usuario:");
+            System.out.println("Introduce los datos del nuevo usuario.");
             System.out.print("Nombre completo: ");
             String nombre = scanner.nextLine();
 
@@ -146,10 +150,12 @@ public class MenuUsuarios {
             JugadorDTO jugadorExistente = new JugadorDTO();
             
             System.out.println("\n  ¿Qué deseas modificar?");
+            System.out.println("────────────────────────────");
             System.out.println("    1. Nombre completo");
             System.out.println("    2. Fecha de nacimiento");
             System.out.println("    3. Correo electrónico");
-            System.out.print("Elige una opción: ");
+            System.out.println("────────────────────────────");
+            System.out.print("\n Elige una opción: ");
             int opcionModificar = scanner.nextInt();
             scanner.nextLine(); // Consumir el salto de línea
 
