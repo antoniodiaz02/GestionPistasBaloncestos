@@ -15,7 +15,14 @@ import java.io.IOException;
  */
 public class PistaDAO {
 
+	/**
+     * Objeto connection para crear la conexión con la base de datos.
+     */
     private Connection connection;
+    
+    /**
+     * Objeto properties encargado de las sentencias SQL.
+     */
     private Properties properties;
 
     /**
@@ -35,7 +42,7 @@ public class PistaDAO {
      * Inserta una nueva pista en la base de datos.
      *
      * @param pista El objeto PistaDTO que se desea insertar.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean insertPista(PistaDTO pista) {
         boolean respuesta = false;
@@ -62,6 +69,11 @@ public class PistaDAO {
         return respuesta;
     }
 
+    /**
+     * Busca una pista por su nombre asociado.
+     * @param nombre Nombre de la pista a buscar.
+     * @return pista Objeto pista si se encuentra.
+     */
     public PistaDTO findPistaByNombre(String nombre) {
         PistaDTO pista = null;
         String query = properties.getProperty("find_pista_by_nombre");
@@ -94,12 +106,11 @@ public class PistaDAO {
         return pista;
     }
 
-
     /**
      * Actualiza la información de una pista en la base de datos.
      *
      * @param pista El objeto PistaDTO con los nuevos datos.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean updatePista(PistaDTO pista) {
         boolean respuesta = false;
@@ -130,7 +141,7 @@ public class PistaDAO {
      * Elimina una pista de la base de datos.
      *
      * @param nombre El nombre de la pista que se desea eliminar.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean deletePista(String nombre) {
         boolean respuesta = false;
@@ -153,6 +164,10 @@ public class PistaDAO {
         return respuesta;
     }
 
+    /**
+     * Lista las pistas en la base de datos.
+     * @return todasLasPistas Todas las pistas de la base de datos.
+     */
     public List<PistaDTO> listarPistas() {
         List<PistaDTO> todasLasPistas = new ArrayList<>();
         String query = properties.getProperty("listar_todas_las_pistas");
@@ -184,6 +199,12 @@ public class PistaDAO {
         return todasLasPistas;
     }
     
+    /**
+     * Asocia el material a una pista.
+     * @param nombrePista Nombre de la pista a asociar.
+     * @param idMaterial Id del material a asociar.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
+     */
     public boolean asociarMaterialAPista(String nombrePista, int idMaterial) {
         boolean respuesta = false;
         String query = properties.getProperty("insertar_material_a_pista");

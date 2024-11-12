@@ -17,7 +17,14 @@ import java.io.IOException;
  */
 public class MaterialDAO {
 
+	/**
+     * Objeto connection para la conexión con la base de datos.
+     */
     private Connection connection;
+    
+    /**
+     * Objeto properties para las sentencias SQL.
+     */
     private Properties properties;
 
     /**
@@ -37,7 +44,7 @@ public class MaterialDAO {
      * Inserta un nuevo material en la base de datos.
      *
      * @param material El objeto MaterialDTO que se desea insertar.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean insertMaterial(MaterialDTO material) {
         boolean respuesta = false;
@@ -67,7 +74,7 @@ public class MaterialDAO {
      * Busca un material por su ID.
      *
      * @param idMaterial El ID del material que se desea buscar.
-     * @return Un objeto MaterialDTO si se encuentra, null en caso contrario.
+     * @return material Un objeto MaterialDTO si se encuentra, null en caso contrario.
      */
     public MaterialDTO findMaterialById(int idMaterial) {
         MaterialDTO material = null;
@@ -110,7 +117,7 @@ public class MaterialDAO {
      * Actualiza la información de un material en la base de datos.
      *
      * @param material El objeto MaterialDTO con los nuevos datos.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean updateMaterial(MaterialDTO material) {
         boolean respuesta = false;
@@ -140,7 +147,7 @@ public class MaterialDAO {
      * Elimina un material de la base de datos.
      *
      * @param idMaterial El ID del material que se desea eliminar.
-     * @return true si la operación es exitosa, false de lo contrario.
+     * @return respuesta True si la operación es exitosa, false de lo contrario.
      */
     public boolean deleteMaterial(int idMaterial) {
         boolean respuesta = false;
@@ -165,8 +172,7 @@ public class MaterialDAO {
 
     /**
      * Recupera todos los materiales de la base de datos.
-     *
-     * @return Una lista de objetos MaterialDTO.
+     * @return materials Una lista de objetos MaterialDTO.
      */
     public List<MaterialDTO> findAllMaterials() {
         List<MaterialDTO> materials = new ArrayList<>();
@@ -196,6 +202,10 @@ public class MaterialDAO {
         return materials;
     }
     
+    /**
+     * Obtiene los materiales por pista.
+     * @return materiales Una lista de objetos MaterialDTO.
+     */
     public List<MaterialDTO> obtenerMaterialesPorPista(String nombrePista) {
         List<MaterialDTO> materiales = new ArrayList<>();
         String query = "SELECT m.idMaterial, m.tipo, m.uso, m.estado " +

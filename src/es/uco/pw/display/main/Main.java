@@ -3,7 +3,6 @@ package es.uco.pw.display.main;
 import java.util.Scanner;
 
 /**
- * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
  *  @author Carlos De la Torre Frias (GM2)
@@ -30,7 +29,7 @@ public class Main {
 	 * Método principal que inicia la ejecución del programa.
 	 * Este método se encarga de recibir la entrada del usuario y gestiona la interacción con el sistema.
 	 * @param args Argumentos de línea de comandos que pueden ser utilizados
-	 *             para inicializar el programa (no se utilizan en esta implementación).
+	 *             para inicializar el programa.
 	 */
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -51,29 +50,29 @@ public class Main {
 
             switch (opcion) {
                 case 1:
-                    // OPCION 1: Llamar al menú de usuarios
+                    // OPCION 1: Llamar al menú de usuarios.
                     MenuUsuarios menuUsuarios = new MenuUsuarios();
                     menuUsuarios.mostrarMenu();
                     break;
                     
                 case 2:
-                    // OPCION 2: Llamar al menú de gestión de pistas
+                    // OPCION 2: Llamar al menú de gestión de pistas.
                     MenuPistas menuPistas = new MenuPistas();
                     menuPistas.mostrarMenu();
                     break;
                     
                 case 3:
-                	// OPCION 3: LLamar al menú de gestión de reservas
+                	// OPCION 3: LLamar al menú de gestión de reservas.
                     MenuReservas menuReservas = new MenuReservas();
-                    menuReservas.mostrarMenu(); // Llamar al método mostrarMenu de MenuReservas
+                    menuReservas.mostrarMenu(); // Llamar al método mostrarMenu de MenuReservas.
                     break;
                 	
                 case 4:
-                	// OPCION 4: Salir del Menu
+                	// OPCION 4: Salir del Menu.
                 	System.out.println("\n Saliendo del programa...");
                 	break;
                 default:
-                    System.out.println("\n ERROR! Opción no válida. Por favor intente de nuevo.");
+                    System.out.println("\n ¡ERROR! Opción no válida. Por favor intente de nuevo.");
             }
         }
         sc.close();
