@@ -11,7 +11,6 @@ import java.util.Scanner;
 import java.io.IOException;
 
 /**
- * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
  *  @author Carlos De la Torre Frias (GM2)
@@ -119,7 +118,7 @@ public class MenuUsuarios {
     private void listarUsuarios() {
         int codigo = gestor.listarUsuarios();
         
-        if (codigo == -1) {
+        if (codigo == 0) {
             System.out.println("\n ERROR! Ha ocurrido un error a la hora de listar los usuarios.");
         } else if(codigo == 2){
         	System.out.println("\n ADVERTENCIA! No se han encontrado usuarios en la baes de datos.");
@@ -133,15 +132,19 @@ public class MenuUsuarios {
      */
     private void modificarUsuario() {
         try {
+           
+            
             System.out.print("\n Introduce el correo del usuario a modificar: ");
             String correoModificar = scanner.nextLine();
-            JugadorDTO jugadorExistente = gestor.buscarUsuarioPorCorreo(correoModificar);
+            
+            int codigo = gestor.buscarUsuarioPorCorreo(correoModificar);
 
-            if (jugadorExistente == null) {
-                System.out.println("\n ERROR! Usuario no encontrado.");
+            if (codigo != 1) {
+                System.out.println("\n ¡ERROR! Ese correo no pertenece a ningún usuario.");
                 return;
             }
-
+            JugadorDTO jugadorExistente = new JugadorDTO();
+            
             System.out.println("\n  ¿Qué deseas modificar?");
             System.out.println("    1. Nombre completo");
             System.out.println("    2. Fecha de nacimiento");
@@ -154,7 +157,7 @@ public class MenuUsuarios {
                 case 1:
                     System.out.print("\n Introduce el nuevo nombre completo: ");
                     String nuevoNombre = scanner.nextLine();
-                    jugadorExistente.setNombreCompleto(nuevoNombre);
+                    jugadorExistente.separarNombreYApellidos(nuevoNombre);
                     break;
 
                 case 2:
@@ -171,23 +174,23 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    System.out.println("\n ERROR! Opción no válida.");
+                    System.out.println("\n ¡ERROR! Opción no válida.");
                     return;
             }
 
-            // Llamar al método de modificación
-            int resultadoModificar = gestor.modificarUsuario(correoModificar, jugadorExistente);
+         // Llamar al método de modificación en el DAO
+            int resultadoModificar = gestor.modificarUsuario(jugadorExistente, correoModificar);
             if (resultadoModificar == 1) {
-                System.out.println("\n Usuario modificado correctamente.");
+                System.out.println("\nUsuario modificado correctamente.");
             } else if (resultadoModificar == 0) {
-                System.out.println("\n Usuario no encontrado.");
+                System.out.println("\nUsuario no encontrado.");
             } else {
-                System.out.println("\n ERROR! Error al modificar el usuario.");
+                System.out.println("\nERROR! Error al modificar el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("\n ERROR! Formato de fecha incorrecto.");
-        } catch (IOException e) {
-            System.out.println("\n ERROR! Error al modificar el archivo.");
+            System.out.println("\nERROR! Formato de fecha incorrecto.");
+        } catch (Exception e) {
+            System.out.println("\nERROR! Ha ocurrido un error al modificar el usuario." + e.getMessage());
         }
     }
 }

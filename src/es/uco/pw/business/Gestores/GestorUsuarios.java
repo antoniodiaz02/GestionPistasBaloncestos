@@ -1,24 +1,10 @@
 package es.uco.pw.business.Gestores;
 
-import java.io.FileReader;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
 import es.uco.pw.business.DTOs.JugadorDTO;
 import es.uco.pw.data.DAOs.JugadorDAO;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
- * 
- * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
  *  @author Carlos De la Torre Frias (GM2)
@@ -33,13 +19,6 @@ public class GestorUsuarios {
 	
 	// Instanciación de los DAOs para acceder a la base de datos.
     JugadorDAO daoJugador = new JugadorDAO();
-	
-    /**
-     * Constructor de la clase GestorUsuarios. Inicializa la lista de usuarios.
-     */
-    public GestorUsuarios() {
-        usuarios = new ArrayList<>();
-    }
     
     /**
 	 * Añade un nuevo usuario
@@ -58,19 +37,33 @@ public class GestorUsuarios {
     public int listarUsuarios() {
         return daoJugador.listarUsuarios();
     }
-
-    
-    
-    
-    
     
     /**
-     * Lista que almacena los usuarios registrados.
-     */
-    private List<JugadorDTO> usuarios;
+	 * Modifica el usuario en base a distintos parámetros.
+	 * 
+	 * @param jugador Objeto Jugador de JugadorDTO.
+	 * @return codigo Codigo de salida.
+	 */
+    public int modificarUsuario(JugadorDTO jugador, String correoModificar) {
+        return daoJugador.modificarUsuario(jugador, correoModificar);
+    }
 
+    /**
+	 * Busca usuario por correo.
+	 * 
+	 * @param jugador Objeto Jugador de JugadorDTO.
+	 * @return codigo Codigo de salida.
+	 */
+    public int buscarUsuarioPorCorreo(String correo) {
+        return daoJugador.buscarUsuarioPorCorreo(correo);
+    }
     
-
+    
+    
+    
+    
+ 
+ 
     
     
    
@@ -83,109 +76,10 @@ public class GestorUsuarios {
      * @return 1 si se modifica correctamente, 0 si no se encuentra el usuario, -1 si ocurre un error
      * @throws IOException Si ocurre un error al guardar el archivo
      */
-    public int modificarUsuario(String correoElectronico, JugadorDTO nuevoJugador) throws IOException {
-        int codigo = 0;
-        String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
-        List<String> lineas = new ArrayList<>();
-        
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
-            String linea;
-            boolean usuarioModificado = false;
-
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-                String[] datos = linea.split(";");
-
-                if (datos.length == 3) {
-                    String correo = datos[2];
-
-                    // Si encontramos el usuario, lo actualizamos
-                    if (correo.equals(correoElectronico)) {
-                        String nuevaLinea = nuevoJugador.getNombreCompleto() + ";" +
-                                            new SimpleDateFormat("dd/MM/yyyy").format(nuevoJugador.getFechaNacimiento()) + ";" +
-                                            nuevoJugador.getCorreoElectronico();
-                        lineas.add(nuevaLinea);
-                        usuarioModificado = true;
-                    } else {
-                        // Si no es el usuario, simplemente añadimos la línea tal como está
-                        lineas.add(linea);
-                    }
-                }
-            }
-
-            reader.close(); // Cerramos el archivo de lectura
-
-            if (!usuarioModificado) {
-                return 0; // Usuario no encontrado
-            }
-
-            // Reescribimos todo el archivo con las líneas actualizadas
-            BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo, false)); // Sobrescribimos el archivo
-
-            for (String nuevaLinea : lineas) {
-                writer.write(nuevaLinea);
-                writer.newLine();
-            }
-
-            writer.close(); // Cerramos el archivo de escritura
-            codigo = 1; // Usuario modificado correctamente
-        } catch (IOException e) {
-            System.out.println("Error al modificar el archivo: " + e.getMessage());
-            codigo = -1; // Error durante la modificación
-        }
-
-        return codigo;
-    }
-   
     
     
-    /**
-     * Busca un usuario por su correo electrónico en la lista de usuarios.
-     * 
-     * @param correoElectronico Correo del jugador a buscar
-     * @return Jugador si se encuentra, null si no existe
-     */
-	public JugadorDTO buscarUsuarioPorCorreo(String correoElectronico) {
-	    String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
-
-	    try {
-	        // Abrimos el archivo en modo lectura
-	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
-	        String linea;
-
-	        // Leemos cada línea del archivo
-	        while ((linea = reader.readLine()) != null) {
-	            // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-	            String[] datos = linea.split(";");
-
-	            if (datos.length == 3) {
-	                String nombreCompleto = datos[0];
-	                String fechaNacimientoStr = datos[1];
-	                String correo = datos[2];
-
-	                // Si el correo electrónico coincide
-	                if (correo.equals(correoElectronico)) {
-	                    // Convertir la fecha de nacimiento de String a Date
-	                    Date fechaNacimiento = new SimpleDateFormat("dd/MM/yyyy").parse(fechaNacimientoStr);
-
-	                    // Crear y devolver el objeto Jugador
-	                    JugadorDTO jugador = new JugadorDTO(nombreCompleto, fechaNacimiento, correo);
-	                    reader.close();
-	                    return jugador;
-	                }
-	            }
-	        }
-
-	        reader.close(); // Cerramos el archivo
-	    } catch (IOException | ParseException e) {
-	        System.out.println("Error al leer el archivo o procesar los datos: " + e.getMessage());
-	    }
-	    // Si no se encuentra el usuario
-	    return null;
-	}
+    
+    
 }
 
 
@@ -280,5 +174,109 @@ public class GestorUsuarios {
 
         return codigo;
     }*/
+
+
+/*
+	public JugadorDTO buscarUsuarioPorCorreo(String correoElectronico) {
+	    String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
+
+	    try {
+	        // Abrimos el archivo en modo lectura
+	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
+	        String linea;
+
+	        // Leemos cada línea del archivo
+	        while ((linea = reader.readLine()) != null) {
+	            // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
+	            String[] datos = linea.split(";");
+
+	            if (datos.length == 3) {
+	                String nombreCompleto = datos[0];
+	                String fechaNacimientoStr = datos[1];
+	                String correo = datos[2];
+
+	                // Si el correo electrónico coincide
+	                if (correo.equals(correoElectronico)) {
+	                    // Convertir la fecha de nacimiento de String a Date
+	                    Date fechaNacimiento = new SimpleDateFormat("dd/MM/yyyy").parse(fechaNacimientoStr);
+
+	                    // Crear y devolver el objeto Jugador
+	                    JugadorDTO jugador = new JugadorDTO(nombreCompleto, fechaNacimiento, correo);
+	                    reader.close();
+	                    return jugador;
+	                }
+	            }
+	        }
+
+	        reader.close(); // Cerramos el archivo
+	    } catch (IOException | ParseException e) {
+	        System.out.println("Error al leer el archivo o procesar los datos: " + e.getMessage());
+	    }
+	    // Si no se encuentra el usuario
+	    return null;
+	}
+
+ */
+
+
+
+
+/*public int modificarUsuario(String correoElectronico, JugadorDTO nuevoJugador) throws IOException {
+        int codigo = 0;
+        String rutaArchivo = "src/es/uco/pw/files/users.txt"; // Ruta al archivo
+        List<String> lineas = new ArrayList<>();
+        
+        try {
+            // Abrimos el archivo en modo lectura
+            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo));
+            String linea;
+            boolean usuarioModificado = false;
+
+            // Leemos cada línea del archivo
+            while ((linea = reader.readLine()) != null) {
+                // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
+                String[] datos = linea.split(";");
+
+                if (datos.length == 3) {
+                    String correo = datos[2];
+
+                    // Si encontramos el usuario, lo actualizamos
+                    if (correo.equals(correoElectronico)) {
+                        String nuevaLinea = nuevoJugador.getNombreCompleto() + ";" +
+                                            new SimpleDateFormat("dd/MM/yyyy").format(nuevoJugador.getFechaNacimiento()) + ";" +
+                                            nuevoJugador.getCorreoElectronico();
+                        lineas.add(nuevaLinea);
+                        usuarioModificado = true;
+                    } else {
+                        // Si no es el usuario, simplemente añadimos la línea tal como está
+                        lineas.add(linea);
+                    }
+                }
+            }
+
+            reader.close(); // Cerramos el archivo de lectura
+
+            if (!usuarioModificado) {
+                return 0; // Usuario no encontrado
+            }
+
+            // Reescribimos todo el archivo con las líneas actualizadas
+            BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo, false)); // Sobrescribimos el archivo
+
+            for (String nuevaLinea : lineas) {
+                writer.write(nuevaLinea);
+                writer.newLine();
+            }
+
+            writer.close(); // Cerramos el archivo de escritura
+            codigo = 1; // Usuario modificado correctamente
+        } catch (IOException e) {
+            System.out.println("Error al modificar el archivo: " + e.getMessage());
+            codigo = -1; // Error durante la modificación
+        }
+
+        return codigo;
+    }
+   */
 
 

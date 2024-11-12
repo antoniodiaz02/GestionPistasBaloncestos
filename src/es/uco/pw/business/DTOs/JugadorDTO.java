@@ -172,7 +172,7 @@ public class JugadorDTO {
      * Separa el nombre y apellidos de NombreCompleto.
      * @param nombreCompleto Nombre Completo del usuario.
      */
-    private void separarNombreYApellidos(String nombreCompleto) {
+    public void separarNombreYApellidos(String nombreCompleto) {
         String[] partes = nombreCompleto.split(" ");
 
         if (partes.length == 2 || partes.length == 3) {

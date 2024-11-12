@@ -11,6 +11,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
+ *  @author Antonio Diaz Barbancho
+ *  @author Carlos Marín Rodríguez 
+ *  @author Carlos De la Torre Frias (GM2)
+ *  @author Daniel Grande Rubio (GM2)
+ *  @since 12-10-2024
+ *  @version 1.0
+ */
+
+/**
  * Clase que gestiona las pistas en la base de datos.
  */
 public class JugadorDAO {
@@ -77,7 +86,46 @@ public class JugadorDAO {
         return codigo;
     }
 
+    
+    
+    public int buscarUsuarioPorCorreo(String correo) {
+    	
+    	int codigo = 0;
+        String queryBuscar = properties.getProperty("buscar_por_correo");
 
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
+
+            // Comprobar si el usuario ya existe mediante el correo electrónico
+            statementBuscar.setString(1, correo);
+            ResultSet rs = statementBuscar.executeQuery();
+
+            if (rs.next()) {
+                return 1; // Código para indicar que el usuario ya está registrado
+            
+        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
+	        return -1; // Código para indicar error general de base de datos
+	    } finally {
+	        db.closeConnection();
+	    }
+	
+	    return codigo;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * Lista los usuarios de la base de datos.
      *
@@ -133,10 +181,84 @@ public class JugadorDAO {
     }
 
         
+    /**
+     * Modifica un jugador existente en la base de datos.
+     * @param correoElectronico El correo del jugador a modificar.
+     * @param nuevoJugador Objeto JugadorDTO con la información actualizada.
+     * @return int indicando el estado de la operación (1 = éxito, 0 = no encontrado, -1 = error).
+     */
+    public int modificarUsuario(JugadorDTO jugador, String correo) {
+        int codigo = 0;
+
+        // Iniciar la consulta SQL para actualizar solo los campos no nulos
+        StringBuilder queryActualizar = new StringBuilder("UPDATE Usuarios SET ");
         
-    
-    
-    
+        boolean firstField = true;  // Para agregar coma solo si es necesario
+
+        // Verificar cada campo y agregarlo a la consulta si no es nulo
+        if (jugador.getNombre() != null) {
+            queryActualizar.append("nombre = ?");
+            firstField = false;
+        }
+        
+        if (jugador.getApellidos() != null) {
+            if (!firstField) queryActualizar.append(", ");
+            queryActualizar.append("apellidos = ?");
+            firstField = false;
+        }
+        
+        if (jugador.getFechaNacimiento() != null) {
+            if (!firstField) queryActualizar.append(", ");
+            queryActualizar.append("fechaNacimiento = ?");
+            firstField = false;
+        }
+        
+        // Verificar si el correo fue modificado
+        if (jugador.getCorreoElectronico() != null) {
+            if (!firstField) queryActualizar.append(", ");
+            queryActualizar.append("correoElectronico = ?");
+        }
+        
+        // Completar la consulta con la condición WHERE para el correo
+        queryActualizar.append(" WHERE correoElectronico = ?");
+
+        // Crear la conexión y preparar la declaración
+        DBConnection db = new DBConnection();
+        Connection connection = db.getConnection();
+
+        try (PreparedStatement statementActualizar = connection.prepareStatement(queryActualizar.toString())) {
+            int index = 1;
+
+            // Establecer los parámetros solo si no son nulos
+            if (jugador.getNombre() != null) {
+                statementActualizar.setString(index++, jugador.getNombre());
+            }
+            if (jugador.getApellidos() != null) {
+                statementActualizar.setString(index++, jugador.getApellidos());
+            }
+            if (jugador.getFechaNacimiento() != null) {
+                statementActualizar.setDate(index++, new java.sql.Date(jugador.getFechaNacimiento().getTime()));
+            }
+            if (jugador.getCorreoElectronico() != null) {
+                statementActualizar.setString(index++, jugador.getCorreoElectronico());
+            }
+
+            // Establecer el correo electrónico original del jugador (para la cláusula WHERE)
+            statementActualizar.setString(index, correo);
+
+            // Ejecutar la actualización
+            int filasActualizadas = statementActualizar.executeUpdate();
+            codigo = filasActualizadas > 0 ? 1 : 0; // 1 si se actualizó correctamente, 0 si no
+        } catch (SQLException e) {
+            System.err.println("Error al modificar el usuario en la base de datos: " + e.getMessage());
+            codigo = -1;  // Indicar error en la base de datos
+        } finally {
+            db.closeConnection();
+        }
+
+        return codigo;
+    }
+
 } 
     
     
