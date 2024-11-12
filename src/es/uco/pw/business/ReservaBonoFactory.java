@@ -7,7 +7,7 @@ import es.uco.pw.business.DTOs.ReservaFamiliarDTO;
 import es.uco.pw.business.DTOs.ReservaInfantilDTO;
 
 /**
- * Factory concreta para crear reservas bono con parámetros
+ * Factory concreta para crear reservas bono con parámetros.
  * 
  * 
  *  @author Antonio Diaz Barbancho
@@ -21,19 +21,19 @@ import es.uco.pw.business.DTOs.ReservaInfantilDTO;
 public class ReservaBonoFactory extends ReservaFactory {
 
     /**
-     * Identificador del bono
+     * Identificador del bono.
      */
     private String bonoId;
     
     /**
-     * Numero de sesion dentro del bono
+     * Número de sesion dentro del bono.
      */
     private int sesion;
 
     /**
-     * Constructor de la clase ReservaBonoFactory
-     * @param bonoId Identificador del bono
-     * @param sesion Numero de sesion dentro del bono
+     * Constructor de la clase ReservaBonoFactory.
+     * @param bonoId Identificador del bono.
+     * @param sesion Número de sesion dentro del bono.
      */
     public ReservaBonoFactory(String bonoId, int sesion) {
         this.bonoId = bonoId;
@@ -41,15 +41,15 @@ public class ReservaBonoFactory extends ReservaFactory {
     }
     
     /**
-     * Crea una reserva infantil con bono usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento 
-     *  @param numeroNinos Numero de ninos
-     *  @return reserva Objeto de tipo ReservaInfantil creado
+     * Crea una reserva infantil con bono usando parametros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duración.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento .
+     *  @param numeroNinos Número de niños.
+     *  @return reserva Objeto de tipo ReservaInfantil creado.
      */
     @Override
     public ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
@@ -61,16 +61,16 @@ public class ReservaBonoFactory extends ReservaFactory {
     }
 
     /**
-     * Crea una reserva familiar con bono usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento
-     *  @param numeroAdultos Numero de adultos 
-     *  @param numeroNinos Numero de ninos
-     *  @return reserva Objeto de tipo ReservaFamiliar creado
+     * Crea una reserva familiar con bono usando parámetros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duración.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento.
+     *  @param numeroAdultos Número de adultos.
+     *  @param numeroNinos Número de niños.
+     *  @return reserva Objeto de tipo ReservaFamiliar creado.
      */
     @Override
     public ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
@@ -82,15 +82,15 @@ public class ReservaBonoFactory extends ReservaFactory {
     }
 
     /**
-     * Crea una reserva adultos con bono usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento
-     *  @param numeroAdultos Numero de adultos 
-     *  @return reserva Objeto de tipo ReservaAdultos creado
+     * Crea una reserva adultos con bono usando parámetros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duración.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento.
+     *  @param numeroAdultos Número de adultos.
+     *  @return reserva Objeto de tipo ReservaAdultos creado.
      */
     @Override
     public ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {

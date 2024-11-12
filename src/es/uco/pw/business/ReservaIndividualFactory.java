@@ -23,19 +23,19 @@ public class ReservaIndividualFactory extends ReservaFactory {
      * Constructor por defecto de la clase ReservaIndividualFactory.
      */
     public ReservaIndividualFactory() {
-        // Constructor por defecto
+        // Constructor por defecto.
     }
 	
 	/**
-     * Crea una reserva infantil individual usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento 
-     *  @param numeroNinos Numero de ninos
-     *  @return reserva Objeto de tipo ReservaInfantil creado
+     * Crea una reserva infantil individual usando parámetros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duración.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento .
+     *  @param numeroNinos Número de niños.
+     *  @return reserva Objeto de tipo ReservaInfantil creado.
      */
     @Override
     public ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
@@ -43,16 +43,16 @@ public class ReservaIndividualFactory extends ReservaFactory {
     }
 
     /**
-     * Crea una reserva familiar individual usando parametros personalizados
-     *  @param idUsuario Identificador del usuario
-     *  @param fecha Fecha
-     *  @param duracion Duracion
-     *  @param idPista Identificador de la pista
-     *  @param precio Precio
-     *  @param descuento Descuento
-     *  @param numeroAdultos Numero de adultos 
-     *  @param numeroNinos Numero de ninos
-     *  @return reserva Objeto de tipo ReservaFamiliar creado
+     * Crea una reserva familiar individual usando parámetros personalizados.
+     *  @param idUsuario Identificador del usuario.
+     *  @param fecha Fecha.
+     *  @param duracion Duración.
+     *  @param idPista Identificador de la pista.
+     *  @param precio Precio.
+     *  @param descuento Descuento.
+     *  @param numeroAdultos Número de adultos. 
+     *  @param numeroNinos Número de ninos.
+     *  @return reserva Objeto de tipo ReservaFamiliar creado.
      */
     @Override
     public ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
@@ -60,14 +60,14 @@ public class ReservaIndividualFactory extends ReservaFactory {
     }
 
     /**
-     * Crea una reserva adultos individual  usando parametros personalizados.
+     * Crea una reserva adultos individual usando parámetros personalizados.
      *  @param idUsuario Identificador del usuario.
      *  @param fecha Fecha.
-     *  @param duracion Duracion.
+     *  @param duracion Duración.
      *  @param idPista Identificador de la pista.
      *  @param precio Precio.
      *  @param descuento Descuento. 
-     *  @param numeroAdultos Numero de adultos.
+     *  @param numeroAdultos Número de adultos.
      *  @return reserva Objeto de tipo ReservaAdultos creado.
      */
     @Override

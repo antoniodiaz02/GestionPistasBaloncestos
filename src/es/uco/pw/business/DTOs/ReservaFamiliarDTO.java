@@ -14,29 +14,29 @@ import java.util.Date;
 public class ReservaFamiliarDTO extends ReservaDTO {
 
     /**
-     * Número de adultos en la reserva
+     * Número de adultos en la reserva.
      */
     private int numAdultos;
 
     /**
-     * Número de niños en la reserva
+     * Número de niños en la reserva.
      */
     private int numNinos;
 
     /**
-     * Constructor vacío de la clase ReservaFamiliar
+     * Constructor vacío de la clase ReservaFamiliar.
      */
     public ReservaFamiliarDTO() {}
 
-    /** Constructor parametrizable de la subclase ReservaFamiliar
+    /** Constructor parametrizable de la subclase ReservaFamiliar.
      * @param idUsuario Identificador del usuario.
      * @param fechaHora Fecha hora.
-     * @param duracionMinutos Duracion en minutos.
+     * @param duracionMinutos Duración en minutos.
      * @param idPista Identificador de la pista.
      * @param precio Precio.
      * @param descuento Descuento.
-     * @param numeroAdultos Numero de adultos.
-     * @param numeroNinos Numero de ninos.
+     * @param numeroAdultos Número de adultos.
+     * @param numeroNinos Número de ninos.
      */
     public ReservaFamiliarDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
@@ -44,42 +44,41 @@ public class ReservaFamiliarDTO extends ReservaDTO {
         this.numNinos = numeroNinos;
     }
     
-    
     /**
-     * Devuelve el número de adultos en la reserva
-     * @return numAdultos Número de adultos
+     * Devuelve el número de adultos en la reserva.
+     * @return numAdultos Número de adultos.
      */
     public int getNumAdultos() {
         return numAdultos;
     }
 
     /**
-     * Modifica el número de adultos en la reserva
-     * @param numAdultos Número de adultos
+     * Modifica el número de adultos en la reserva.
+     * @param numAdultos Número de adultos.
      */
     public void setNumAdultos(int numAdultos) {
         this.numAdultos = numAdultos;
     }
 
     /**
-     * Devuelve el número de niños en la reserva
-     * @return numNinos Número de niños
+     * Devuelve el número de niños en la reserva.
+     * @return numNinos Número de niños.
      */
     public int getNumNinos() {
         return numNinos;
     }
 
     /**
-     * Modifica el número de niños en la reserva
-     * @param numNinos Número de niños
+     * Modifica el número de niños en la reserva.
+     * @param numNinos Número de niños.
      */
     public void setNumNinos(int numNinos) {
         this.numNinos = numNinos;
     }
 
     /**
-     * Muestra la información de la reserva familiar
-     * @return String Información de la reserva
+     * Muestra la información de la reserva familiar.
+     * @return String Información de la reserva.
      */
     @Override
     public String toString() {

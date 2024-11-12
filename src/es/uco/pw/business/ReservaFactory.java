@@ -19,49 +19,46 @@ import es.uco.pw.business.DTOs.ReservaInfantilDTO;
 public abstract class ReservaFactory {
     
 	/**
-     * Constructor por defecto de la clase ReservaFactory
+     * Constructor por defecto de la clase ReservaFactory.
      */
     public ReservaFactory() {
-        // Constructor por defecto
+        // Constructor por defecto.
     }
 	
     /**
      * Método abstracto para crear una reserva infantil.
-     * @param idUsuario ID del usuario que realiza la reserva
-     * @param fecha Fecha de la reserva
-     * @param duracion Duración de la reserva en horas
-     * @param idPista ID de la pista a reservar
-     * @param precio Precio de la reserva
-     * @param descuento Descuento aplicado a la reserva
-     * @param numeroNinos Número de niños en la reserva
-     * @return ReservaInfantil
+     * @param idUsuario Id del usuario que realiza la reserva.
+     * @param fecha Fecha de la reserva.
+     * @param duracion Duración de la reserva en horas.
+     * @param idPista Id de la pista a reservar.
+     * @param precio Precio de la reserva.
+     * @param descuento Descuento aplicado a la reserva.
+     * @param numeroNinos Número de niños en la reserva.
      */
     public abstract ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva familiar.
-     * @param idUsuario ID del usuario que realiza la reserva
-     * @param fecha Fecha de la reserva
-     * @param duracion Duración de la reserva en horas
-     * @param idPista ID de la pista a reservar
-     * @param precio Precio de la reserva
-     * @param descuento Descuento aplicado a la reserva
-     * @param numeroAdultos Número de adultos en la reserva
-     * @param numeroNinos Número de niños en la reserva
-     * @return ReservaFamiliar
+     * @param idUsuario Id del usuario que realiza la reserva.
+     * @param fecha Fecha de la reserva.
+     * @param duracion Duración de la reserva en horas.
+     * @param idPista Id de la pista a reservar.
+     * @param precio Precio de la reserva.
+     * @param descuento Descuento aplicado a la reserva.
+     * @param numeroAdultos Número de adultos en la reserva.
+     * @param numeroNinos Número de niños en la reserva.
      */
     public abstract ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva para adultos.
-     * @param idUsuario ID del usuario que realiza la reserva
-     * @param fecha Fecha de la reserva
-     * @param duracion Duración de la reserva en horas
-     * @param idPista ID de la pista a reservar
-     * @param precio Precio de la reserva
-     * @param descuento Descuento aplicado a la reserva
-     * @param numeroAdultos Número de adultos en la reserva
-     * @return ReservaAdultos
+     * @param idUsuario Id del usuario que realiza la reserva.
+     * @param fecha Fecha de la reserva.
+     * @param duracion Duración de la reserva en horas.
+     * @param idPista Id de la pista a reservar.
+     * @param precio Precio de la reserva.
+     * @param descuento Descuento aplicado a la reserva.
+     * @param numeroAdultos Número de adultos en la reserva.
      */
     public abstract ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos);
 }

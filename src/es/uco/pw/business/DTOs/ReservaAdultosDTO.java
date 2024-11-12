@@ -14,12 +14,12 @@ import java.util.Date;
 public class ReservaAdultosDTO extends ReservaDTO {
 
     /**
-     * Número de adultos en la reserva
+     * Número de adultos en la reserva.
      */
     private int numAdultos;
 
     /**
-     * Constructor vacío de la clase ReservaAdultos
+     * Constructor vacío de la clase ReservaAdultos.
      */
     public ReservaAdultosDTO() {}
 
@@ -28,37 +28,36 @@ public class ReservaAdultosDTO extends ReservaDTO {
      * Constructor parametrizable de la subclase ReservaAdultos.
      * @param idUsuario Identificador del usuario.
      * @param fechaHora Fecha hora.
-     * @param duracionMinutos Duracion en minutos.
+     * @param duracionMinutos Duración en minutos.
      * @param idPista Identificador de la pista.
      * @param precio Precio.
      * @param descuento Descuento a aplicar.
-     * @param numeroAdultos Numero de adultos.
+     * @param numeroAdultos Número de adultos.
      */
     public ReservaAdultosDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
         this.numAdultos = numeroAdultos;
     }
     
-    
     /**
-     * Devuelve el número de adultos en la reserva
-     * @return numAdultos Número de adultos
+     * Devuelve el número de adultos en la reserva.
+     * @return numAdultos Número de adultos.
      */
     public int getNumAdultos() {
         return numAdultos;
     }
 
     /**
-     * Modifica el número de adultos en la reserva
-     * @param numAdultos Número de adultos
+     * Modifica el número de adultos en la reserva.
+     * @param numAdultos Número de adultos.
      */
     public void setNumAdultos(int numAdultos) {
         this.numAdultos = numAdultos;
     }
 
     /**
-     * Muestra la información de la reserva de adultos
-     * @return String Información de la reserva
+     * Muestra la información de la reserva de adultos.
+     * @return String Información de la reserva.
      */
     @Override
     public String toString() {

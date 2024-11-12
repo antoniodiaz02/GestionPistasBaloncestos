@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 
 /**
- * Clase que representa a una persona que va a hacer uso de las instalaciones deportivas.
+ * Clase que representa a un usuario que va a hacer uso de las instalaciones deportivas.
  * 
  *  @author Antonio Diaz Barbancho
  *  @author Carlos Marín Rodríguez 
@@ -19,49 +19,49 @@ import java.util.Arrays;
 public class JugadorDTO {
 
     /**
-     * Nombre y apellidos del jugador
+     * Nombre y apellidos del jugador.
      */
     private String nombreCompleto;
 
     /**
-     * Nombre del jugador
+     * Nombre del jugador.
      */
     private String nombre;
     
     /**
-     * Apellidos del jugador
+     * Apellidos del jugador.
      */
     private String apellidos;
     
     
     /**
-     * Fecha de nacimiento del jugador
+     * Fecha de nacimiento del jugador.
      */
     private Date fechaNacimiento;
 
     /**
-     * Fecha de inscripción (primera reserva)
+     * Fecha de inscripción (primera reserva).
      */
     private Date fechaInscripcion;
 
     /**
-     * Correo electrónico del jugador (debe ser único)
+     * Correo electrónico del jugador (debe ser único).
      */
     private String correoElectronico;
 
     /**
-     * Constructor vacio clase Jugador
+     * Constructor vacío clase Jugador.
      */
     public JugadorDTO() {
     	
     }
     
     /**
-     * Constructor parametrizado de la clase Jugador
+     * Constructor parametizado de la clase Jugador.
      * 
-     * @param nombreCompleto Nombre y apellidos del jugador
-     * @param fechaNacimiento Fecha de nacimiento del jugador
-     * @param correoElectronico Correo electrónico del jugador
+     * @param nombreCompleto Nombre y apellidos del jugador.
+     * @param fechaNacimiento Fecha de nacimiento del jugador.
+     * @param correoElectronico Correo electrónico del jugador.
      */
     public JugadorDTO(String nombreCompleto, Date fechaNacimiento, String correoElectronico) {
         this.nombreCompleto = nombreCompleto;
@@ -72,18 +72,17 @@ public class JugadorDTO {
         separarNombreYApellidos(nombreCompleto);
     }
 
-
     /**
-     * Devuelve la fecha de inscripcion.
-     * @return nombreCompleto Nombre del jugador
+     * Devuelve la fecha de inscripción.
+     * @return nombreCompleto Nombre del jugador.
      */
     public Date getFechaInscripcion() {
         return fechaInscripcion;
     }
     
     /**
-     * Devuelve el nombre completo del jugador
-     * @return nombreCompleto Nombre del jugador
+     * Devuelve el nombre completo del jugador.
+     * @return nombreCompleto Nombre del jugador.
      */
     public String getNombreCompleto() {
         return nombreCompleto;
@@ -106,48 +105,48 @@ public class JugadorDTO {
     }
 
     /**
-     * Modifica el nombre completo del jugador
-     * @param nombreCompleto Nombre del jugador
+     * Modifica el nombre completo del jugador.
+     * @param nombreCompleto Nombre del jugador.
      */
     public void setNombreCompleto(String nombreCompleto) {
         this.nombreCompleto = nombreCompleto;
     }
 
     /**
-     * Devuelve la fecha de nacimiento del jugador
-     * @return fechaNacimiento Fecha de nacimiento
+     * Devuelve la fecha de nacimiento del jugador.
+     * @return fechaNacimiento Fecha de nacimiento.
      */
     public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
 
     /**
-     * Modifica la fecha de nacimiento del jugador
-     * @param fechaNacimiento Fecha de nacimiento
+     * Modifica la fecha de nacimiento del jugador.
+     * @param fechaNacimiento Fecha de nacimiento.
      */
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
     /**
-     * Devuelve el correo electrónico del jugador
-     * @return correoElectronico Correo electrónico
+     * Devuelve el correo electrónico del jugador.
+     * @return correoElectronico Correo electrónico.
      */
     public String getCorreoElectronico() {
         return correoElectronico;
     }
 
     /**
-     * Modifica el correo electrónico del jugador
-     * @param correoElectronico Correo electrónico
+     * Modifica el correo electrónico del jugador.
+     * @param correoElectronico Correo electrónico.
      */
     public void setCorreoElectronico(String correoElectronico) {
         this.correoElectronico = correoElectronico;
     }
 
     /**
-     * Calcula los años de antigüedad del jugador
-     * @return años de antigüedad
+     * Calcula los años de antigüedad del jugador.
+     * @return años de antigüedad.
      */
     public int calcularAntiguedad() {
     	
@@ -159,8 +158,8 @@ public class JugadorDTO {
     }
 
     /**
-     * Muestra la información del jugador
-     * @return String Información del jugador
+     * Muestra la información del jugador.
+     * @return String Información del jugador.
      */
     @Override
     public String toString() {

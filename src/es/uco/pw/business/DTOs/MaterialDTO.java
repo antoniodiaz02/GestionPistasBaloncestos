@@ -1,7 +1,7 @@
 package es.uco.pw.business.DTOs;
 
 /**
- * Clase que representa el material que puede ser reservado junto a la pista .
+ * Clase que representa el material que puede ser reservado junto a la pista.
  * 
  *  @author Antonio Diaz Barbancho
  *	@author Carlos Marín Rodríguez 
@@ -14,22 +14,22 @@ package es.uco.pw.business.DTOs;
 public class MaterialDTO{
 	
 	/**
-	 * Identificador del material a reservar
+	 * Identificador del material a reservar.
 	 */
 	private int idMaterial;
 	
 	/**
-	 * Tipo de material pelotas, canastas y conos
+	 * Tipo de material pelotas, canastas y conos.
 	 */
 	private TipoMaterial tipoMaterial;
 	
 	/**
-	 * Uso del inteior, true para pistas de interior y false para exterior
+	 * Uso del inteior, true para pistas de interior y false para exterior.
 	 */
 	private boolean usoInterior;
 	
 	/**
-	 * Estado del material si esta disponible, reservado o en mal estado
+	 * Estado del material si esta disponible, reservado o en mal estado.
 	 */
     private EstadoMaterial estadoMaterial;
 	
@@ -41,17 +41,17 @@ public class MaterialDTO{
     public enum TipoMaterial {
     	
     	/**
-    	 * Material pelota
+    	 * Material pelota.
     	 */
         PELOTAS,
         
         /**
-    	 * Material canastas
+    	 * Material canastas.
     	 */
         CANASTAS,
         
         /**
-    	 * Material cono
+    	 * Material cono.
     	 */
         CONOS
     }
@@ -63,34 +63,34 @@ public class MaterialDTO{
     public enum EstadoMaterial {
     	
     	/**
-    	 * Estado disponible
+    	 * Estado disponible.
     	 */
         DISPONIBLE,
         
         /**
-    	 * Estado reservado
+    	 * Estado reservado.
     	 */
         RESERVADO,
         
         /**
-    	 * Estado correspondiente a mal estado del material
+    	 * Estado correspondiente a mal estado del material.
     	 */
         MAL_ESTADO
     }
     
     /**
-	 * Constructor vacio de la clase Material
+	 * Constructor vacio de la clase Material.
 	 */
     public MaterialDTO() {
     	
     }
     
     /**
-     * Constructor de la clase material
-     * @param idMaterial Para el identificador del material
-     * @param tipoMaterial Para el tipo del material
-     * @param usoInterior Para indicar el uso interor o exterior
-     * @param estadoMaterial Para indicar el estado del material
+     * Constructor de la clase material.
+     * @param idMaterial Para el identificador del material.
+     * @param tipoMaterial Para el tipo del material.
+     * @param usoInterior Para indicar el uso interor o exterior.
+     * @param estadoMaterial Para indicar el estado del material.
      * 
  	*/
     public MaterialDTO(int idMaterial, TipoMaterial tipoMaterial, boolean usoInterior, EstadoMaterial estadoMaterial) {
@@ -101,73 +101,72 @@ public class MaterialDTO{
     }
     
     /**
-     * Devuelve el id del material
-     * @return idMaterial El id del material
+     * Devuelve el id del material.
+     * @return idMaterial El id del material.
  	*/
     public int getIdMaterial() {
 		return idMaterial;
 	}
 
 	/**
-	 * Modifica el id del Material
-	 * @param idMaterial Id del material
+	 * Modifica el identificador del Material.
+	 * @param idMaterial Id del material.
 	 */
 	public void setIdMaterial(int idMaterial) {
 		this.idMaterial = idMaterial;
 	}
 
 	/**
-	 * Devuelve el uso del material
-	 * @return usoMaterial El uso del material
+	 * Devuelve el uso del material.
+	 * @return usoMaterial El uso del material.
 	 */
 	public boolean getUsoInterior() {
 		return usoInterior;
 	}
 
 	/**
-	 * Modifica el uso del interior
-	 * @param usoInterior Uso interior 
+	 * Modifica el uso del interior.
+	 * @param usoInterior Uso interior.
 	 */
 	public void setUsoInterior(boolean usoInterior) {
 		this.usoInterior = usoInterior;
 	}
 
 	/**
-	 * Devuelve el estado del material
-	 * @return estadoMaterial Estado del material
+	 * Devuelve el estado del material.
+	 * @return estadoMaterial Estado del material.
 	 */
 	public EstadoMaterial getEstadoMaterial() {
 		return estadoMaterial;
 	}
 
 	/**
-	 * Modifica el estado del material
-	 * @param estadoMaterial Estado del material
+	 * Modifica el estado del material.
+	 * @param estadoMaterial Estado del material.
 	 */
 	public void setEstadoMaterial(EstadoMaterial estadoMaterial) {
 		this.estadoMaterial = estadoMaterial;
 	}
 	
 	/**
-	 * Modifica el tipo de material
-	 * @param tipoMaterial Tipo de material
+	 * Modifica el tipo de material.
+	 * @param tipoMaterial Tipo de material.
 	 */
 	 public void setTipoMaterial(TipoMaterial tipoMaterial) {
 	        this.tipoMaterial = tipoMaterial;
 	    }
 	 
 	 /**
-		 * Devuelve el tipo de material
-		 * @return Devuelve el tipo de material
+		 * Devuelve el tipo de material.
+		 * @return Devuelve el tipo de material.
 		 */
 	 public TipoMaterial getTipoMaterial() {
 	        return tipoMaterial;
 	    }
 	
 	/*
-	    * Muestra la informacion referente al Material
-	    * @param none
-	    * @return string La informacion del material
+	    * Muestra la informacion referente al Material.
+	    * @return string La informacion del material.
 		*/
 	@Override
 	public String toString() {

@@ -16,32 +16,32 @@ import java.util.List;
 public class PistaDTO {
 
     /**
-     * Nombre de la pista
+     * Nombre de la pista.
      */
     private String nombre;
 
     /**
-     * Estado de la pista (disponible o no)
+     * Estado de la pista (disponible o no).
      */
     private boolean disponible;
 
     /**
-     * Tipo de la pista (interior/exterior)
+     * Tipo de la pista (interior/exterior).
      */
     private boolean esInterior;
 
     /**
-     * Tamaño de la pista
+     * Tamaño de la pista.
      */
     private TamanoPista tamanoPista;
 
     /**
-     * Número máximo de jugadores autorizados
+     * Número máximo de jugadores autorizados.
      */
     private int maxJugadores;
 
     /**
-     * Lista de materiales asociados a la pista
+     * Lista de materiales asociados a la pista.
      */
     private List<MaterialDTO> materiales;
 
@@ -73,23 +73,21 @@ public class PistaDTO {
     }
 
     /**
-     * Constructor vacío de la clase Pista
+     * Constructor vacío de la clase Pista.
      */
-    
     public PistaDTO() {
     	
     }
     
     /**
-     * Constructor parametrizado de la clase Pista
+     * Constructor parametrizado de la clase Pista.
      * 
-     * @param nombre Nombre de la pista
-     * @param disponible Estado de la pista
-     * @param esInterior Tipo de pista (interior/exterior)
-     * @param tamanoPista Tamaño de la pista
-     * @param maxJugadores Máximo de jugadores permitidos
+     * @param nombre Nombre de la pista.
+     * @param disponible Estado de la pista.
+     * @param esInterior Tipo de pista (interior/exterior).
+     * @param tamanoPista Tamaño de la pista.
+     * @param maxJugadores Máximo de jugadores permitidos.
      */
-    
     public PistaDTO(String nombre, boolean disponible, boolean esInterior, TamanoPista tamanoPista, int maxJugadores) {
         this.nombre = nombre;
         this.disponible = disponible;
@@ -100,87 +98,87 @@ public class PistaDTO {
     }
 
     /**
-     * Devuelve el nombre de la pista
-     * @return nombre Nombre de la pista
+     * Devuelve el nombre de la pista.
+     * @return nombre Nombre de la pista.
      */
     public String getNombre() {
         return nombre;
     }
 
     /**
-     * Modifica el nombre de la pista
-     * @param nombre Nombre de la pista
+     * Modifica el nombre de la pista.
+     * @param nombre Nombre de la pista.
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
     /**
-     * Devuelve el estado de la pista
-     * @return disponible Estado de la pista
+     * Devuelve el estado de la pista.
+     * @return disponible Estado de la pista.
      */
     public boolean isDisponible() {
         return disponible;
     }
 
     /**
-     * Modifica el estado de la pista
-     * @param disponible Estado de la pista
+     * Modifica el estado de la pista.
+     * @param disponible Estado de la pista.
      */
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
 
     /**
-     * Devuelve si la pista es interior
-     * @return esInterior True si es interior, False si es exterior
+     * Devuelve si la pista es interior.
+     * @return esInterior True si es interior, False si es exterior.
      */
     public boolean isInterior() {
         return esInterior;
     }
 
     /**
-     * Modifica si la pista es interior
-     * @param esInterior True si es interior, False si es exterior
+     * Modifica si la pista es interior.
+     * @param esInterior True si es interior, False si es exterior.
      */
     public void setInterior(boolean esInterior) {
         this.esInterior = esInterior;
     }
 
     /**
-     * Devuelve el tamaño de la pista
-     * @return tamanoPista Tamaño de la pista
+     * Devuelve el tamaño de la pista.
+     * @return tamanoPista Tamaño de la pista.
      */
     public TamanoPista getTamanoPista() {
         return tamanoPista;
     }
 
     /**
-     * Modifica el tamaño de la pista
-     * @param tamanoPista Tamaño de la pista
+     * Modifica el tamaño de la pista.
+     * @param tamanoPista Tamaño de la pista.
      */
     public void setTamanoPista(TamanoPista tamanoPista) {
         this.tamanoPista = tamanoPista;
     }
 
     /**
-     * Devuelve el número máximo de jugadores
-     * @return maxJugadores Número máximo de jugadores
+     * Devuelve el número máximo de jugadores.
+     * @return maxJugadores Número máximo de jugadores.
      */
     public int getMaxJugadores() {
         return maxJugadores;
     }
 
     /**
-     * Modifica el número máximo de jugadores
-     * @param maxJugadores Número máximo de jugadores
+     * Modifica el número máximo de jugadores.
+     * @param maxJugadores Número máximo de jugadores.
      */
     public void setMaxJugadores(int maxJugadores) {
         this.maxJugadores = maxJugadores;
     }
 
     /**
-     * Devuelve el subconjunto de materiales disponible
+     * Devuelve el subconjunto de materiales disponible.
      * @return disponibles
      */
     public List<MaterialDTO> consultarMaterialesDisponibles() {
@@ -194,18 +192,18 @@ public class PistaDTO {
     }
      
     /**
-     * Añade un material a la pista si cumple las restricciones de uso
-     * @param material Material a asociar a la pista
-     * @return True si se asoció correctamente, False en caso contrario
+     * Añade un material a la pista si cumple las restricciones de uso.
+     * @param material Material a asociar a la pista.
+     * @return True si se asoció correctamente, False en caso contrario.
      */
     public boolean asociarMaterial(MaterialDTO material) {
     	  
-    	    // Si la pista es exterior solo aceptar materiales de exterior
+    	    // Si la pista es exterior solo aceptar materiales de exterior.
     	    if (!esInterior && material.getUsoInterior()) {
     	        return false;
     	    }
 
-    	    // Contar el número de pelotas, canastas y conos ya asociados
+    	    // Contar el número de pelotas, canastas y conos ya asociados.
     	    long pelotas = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.PELOTAS).count();
     	    long canastas = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.CANASTAS).count();
     	    long conos = materiales.stream().filter(m -> m.getTipoMaterial() == MaterialDTO.TipoMaterial.CONOS).count();
@@ -220,7 +218,7 @@ public class PistaDTO {
     	        return false;
     	    }
     	    
-    	    // Validar que el material no esté ya asociado
+    	    // Validar que el material no esté ya asociado.
     	    if (materiales.contains(material)) {
     	        return false;
     	    }
@@ -229,14 +227,17 @@ public class PistaDTO {
     	    return true;
     	}
     
-    
+    /**
+     * Asocia la lista de materiales.
+     * @param materiales Lista de materiales.
+     */
     public void setMateriales(List<MaterialDTO> materiales) {
         this.materiales = materiales;
     }
     
     /**
-     * Muestra toda la información de la pista
-     * @return String Información de la pista
+     * Muestra toda la información de la pista.
+     * @return String Información de la pista.
      */
     @Override
     public String toString() {
