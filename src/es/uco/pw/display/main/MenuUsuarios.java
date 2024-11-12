@@ -118,7 +118,7 @@ public class MenuUsuarios {
     private void listarUsuarios() {
         int codigo = gestor.listarUsuarios();
         
-        if (codigo == 0) {
+        if (codigo == -1) {
             System.out.println("\n ERROR! Ha ocurrido un error a la hora de listar los usuarios.");
         } else if(codigo == 2){
         	System.out.println("\n ADVERTENCIA! No se han encontrado usuarios en la baes de datos.");
