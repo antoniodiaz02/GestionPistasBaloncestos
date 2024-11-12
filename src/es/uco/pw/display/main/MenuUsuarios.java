@@ -3,12 +3,10 @@ package es.uco.pw.display.main;
 import es.uco.pw.business.DTOs.JugadorDTO;
 import es.uco.pw.business.Gestores.GestorUsuarios;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
-import java.io.IOException;
 
 /**
  *  @author Antonio Diaz Barbancho
@@ -24,12 +22,22 @@ import java.io.IOException;
 *  */
 public class MenuUsuarios {
     
+	/**
+     * Objeto gestor.
+     */
     private GestorUsuarios gestor;
+    
+    /**
+     * Formato de fecha.
+     */
     private SimpleDateFormat sdf;
+    /**
+     * Entrada de datos del usuario.
+     */
     private Scanner scanner;
 
     /**
-    * Constructor de la clase MenuUsuarios
+    * Constructor de la clase MenuUsuarios.
     *  */
     public MenuUsuarios() {
         this.gestor = new GestorUsuarios();
@@ -76,7 +84,7 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    System.out.println(" ERROR! Opción no válida. Por favor intente de nuevo.");
+                    System.out.println(" ¡ERROR! Opción no válida. Por favor intente de nuevo.");
             }
 
             System.out.println(); // Salto de línea para separar las acciones
@@ -84,8 +92,8 @@ public class MenuUsuarios {
     }
 
     /**
-     * Inserta un usuario al fichero
-     * @throws ParseException Si ocurre un error en la fecha
+     * Inserta un usuario en la base de datos.
+     * @throws ParseException Si ocurre un error en la fecha.
      */
     private void insertarUsuario() {
         try {
@@ -105,27 +113,27 @@ public class MenuUsuarios {
             int codigo = gestor.insertarUsuario(nuevoJugador);
 
             if (codigo == 1) {
-                System.out.println("\n Usuario añadido correctamente.");
+                System.out.println("\n Usuario registrado correctamente.");
             } else if (codigo == -2) {
-                System.out.println("\n ERROR! El usuario ya está registrado.");
+                System.out.println("\n ¡ERROR! El usuario ya está registrado.");
             } else {
-                System.out.println("\n ERROR! Error al añadir el usuario.");
+                System.out.println("\n ¡ERROR! Error al añadir el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("\n ERROR! Formato de fecha incorrecto.");
+            System.out.println("\n ¡ERROR! Formato de fecha incorrecto.");
         }
     }
 
     /**
-     * Lista los usuarios del fichero usuarios
+     * Lista los usuarios registrados en la base de datos.
      */
     private void listarUsuarios() {
         int codigo = gestor.listarUsuarios();
         
         if (codigo == -1) {
-            System.out.println("\n ERROR! Ha ocurrido un error a la hora de listar los usuarios.");
+            System.out.println("\n ¡ERROR! Ha ocurrido un error a la hora de listar los usuarios.");
         } else if(codigo == 2){
-        	System.out.println("\n ADVERTENCIA! No se han encontrado usuarios en la baes de datos.");
+        	System.out.println("\n ¡ADVERTENCIA! No se han encontrado usuarios en la baes de datos.");
         }else{
         	System.out.println("\n Se han listado los usuarios correctamente.");
         }
@@ -137,7 +145,6 @@ public class MenuUsuarios {
     private void modificarUsuario() {
         try {
            
-            
             System.out.print("\n Introduce el correo del usuario a modificar: ");
             String correoModificar = scanner.nextLine();
             
@@ -184,19 +191,19 @@ public class MenuUsuarios {
                     return;
             }
 
-         // Llamar al método de modificación en el DAO
+         // Llamar al método de modificación en el DAO.
             int resultadoModificar = gestor.modificarUsuario(jugadorExistente, correoModificar);
             if (resultadoModificar == 1) {
-                System.out.println("\nUsuario modificado correctamente.");
+                System.out.println("\n Usuario modificado correctamente.");
             } else if (resultadoModificar == 0) {
-                System.out.println("\nUsuario no encontrado.");
+                System.out.println("\n Usuario no encontrado.");
             } else {
-                System.out.println("\nERROR! Error al modificar el usuario.");
+                System.out.println("\n ¡ERROR! Error al modificar el usuario.");
             }
         } catch (ParseException e) {
-            System.out.println("\nERROR! Formato de fecha incorrecto.");
+            System.out.println("\n ¡ERROR! Formato de fecha incorrecto.");
         } catch (Exception e) {
-            System.out.println("\nERROR! Ha ocurrido un error al modificar el usuario." + e.getMessage());
+            System.out.println("\n ¡ERROR! Ha ocurrido un error al modificar el usuario." + e.getMessage());
         }
     }
 }
