@@ -65,34 +65,70 @@ public class ReservaDAO {
     }
     
     public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva) {
+        
+        // Validar que los datos iniciales no sean nulos o incorrectos
+        if (correoUsuario == null || correoUsuario.isEmpty()) {
+            System.out.println(" ERROR! El correo no puede estar vacío.");
+            return false;
+        }
+        if (nombrePista == null || nombrePista.isEmpty()) {
+            System.out.println(" ERROR! El nombre de la pista no puede estar vacío.");
+            return false;
+        }
+        if (fechaHora == null) {
+            System.out.println(" ERROR! La fecha y hora no pueden estar vacías.");
+            return false;
+        }
+        if (duracion != 60 && duracion != 90 && duracion != 120) {
+            System.out.println(" ERROR! Duración no válida. Solo se permiten 60, 90 o 120 minutos.");
+            return false;
+        }
+        if (tipoReserva == null) {
+            System.out.println(" ERROR! El tipo de reserva no puede estar vacío.");
+            return false;
+        }
+        
+        // Validar que el usuario exista
         JugadorDTO jugador = buscarJugador(correoUsuario);
+        if (jugador == null) {
+            System.out.println(" ERROR! El usuario no existe.");
+            return false;
+        }
+        
+        // Validar que la pista exista y esté disponible
         PistaDTO pista = buscarPista(nombrePista);
-        
-        
-        // Comprobación adicional para evitar reservas en la misma pista y hora
+        if (pista == null) {
+            System.out.println(" ERROR! La pista no existe.");
+            return false;
+        }
+        if (!pista.isDisponible()) {
+            System.out.println(" ERROR! La pista no está disponible.");
+            return false;
+        }
+
+        // Validar que no exista una reserva para la misma pista y hora
         if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
             System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
             return false;
         }
         
-        // Si no existe el jugador y la pista devuelve false.
-        if (jugador == null) {
-            System.out.println(" ERROR! El usuario no existe.");
-            return false;
-        }
-        if (pista == null) {
-            System.out.println(" ERROR! La pista no existe.");
+        // Validar que no se reserve la pista con menos de 24 horas de anticipación
+        if (plazoExcedido(fechaHora)) {
+            System.out.println(" ERROR! No se puede reservar una pista con menos de 24 horas de antelación.");
             return false;
         }
         
-        // Si la pista no está disponible devuelve false.
-        if (!pista.isDisponible()) {
-            System.out.println(" ERROR! La pista no está disponible.");
+        // Validar que los números de adultos y niños sean coherentes con el tipo de reserva
+        if (tipoReserva == ReservaInfantilDTO.class && numeroNinos <= 0) {
+            System.out.println(" ERROR! Para reservas infantiles, debe haber al menos un niño.");
             return false;
         }
-        // Si se intenta reservar la pista 24 horas antes devuelve false.
-        if (plazoExcedido(fechaHora)) {
-            System.out.println(" ERROR! No se puede reservar una pista antes de 24 horas.");
+        if (tipoReserva == ReservaFamiliarDTO.class && (numeroAdultos <= 0 || numeroNinos <= 0)) {
+            System.out.println(" ERROR! Para reservas familiares, debe haber al menos un adulto y un niño.");
+            return false;
+        }
+        if (tipoReserva == ReservaAdultosDTO.class && numeroAdultos <= 0) {
+            System.out.println(" ERROR! Para reservas de adultos, debe haber al menos un adulto.");
             return false;
         }
 
@@ -116,8 +152,9 @@ public class ReservaDAO {
             return true;
         }
         
-        System.out.println(" ERROR! Tipo incorrecto de reserva.\nADULTOS->Pistas ADULTOS. FAMILIAR-> Pistas MINIBASKET y 3v3. INFANTIL-> Pistas MINIBASKET");
+        System.out.println(" ERROR! Tipo incorrecto de reserva.\nADULTOS->Pistas ADULTOS.\nFAMILIAR-> Pistas MINIBASKET y 3v3.\nINFANTIL-> Pistas MINIBASKET");
         return false;
+        
     }
     
     /**
@@ -133,43 +170,57 @@ public class ReservaDAO {
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
     public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, String bonoId) {
-    	JugadorDTO jugador = buscarJugador(correoUsuario);
+
+        // Buscar el jugador
+        JugadorDTO jugador = buscarJugador(correoUsuario);
+        if (jugador == null) {
+            System.out.println(" ERROR! El usuario no existe.");
+            return false;
+        }
+
+        // Buscar la pista
         PistaDTO pista = buscarPista(nombrePista);
+        if (pista == null) {
+            System.out.println(" ERROR! La pista no existe.");
+            return false;
+        }
+
+        // Comprobación de disponibilidad de la pista
+        if (!pista.isDisponible()) {
+            System.out.println(" ERROR! La pista no está disponible.");
+            return false;
+        }
         
         
-        // Comprobación adicional para evitar reservas en la misma pista y hora
+        // Verificar si ya existe una reserva para esa pista y horario
         if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
             System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
             return false;
         }
 
-        // Si no existe el jugador y la pista devuelve false.
-        if (jugador == null) {
-            System.out.println(" ERROR! El usuario no existe.");
-            return false;
-        }
-        if (pista == null) {
-            System.out.println(" ERROR! La pista no existe.");
-            return false;
-        }
-        
-        // Si la pista no está disponible devuelve false.
-        if (!pista.isDisponible()) {
-            System.out.println(" ERROR! La pista no está disponible.");
-            return false;
-        }
-        // Si se intenta reservar la pista 24 horas antes devuelve false.
+        // Verificar que no se intenta reservar con menos de 24 horas de antelación
         if (plazoExcedido(fechaHora)) {
             System.out.println(" ERROR! No se puede reservar una pista antes de 24 horas.");
             return false;
         }
         
-        // 1. Comprobacion del bono si está disponible para poder hacer reservas. 
-        if(!comprobarBono(bonoId,correoUsuario,pista.getTamanoPista())) {
-        	return false;
-        }        
+        // 1. Comprobar que el bono es válido y compatible con el tipo de reserva
+        if (!comprobarBono(bonoId, correoUsuario, pista.getTamanoPista())) {
+            System.out.println(" ERROR! Bono no válido o incompatible con el tipo de pista.");
+            return false;
+        }      
 
-        int sesion= obtenerSesionesRestantes(bonoId);
+        int sesion;
+        try {
+            sesion = obtenerSesionesRestantes(bonoId);
+            if (sesion <= 0) {
+                System.out.println(" ERROR! No quedan sesiones disponibles en el bono.");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(" ERROR! No se pudo verificar las sesiones del bono: " + e.getMessage());
+            return false;
+        }
         
         // 2. Realización de la reserva.
         String idReserva= generarIdentificadorUnicoReservas();
@@ -187,7 +238,7 @@ public class ReservaDAO {
             reserva= reservaBono.createReservaFamiliar(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
         } else if (tipoReserva == ReservaAdultosDTO.class) {
             reserva= reservaBono.createReservaAdultos(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
-        }
+        } 
         
         
         // 3. Modificacion del número de reservas de bono y adición de la fecha si es su primera reserva.
@@ -209,8 +260,18 @@ public class ReservaDAO {
 	 * @return Devuelve true si el procedimiento de creacion del bono se ha hecho de manera correcta, y false si hay algo que falla.
 	 */
     public boolean hacerNuevoBono(String correoUsuario, TamanoPista tamano){
-    	JugadorDTO jugador = buscarJugador(correoUsuario);
-    	if (jugador == null) return false;
+        // Validar que el jugador exista
+        JugadorDTO jugador = buscarJugador(correoUsuario);
+        if (jugador == null) {
+            System.out.println(" ERROR! El usuario no existe.");
+            return false;
+        }
+
+        // Validar que el tamaño de la pista no sea nulo
+        if (tamano == null) {
+            System.out.println(" ERROR! El tamaño de la pista no puede ser nulo.");
+            return false;
+        }
     	
     	// Valor por defecto para las sesiones de un bono nuevo
     	int sesiones = 5;
@@ -225,6 +286,7 @@ public class ReservaDAO {
     		writer.write(bonoId + ";" + correoUsuario + ";" + tamano.toString() + ";" + sesiones + ";" + fechaPrimeraSesion);
     		writer.newLine();  // Añadir una nueva línea al final
     	} catch (IOException e) {
+            System.out.println(" ERROR! No se pudo guardar el bono en el archivo: " + e.getMessage());
     		e.printStackTrace();
     		return false;
     	}
@@ -346,6 +408,11 @@ public class ReservaDAO {
      *         o si ocurre algún error.
      */
     public JugadorDTO buscarJugador(String correoElectronico) {
+        if (correoElectronico == null || correoElectronico.isEmpty()) {
+            System.out.println(" ERROR! El correo electrónico proporcionado es nulo o está vacío.");
+            return null;
+        }
+        
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -354,7 +421,6 @@ public class ReservaDAO {
                     // Ajustamos la conversión de fecha
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Ajusta el formato según cómo esté almacenada la fecha en el archivo
                     Date fechaNacimiento;
-                    
                     try {
                         fechaNacimiento = sdf.parse(datos[1]);  // Convertimos la fecha de nacimiento a Date
                     } catch (ParseException e) {
@@ -365,7 +431,7 @@ public class ReservaDAO {
                     // Creamos el objeto Jugador con los datos adaptados
                     return new JugadorDTO(datos[0], fechaNacimiento, datos[2]); // nombreCompleto, fechaNacimiento, correoElectronico
                 }
-            }
+            }           
         } catch (IOException e) {
             System.out.println(" ERROR! Error al buscar jugador: " + e.getMessage());
         }
@@ -458,16 +524,34 @@ public class ReservaDAO {
     			if (fields.length >= 4 && fields[0].equals(bonoId)) {
     				bonoFound = true;
     				correoPropietario = fields[1].trim();
-    				sesiones = Integer.parseInt(fields[3].trim());
+    				
+                    try {
+                        sesiones = Integer.parseInt(fields[3].trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println(" ERROR! El formato del número de sesiones no es válido.");
+                        return false;
+                    }
     				
     				//Si hay fecha se guarda
     				if (fields.length >= 5) {
-    					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    					fechaBono = sdf.parse(fields[4].trim());
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                            fechaBono = sdf.parse(fields[4].trim());
+                        } catch (ParseException e) {
+                            System.out.println(" ERROR! El formato de la fecha no es válido.");
+                            return false;
+                        }
     				}
     				
     				String tamanoString= fields[2];
-    				TamanoPista tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
+    				TamanoPista tamanoBono;
+    				
+                    try {
+                        tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(" ERROR! El tamaño del bono no es válido.");
+                        return false;
+                    }
     				
     				//Comprueba si se realiza una reserva del mismo tamaño de pista que el del bono.
     				if(tamanoBono!=tamano) {
@@ -478,11 +562,11 @@ public class ReservaDAO {
     			}
     			
     		}
-    	} catch (IOException | ParseException e) {
-    		System.out.println(" ERROR! Error al hacer el parseo.");
-    		e.printStackTrace();
-    		return false;
-    	}
+        } catch (IOException e) {
+            System.out.println(" ERROR! Error al leer el archivo de bonos: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     	
     	// Comprobar que el bono existe, y tiene sesiones disponibles.
     	if (!bonoFound) {
@@ -490,7 +574,7 @@ public class ReservaDAO {
     		return false;
     	}
     	
-    	if (sesiones == 0) {
+    	if (sesiones <= 0) {
     		System.out.println(" ERROR! El bono ya no le quedan sesiones");
     	}
     	
@@ -552,13 +636,25 @@ public class ReservaDAO {
 	            }
 	        }
 	
+	        // Si se encontró el bono, renombrar el archivo temporal
 	        if (bonoFound) {
-	            // Renombrar el archivo original y el temporal
-	            archivoBonos.delete();
-	            tempFile.renameTo(archivoBonos);
+	            boolean archivoEliminado = archivoBonos.delete();
+	            if (!archivoEliminado) {
+	                System.out.println(" ERROR! No se pudo eliminar el archivo original.");
+	                return false;
+	            }
+
+	            boolean archivoRenombrado = tempFile.renameTo(archivoBonos);
+	            if (!archivoRenombrado) {
+	                System.out.println(" ERROR! No se pudo renombrar el archivo temporal.");
+	                return false;
+	            }
 	        } else {
 	            // Si no se encontró el bono, eliminar el archivo temporal
-	            tempFile.delete();
+	            boolean archivoEliminadoTemp = tempFile.delete();
+	            if (!archivoEliminadoTemp) {
+	                System.out.println(" ERROR! No se pudo eliminar el archivo temporal.");
+	            }
 	        }
 	
 	    } catch (IOException e) {
@@ -576,15 +672,29 @@ public class ReservaDAO {
 	 * @return Devuelve true si se excedió el plazo, y devuelve false si no se ha excedido el plazo. 
 	 */
 	public static boolean plazoExcedido(Date fechaRecibida) {
+	    try {
+	        // Validar que la fecha recibida no sea nula
+	        if (fechaRecibida == null) {
+	            System.out.println(" ERROR! La fecha recibida es nula.");
+	            return true; // Consideramos que está excedido el plazo si la fecha es inválida
+	        }
 
-        Date fechaActual = new Date();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(fechaRecibida);
-
-        cal.add(Calendar.HOUR_OF_DAY, -24);
-
-        return fechaActual.after(cal.getTime());
+	        Date fechaActual = new Date();
+	
+	        // Crear una instancia de calendario para manipular la fecha
+	        Calendar cal = Calendar.getInstance();
+	        cal.setTime(fechaRecibida);
+	
+	        // Restar 24 horas a la fecha recibida
+	        cal.add(Calendar.HOUR_OF_DAY, -24);
+	
+	        return fechaActual.after(cal.getTime());
+	        
+	    } catch (Exception e) {
+	        System.out.println(" ERROR! Ocurrió un error al comprobar el plazo excedido: " + e.getMessage());
+	        e.printStackTrace();
+	        return true; // Por precaución, considerar que el plazo está excedido si hay un error
+	    }
     }
 	
 	
@@ -598,6 +708,7 @@ public class ReservaDAO {
         try {
             // Abrimos el archivo en modo lectura
             BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
+            
             String linea;
             Date fecha;
             boolean hayReservas = false;
@@ -699,7 +810,11 @@ public class ReservaDAO {
             return -1; // Código de error indicando que la fecha es pasada
         }
         
-        if(plazoExcedido(nuevaReserva.getFechaHora())) return -1;
+        // Verificación adicional de plazo
+        if (plazoExcedido(nuevaReserva.getFechaHora())) {
+            System.out.println("ERROR! No se puede modificar la reserva, el plazo permitido ha expirado.");
+            return -1; // Código de error indicando plazo excedido
+        }
 
         try {
             // Abrimos el archivo en modo lectura

@@ -100,14 +100,39 @@ public class MenuReservas {
     }
 
     private static void hacerReservaIndividual(Scanner scanner) {
+    	
         System.out.print("Ingrese su correo: ");
         String correo = scanner.nextLine();
+        if (correo == null || correo.isEmpty()) {
+            System.out.println(" ERROR! El correo no puede estar vacío.");
+            return;
+        }
+        
         System.out.print("Nombre de la pista: ");
         String nombrePista = scanner.nextLine();
+        if (nombrePista == null || nombrePista.isEmpty()) {
+            System.out.println(" ERROR! El nombre de la pista no puede estar vacío.");
+            return;
+        }
+        
         System.out.print("Fecha y hora de la reserva (dd/MM/yyyy HH:mm): ");
-        Date fechaHora = leerFechaHora(scanner);
+        Date fechaHora;
+        try {
+            fechaHora = leerFechaHora(scanner);
+        } catch (Exception e) {
+            System.out.println(" ERROR! Formato de fecha y hora inválido. Use el formato dd/MM/yyyy HH:mm.");
+            return;
+        }
+        
         System.out.print("Duración en minutos (60, 90, 120): ");
-        int duracion = scanner.nextInt();
+        int duracion;
+
+        duracion = scanner.nextInt();
+        if (duracion != 60 && duracion != 90 && duracion != 120) {
+        	System.out.println(" ERROR! Duración no válida. Solo se permiten 60, 90 o 120 minutos.");
+            return;
+        }
+
 
         System.out.println("Tipo de reserva: 1. Infantil, 2. Familiar, 3. Adultos");
         int tipo = scanner.nextInt();
@@ -139,19 +164,52 @@ public class MenuReservas {
 
         boolean resultado = gestorReservas.hacerReservaIndividual(correo, nombrePista, fechaHora, duracion, numeroAdultos, numeroNinos, tipoReserva);
         System.out.println(resultado ? "Reserva realizada con éxito." : " ERROR! Error al realizar la reserva.");
+        
     }
 
     private static void hacerReservaBono(Scanner scanner) {    	
     	System.out.print("ID del bono: ");
     	String bonoId = scanner.nextLine();
+        if (bonoId == null || bonoId.isEmpty()) {
+            System.out.println("ERROR! El ID del bono no puede estar vacío.");
+            return;
+        }
+        
         System.out.print("Ingrese su correo: ");
         String correo = scanner.nextLine();
+        if (correo == null || correo.isEmpty()) {
+            System.out.println("ERROR! El correo no puede estar vacío.");
+            return;
+        }
+        
         System.out.print("Nombre de la pista: ");
         String nombrePista = scanner.nextLine();
+        if (nombrePista == null || nombrePista.isEmpty()) {
+            System.out.println("ERROR! El nombre de la pista no puede estar vacío.");
+            return;
+        }
+        
         System.out.print("Fecha y hora de la reserva (dd/MM/yyyy HH:mm): ");
-        Date fechaHora = leerFechaHora(scanner);
+        Date fechaHora;
+        try {
+            fechaHora = leerFechaHora(scanner);
+            if (fechaHora == null) {
+                throw new IllegalArgumentException("La fecha y hora no pueden ser nulas.");
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR! Formato de fecha y hora inválido. Use el formato dd/MM/yyyy HH:mm.");
+            return;
+        }
+        
         System.out.print("Duración en minutos (60, 90, 120): ");
-        int duracion = scanner.nextInt();
+        int duracion;
+
+        duracion = scanner.nextInt();
+        if (duracion != 60 && duracion != 90 && duracion != 120) {
+        	System.out.println(" ERROR! Duración no válida. Solo se permiten 60, 90 o 120 minutos.");
+            return;
+        }
+
 
         System.out.println("Tipo de reserva: 1. Infantil, 2. Familiar, 3. Adultos");
         int tipo = scanner.nextInt();
@@ -171,12 +229,20 @@ public class MenuReservas {
         
         if(tipo==1 || tipo==2) {
         	System.out.print("Número de niños: ");
-        	numeroNinos= scanner.nextInt();        	
+        	numeroNinos= scanner.nextInt(); 
+            if (numeroNinos < 0) {
+                System.out.println("ERROR! El número de niños no puede ser negativo.");
+                return;
+            }
         }
         
         if(tipo>=2) {
         	System.out.print("Número de adultos: ");
         	numeroAdultos = scanner.nextInt();	
+            if (numeroAdultos < 0) {
+                System.out.println("ERROR! El número de adultos no puede ser negativo.");
+                return;
+            }
         }
 
         scanner.nextLine(); // Limpiar el buffer de entrada
@@ -189,6 +255,10 @@ public class MenuReservas {
     private static void hacerNuevoBono(Scanner scanner) {
         System.out.print("Ingrese su correo: ");
         String correo = scanner.nextLine();
+        if (correo == null || correo.isEmpty()) {
+            System.out.println("ERROR! El correo no puede estar vacío.");
+            return;
+        }
 
         System.out.println("Seleccione el tamaño de la pista para el bono: 1. MINIBASKET, 2. TRES_VS_TRES, 3. ADULTOS");
         int opcionTamano = scanner.nextInt();
@@ -249,28 +319,48 @@ public class MenuReservas {
             case 1:
                 System.out.print("\n Introduce el nuevo correo: ");
                 String correoUsuario = scanner.nextLine();
-                JugadorDTO user= gestorReservas.buscarJugador(correoUsuario);
-                if(user==null) {
-                	modificable= false;
-                	System.out.print(" ERROR! El usuario no existe.");
+                if (correoUsuario == null || correoUsuario.isEmpty()) {
+                    System.out.println("ERROR! El correo no puede estar vacío.");
+                    break;  // Salir del caso si el correo es vacío
                 }
-                nuevaReserva.setUsuarioId(correoUsuario);
+
+                JugadorDTO user = gestorReservas.buscarJugador(correoUsuario);
+                if (user == null) {
+                    modificable = false;
+                    System.out.println("ERROR! El usuario no existe.");
+                } else {
+                    nuevaReserva.setUsuarioId(correoUsuario);
+                }
                 break;
 
             case 2:
                 System.out.print("\n Introduce la nueva fecha de reserva (dd/MM/yyyy HH:mm): ");
                 Date nuevaFecha = leerFechaHora(scanner);
+                if (nuevaFecha == null) {
+                    System.out.println("ERROR! La fecha no puede ser nula.");
+                    break;  // Salir si la fecha es inválida
+                }
                 nuevaReserva.setFechaHora(nuevaFecha);
                 break;
 
             case 3:
                 System.out.print("\n Introduce la nueva duracion de reserva: ");
                 int duracion = scanner.nextInt();
+                if (duracion <= 0) {
+                    System.out.println("ERROR! La duración debe ser un número positivo.");
+                    break;  // Salir si la duración es inválida
+                }
                 nuevaReserva.setDuracion(duracion);
                 break;
             case 4:
                 System.out.print("\n Introduce la nueva pista: ");
                 String pistaString = scanner.nextLine();
+                
+                if (pistaString == null || pistaString.isEmpty()) {
+                    System.out.println("ERROR! El nombre de la pista no puede estar vacío.");
+                    break;  // Salir si el nombre de la pista es vacío
+                }
+                
                 PistaDTO pista= gestorReservas.buscarPista(pistaString);
                 
                 if(pista==null) {
@@ -330,11 +420,19 @@ public class MenuReservas {
         try {
             System.out.print("Ingrese la fecha de la reserva (dd/MM/yyyy): ");
             String fechaInput = scanner.nextLine();
+            if (fechaInput == null || fechaInput.trim().isEmpty()) {
+                System.out.println("ERROR! La fecha no puede estar vacía.");
+                return; // Salir si la fecha es vacía
+            }
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date fechaBuscada = sdf.parse(fechaInput);
 
             System.out.print("Ingrese el ID de la pista: ");
             String idPista = scanner.nextLine();
+            if (idPista == null || idPista.trim().isEmpty()) {
+                System.out.println("ERROR! El ID de la pista no puede estar vacío.");
+                return; // Salir si el ID de la pista es vacío
+            }
 
             int resultado = gestorReservas.listarReservasPorFechaYPista(fechaBuscada, idPista);
             if (resultado == -1) {
@@ -350,6 +448,11 @@ public class MenuReservas {
     private static void cancelarReserva() {
         System.out.print("Ingrese el ID de la reserva a cancelar: ");
         String idReserva = scanner.nextLine();
+        if (idReserva == null || idReserva.trim().isEmpty()) {
+            System.out.println("ERROR! El ID de la reserva no puede estar vacío.");
+            return; // Salir si el ID de la reserva es vacío
+        }
+        
         if (gestorReservas.cancelarReserva(idReserva)) {
             System.out.println("Reserva cancelada correctamente.");
         } else {
