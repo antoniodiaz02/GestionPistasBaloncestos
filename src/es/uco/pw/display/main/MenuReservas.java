@@ -50,9 +50,9 @@ public class MenuReservas {
         boolean salir = false;
 
         while (!salir) {
-        	System.out.println("\n───────────────────────────────────────");
-            System.out.println("----- Menú de Gestión de Reservas -----");
-            System.out.println("───────────────────────────────────────");
+        	System.out.println("\n───────────────────────────────────────────");
+            System.out.println("======= Menú de Gestión de Reservas ======");
+            System.out.println("───────────────────────────────────────────");
             System.out.println("  1. Crear nuevo bono");
             System.out.println("  2. Hacer reserva individual");
             System.out.println("  3. Hacer reserva con bono");
@@ -60,9 +60,9 @@ public class MenuReservas {
             System.out.println("  5. Cancelar una reserva");
             System.out.println("  6. Listar reservas futuras");
             System.out.println("  7. Listar reservas por fecha y pista");
-            System.out.println("───────────────────────────────────────");
+            System.out.println("───────────────────────────────────────────");
             System.out.println("  8. Salir");
-            System.out.println("───────────────────────────────────────");
+            System.out.println("───────────────────────────────────────────");
             System.out.print("\n Seleccione una opción: ");
             int opcion = scanner.nextInt();
             scanner.nextLine(); // Limpiar el buffer de entrada
@@ -229,7 +229,7 @@ public class MenuReservas {
 
     private static void modificarReserva() {    	
         System.out.print("Ingrese el ID de la reserva a modificar: ");
-        String idReserva = scanner.nextLine();
+        int idReserva = scanner.nextInt();
         
         // Pedir al usuario que seleccione el tipo de reserva
         ReservaDTO nuevaReserva= gestorReservas.obtenerReservaPorId(idReserva);
@@ -254,7 +254,8 @@ public class MenuReservas {
                 	modificable= false;
                 	System.out.print(" ERROR! El usuario no existe.");
                 }
-                nuevaReserva.setUsuarioId(correoUsuario);
+                int id_user= gestorReservas.buscarIdJugador(correoUsuario);
+                nuevaReserva.setUsuarioId(id_user);
                 break;
 
             case 2:
@@ -269,14 +270,14 @@ public class MenuReservas {
                 nuevaReserva.setDuracion(duracion);
                 break;
             case 4:
-                System.out.print("\n Introduce la nueva pista: ");
+                System.out.print("\n Introduce el identificador de la nueva pista: ");
                 String pistaString = scanner.nextLine();
                 PistaDTO pista= gestorReservas.buscarPista(pistaString);
+                int pista_id= gestorReservas.buscarIdPista(pistaString);
                 
                 if(pista==null) {
                 	System.out.print(" ERROR! No existe la pista que se quiere introducir.");
                 }
-                TamanoPista tamano= pista.getTamanoPista();
                 
 //                if((tipo== 1 && tamano==TamanoPista.TRES_VS_TRES) || (tipo== 1 && tamano==TamanoPista.ADULTOS)) {
 //                	System.out.print(" ERROR! Pista no compatible con el tipo de reserva.");
@@ -293,7 +294,7 @@ public class MenuReservas {
 //                	modificable= false;
 //                }
                 
-                nuevaReserva.setPistaId(pistaString);
+                nuevaReserva.setPistaId(pista_id);
                 break;
 
             default:
@@ -334,7 +335,7 @@ public class MenuReservas {
             Date fechaBuscada = sdf.parse(fechaInput);
 
             System.out.print("Ingrese el ID de la pista: ");
-            String idPista = scanner.nextLine();
+            int idPista = scanner.nextInt();
 
             int resultado = gestorReservas.listarReservasPorFechaYPista(fechaBuscada, idPista);
             if (resultado == -1) {
@@ -349,7 +350,7 @@ public class MenuReservas {
 
     private static void cancelarReserva() {
         System.out.print("Ingrese el ID de la reserva a cancelar: ");
-        String idReserva = scanner.nextLine();
+        int idReserva = scanner.nextInt();
         if (gestorReservas.cancelarReserva(idReserva)) {
             System.out.println("Reserva cancelada correctamente.");
         } else {

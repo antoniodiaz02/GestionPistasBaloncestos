@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `Reservas` (
   `duracion` INT(11) NOT NULL,
   `pistaId` INT(11) NOT NULL,
   `precio` FLOAT NOT NULL,
-  `descuento` BOOLEAN NOT NULL,
+  `descuento` FLOAT NOT NULL,
   `tipoReserva` VARCHAR(20) NOT NULL,  -- Cambiado de ENUM a VARCHAR
   `numNinos` INT(11) NULL,
   `numAdultos` INT(11) NULL

@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.BufferedReader;
@@ -92,7 +93,7 @@ public class ReservaDAO {
 
         // Calcular precio y descuento
         float precio = calcularPrecio(duracion);
-        float descuento = jugador.calcularAntiguedad() > 2 ? precio * 0.1f : 0;
+        float descuento = calcularAntiguedadJugador(correoUsuario) > 2 ? precio * 0.1f : 0;
 
         String tipoReservaString = null;
 
@@ -277,9 +278,37 @@ public class ReservaDAO {
 
         return respuesta;
     }
+   
+    public int calcularAntiguedadJugador(String correoElectronico) {
+    	String queryBuscar = properties.getProperty("buscar_por_correo");
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+        java.sql.Date fechaInscripcion;
+        String nombreCompleto;
 
-    
-    
+        try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
+
+            // Comprobar si el usuario ya existe mediante el correo electrónico.
+            statementBuscar.setString(1, correoElectronico);
+            ResultSet rs = statementBuscar.executeQuery();
+
+            if (rs.next()) {
+            	fechaInscripcion= rs.getDate("fechaInscripcion");
+            	if (fechaInscripcion == null) {
+            		return 0;
+            	}
+                long diffInMillis = new Date().getTime() - fechaInscripcion.getTime();
+                return (int) TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS) / 365;
+            	
+            }
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
+	        return -1; // Código para indicar error general de base de datos.
+	    } finally {
+	        db.closeConnection();
+	    }
+        return -1;
+    }
     
     /**
 	 * Genera un nuevo bono de usuario.
@@ -296,7 +325,7 @@ public class ReservaDAO {
     	String queryJugador= properties.getProperty("buscar_por_correo");
     	
     	DBConnection dbConnection = new DBConnection();
-        Connection conexion = dbConnection.getConnection();
+    	connection = dbConnection.getConnection();
  	
         if(jugador.buscarUsuarioPorCorreo(correoUsuario) != 1) {
         	return false;
@@ -305,7 +334,7 @@ public class ReservaDAO {
     	// Valor por defecto para las sesiones de un bono nuevo
     	int sesiones = 5;
     	
-    	try (PreparedStatement stmtJugador = conexion.prepareStatement(queryJugador)) {
+    	try (PreparedStatement stmtJugador = connection.prepareStatement(queryJugador)) {
     		stmtJugador.setString(1, correoUsuario);
     		
     		ResultSet rs = stmtJugador.executeQuery();
@@ -315,7 +344,7 @@ public class ReservaDAO {
                 // Obtener el valor de id_usuario del ResultSet
                 idUsuario = rs.getInt("idUsuario"); // Asegúrate de que "id_usuario" es el nombre correcto de la columna en tu base de datos
             }
-            try (PreparedStatement stmtInsert = conexion.prepareStatement(queryInsert)) {
+            try (PreparedStatement stmtInsert = connection.prepareStatement(queryInsert)) {
             	// Establecer los parámetros de la consulta
             	stmtInsert.setInt(1, idUsuario);                // ID del usuario
             	stmtInsert.setInt(2, sesiones);                 // Número de sesiones
@@ -401,7 +430,6 @@ public class ReservaDAO {
      * @return El identificador de la pista con el nombre de pista nombre.
      */
     public int buscarIdPista(String nombre) {
-    	PistaDAO pista = new PistaDAO();
     	String queryBuscar = properties.getProperty("find_pista_by_nombre");
         DBConnection db = new DBConnection();
         connection = db.getConnection();
@@ -446,7 +474,7 @@ public class ReservaDAO {
 	 * @param reserva Clase Reserva que tiene todos los datos de la reserva.
 	 * @param idReserva Identificador único de la reserva.
 	 */
-    private void guardarReservaEnArchivo(ReservaDTO reserva, String idReserva) {
+    private void guardarReserva(ReservaDTO reserva, int idReserva) {
     	String query= properties.getProperty("insert_reserva");
         
     	DBConnection db = new DBConnection();
@@ -467,7 +495,7 @@ public class ReservaDAO {
             // Configurar los parámetros de la consulta SQL
             stmt.setInt(1, reserva.getUsuarioId());            
             stmt.setTimestamp(2, new java.sql.Timestamp(reserva.getFechaHora().getTime()));
-            stmt.setString(4, reserva.getPistaId());
+            stmt.setInt(4, reserva.getPistaId());
             stmt.setInt(6, reserva.getDuracion());
             stmt.setDouble(7, reserva.getPrecio());
             stmt.setDouble(8, reserva.getDescuento());
@@ -492,7 +520,7 @@ public class ReservaDAO {
             System.out.println(" ERROR! Error al guardar la reserva en la base de datos: " + e.getMessage());
         } finally {
             // Cerrar la conexión usando el método de DBConnection
-            dbConnection.closeConnection();
+            db.closeConnection();
         }
     }
     
@@ -510,14 +538,14 @@ public class ReservaDAO {
     	String query = properties.getProperty("buscar_bono");
     	
     	DBConnection db = new DBConnection();
-        Connection conexion = db.getConnection();
+    	connection = db.getConnection();
     	
     	boolean bonoFound = false;
     	int sesiones = 0;
     	Date fechaBono = null;
     	int idPropietario = -1;
     	
-    	try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+    	try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, bonoId);  // Asigna el id del bono al parámetro de la consulta
             ResultSet rs = stmt.executeQuery();
 
@@ -585,11 +613,11 @@ public class ReservaDAO {
 		String queryActualizarBono= properties.getProperty("update_bono");
 	    
 	    DBConnection db = new DBConnection();
-	    Connection conexion = db.getConnection();
+	    connection = db.getConnection();
 	    
 	    try {
 	        // Paso 1: Buscar el bono por su ID
-	        try (PreparedStatement stmtBuscar = conexion.prepareStatement(queryBuscarBono)) {
+	        try (PreparedStatement stmtBuscar = connection.prepareStatement(queryBuscarBono)) {
 	            stmtBuscar.setInt(1, bonoId);
 	            ResultSet rs = stmtBuscar.executeQuery();
 
@@ -624,7 +652,7 @@ public class ReservaDAO {
 	                }
 
 	                // Paso 3: Actualizar el bono en la base de datos
-	                try (PreparedStatement stmtActualizar = conexion.prepareStatement(queryActualizarBono)) {
+	                try (PreparedStatement stmtActualizar = connection.prepareStatement(queryActualizarBono)) {
 	                    stmtActualizar.setInt(1, nuevasSesiones);
 	                    stmtActualizar.setDate(2, nuevaFechaPrimeraSesion); // Actualizar la fecha de la primera sesión si es necesario
 	                    stmtActualizar.setDate(3, nuevaFechaCaducidad);
@@ -680,9 +708,9 @@ public class ReservaDAO {
         String query = properties.getProperty("select_futuras");
         
         DBConnection db = new DBConnection();
-        Connection conexion = db.getConnection();
+        connection = db.getConnection();
         
-        try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
@@ -738,12 +766,14 @@ public class ReservaDAO {
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
 	 */
-	public int modificarReserva(String idReserva, ReservaDTO nuevaReserva) throws IOException {
+	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) throws IOException {
 		String query = properties.getProperty("modificar_reserva");
 		int codigo= -1;
+		int numNinos= -1;
+		int numAdultos= -1;
         
         DBConnection db = new DBConnection();
-        Connection conexion = db.getConnection();
+        connection = db.getConnection();
         
         // Comprobación adicional para asegurar que la nueva fecha es futura
         if (!esReservaFutura(nuevaReserva.getFechaHora())) {
@@ -760,27 +790,40 @@ public class ReservaDAO {
                     : "ADULTOS";
 
             // Establecer los parámetros en la consulta SQL
-            statement.setInt(1, buscarIdJugador(nuevaReserva.getUsuarioId()));  						// Usuario ID
+            statement.setInt(1, nuevaReserva.getUsuarioId());  											// Usuario ID
             statement.setTimestamp(2, new java.sql.Timestamp(nuevaReserva.getFechaHora().getTime()));   // Fecha y hora
             statement.setInt(3, nuevaReserva.getDuracion());  											// Duración
-            statement.setInt(4, buscarIdPista(nuevaReserva.getPistaId()));  							// Pista ID
-            statement.setDouble(5, calcularPrecio(nuevaReserva.getDuracion()));  						// Precio calculado
-            statement.setDouble(6, nuevaReserva.getDescuento());  										// Descuento aplicado
+            statement.setInt(4, nuevaReserva.getPistaId());  							// Pista ID
+            statement.setFloat(5, calcularPrecio(nuevaReserva.getDuracion()));  						// Precio calculado
+            statement.setFloat(6, nuevaReserva.getDescuento());  										// Descuento aplicado
             statement.setString(7, tipoReserva);  														// Tipo de reserva
+            
+            
+            if (nuevaReserva instanceof ReservaInfantilDTO) {
+                // Si es una reserva infantil, obtenemos el número de niños
+                numNinos = ((ReservaInfantilDTO) nuevaReserva).getNumNinos();
+            } else if (nuevaReserva instanceof ReservaFamiliarDTO) {
+                // Si es una reserva familiar, sumamos niños y adultos
+                numNinos = ((ReservaFamiliarDTO) nuevaReserva).getNumNinos();
+                numAdultos= ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos();
+            } else if (nuevaReserva instanceof ReservaAdultosDTO) {
+                // Si es una reserva de adultos, obtenemos el número de adultos
+                numAdultos = ((ReservaAdultosDTO) nuevaReserva).getNumAdultos();
+            }
             
             // Determinar el número de personas según el tipo de reserva
             if(tipoReserva== "INFANTIL" ) {
-            	statement.setInt(8, nuevaReserva.getNumNinos()); 
+            	statement.setInt(8, numNinos); 
             	statement.setNull(9, java.sql.Types.INTEGER);
             	
             }
             else if(tipoReserva== "FAMILIAR") {
-            	statement.setInt(8, nuevaReserva.getNumNinos()); 
-            	statement.setNull(9, nuevaReserva.getNumAdultos());
+            	statement.setInt(8, numNinos); 
+            	statement.setNull(9, numAdultos);
             }
             else {
             	statement.setInt(8, java.sql.Types.INTEGER);
-            	statement.setNull(9, nuevaReserva.getNumAdultos());
+            	statement.setNull(9, numAdultos);
             }
 
             // Ejecutar la actualización
@@ -811,14 +854,14 @@ public class ReservaDAO {
 	 * @param idPista Identificador de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
+	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
 		String query = properties.getProperty("modificar_reserva");
 	    int codigo = 0;
 	    
 	    DBConnection db = new DBConnection();
-        Connection conexion = db.getConnection();
+	    connection = db.getConnection();
         
-        try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
@@ -872,18 +915,18 @@ public class ReservaDAO {
 	 * @param idReserva Identificador único de la reserva a cancelar.
 	 * @return Devuelve true si consiguió borrar la reserva del fichero correctamente, y devuelve false si hubo algún error.
 	 */
-	public boolean cancelarReserva(String idReserva) {
+	public boolean cancelarReserva(int idReserva) {
 		boolean eliminada= false;
 		
 		String queryBuscarReserva = properties.getProperty("buscar_reserva"); // Consulta para buscar la reserva
 	    String queryEliminarReserva = properties.getProperty("eliminar_reserva"); // Consulta para eliminar la reserva
 	    
 	    DBConnection db = new DBConnection();
-	    Connection conexion = db.getConnection();
+	    connection = db.getConnection();
 
-	    try (PreparedStatement stmtBuscar = conexion.prepareStatement(queryBuscarReserva)) {
+	    try (PreparedStatement stmtBuscar = connection.prepareStatement(queryBuscarReserva)) {
 	        // Establecer el parámetro para la consulta de búsqueda de la reserva
-	        stmtBuscar.setString(1, idReserva);
+	        stmtBuscar.setInt(1, idReserva);
 
 	        // Ejecutar la consulta para obtener la reserva
 	        ResultSet rs = stmtBuscar.executeQuery();
@@ -896,9 +939,9 @@ public class ReservaDAO {
 	            if (!plazoExcedido(fechaReserva)) {
 	                // Si el plazo no ha sido excedido, procedemos con la eliminación de la reserva
 
-	                try (PreparedStatement stmtEliminar = conexion.prepareStatement(queryEliminarReserva)) {
+	                try (PreparedStatement stmtEliminar = connection.prepareStatement(queryEliminarReserva)) {
 	                    // Establecer el parámetro para la consulta de eliminación
-	                    stmtEliminar.setString(1, idReserva);
+	                    stmtEliminar.setInt(1, idReserva);
 
 	                    // Ejecutar la eliminación
 	                    int filasAfectadas = stmtEliminar.executeUpdate();
@@ -964,33 +1007,28 @@ public class ReservaDAO {
 	 * @return Devuelve true si ya existe una reserva para la misma pista y horario, y false si no existe.
 	 */
 	private boolean existeReservaParaPistaYHora(String nombrePista, Date fechaHora) {
-	    try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
-	        String linea;
-
-	        while ((linea = reader.readLine()) != null) {
-	            String[] datos = linea.split(";");
-	            String pistaId = datos[3];
-	            String fechaHoraString = datos[4];
-	            Date fechaReserva;
-	            
-	            try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                    fechaReserva = sdf.parse(fechaHoraString);
-                } catch (ParseException e) {
-                    System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
-                                       "Formato esperado: dd/MM/yyyy HH:mm.");
-                    continue; // Saltar a la siguiente línea en caso de error
-                }
-
-	            // Compara la pista y la hora
-	            if (pistaId.equals(nombrePista) && fechaReserva.equals(fechaHora)) {
-	                return true; // Ya existe una reserva para la misma pista y hora
-	            }
-	        }
-	    } catch (IOException e) {
-	        System.out.println(" ERROR! Error al comprobar reservas existentes: " + e.getMessage());
-	    }
-	    return false;
+		String query = properties.getProperty("buscar_reserva_existente");
+	
+		DBConnection db = new DBConnection();
+		Connection connection = db.getConnection();
+	
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+		     // Establecer los parámetros
+		     statement.setString(1, nombrePista);
+		     statement.setTimestamp(2, new Timestamp(fechaHora.getTime())); // Convertir Date a Timestamp
+		
+		     // Ejecutar la consulta
+		     ResultSet resultSet = statement.executeQuery();
+		     if (resultSet.next()) {
+		         int count = resultSet.getInt(1);
+		         return count > 0; // Si ya existe una reserva para la pista y la hora
+		     }
+		 } catch (SQLException e) {
+		     System.out.println("ERROR! Error al comprobar reservas existentes en la base de datos: " + e.getMessage());
+		 } finally {
+		     db.closeConnection();
+		 }
+		return false; // No existe una reserva
 	}
 	
 	
@@ -1010,16 +1048,16 @@ public class ReservaDAO {
 	 * @param bonoId Es el identificador de bono.
 	 * @return Devuelve el string del tamaño del bono.
 	 */
-	public String obtenerTamanoBono(String bonoId) {
+	public String obtenerTamanoBono(int bonoId) {
 		String tamanoBono= " ERROR!";
 		String query= properties.getProperty("buscar_bono");
 		
 		DBConnection db = new DBConnection();
-	    Connection conexion = db.getConnection();
+		connection = db.getConnection();
 	    
-	    try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	        // Establecer el parámetro de la consulta
-	        stmt.setString(1, bonoId);
+	        stmt.setInt(1, bonoId);
 
 	        // Ejecutar la consulta
 	        ResultSet rs = stmt.executeQuery();
@@ -1045,67 +1083,56 @@ public class ReservaDAO {
 	
 	
 	
-	public ReservaDTO obtenerReservaPorId(String idReserva) {
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
-            String linea;
+	public ReservaDTO obtenerReservaPorId(int idReserva) {
+		String query= properties.getProperty("buscar_reserva");
+		
+		DBConnection db = new DBConnection();
+		connection = db.getConnection();
+		ReservaDTO reserva= null;
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        // Establecer el parámetro de la consulta
+	        stmt.setInt(1, idReserva);
 
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                // Cada línea tiene el formato:
-                // R_0000;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto0;30/11/2024 19:30;90;30.0;0.0;10
-                String[] datos = linea.split(";");
+	        // Ejecutar la consulta
+	        ResultSet rs = stmt.executeQuery();
 
-                // Comprobar si el identificador de la reserva coincide con el proporcionado
-                if (datos.length >= 9 && datos[0].equals(idReserva)) {
-                    // Extraer los datos de la reserva
-                    String tamanoPista = datos[1];
-                    String usuarioId = datos[2];
-                    String pistaId = datos[3];
-                    String fechaHoraString = datos[4];
-                    int duracion = Integer.parseInt(datos[5]);
-                    float precio = Float.parseFloat(datos[6]);
-                    float descuento = Float.parseFloat(datos[7]);
-                    int particip = Integer.parseInt(datos[8]);
-
-                    // Intentar parsear la fecha y hora
-                    Date fechaHora = null;
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                        fechaHora = sdf.parse(fechaHoraString);
-                    } catch (ParseException e) {
-                        System.out.println(" ERROR! No se pudo parsear la fecha de la reserva: " + fechaHoraString);
-                        continue; // Saltar esta línea si la fecha no es válida
-                    }
-
-                    ReservaDTO reserva;
-                    if(tamanoPista== "ADULTOS") {
-                    	reserva = new ReservaAdultosDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
-                    }
-                    
-                    else if(tamanoPista== "FAMILIAR") {
-                    	int numadultos = Integer.parseInt(datos[9]);
-                    	reserva = new ReservaFamiliarDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,numadultos,particip);
-                    }
-                    
-                    else {
-                    	reserva = new ReservaInfantilDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
-                    }
-                    // Crear una nueva instancia de Reserva con los datos
-
-                    reader.close(); // Cerrar el archivo
-                    return reserva; // Devolver la reserva encontrada
+	        // Verificar si se encontró el bono
+	        if (rs.next()) {
+	            // Obtener el tamaño de la pista del bono
+	        	int usuarioId = rs.getInt("usuarioId");
+	            int duracion= rs.getInt("duracion");
+	            java.sql.Date fechaReserva= rs.getDate("fechaHora");
+	            int pistaId= rs.getInt("pistaId");
+	            float precio = rs.getFloat("precio");
+	            float descuento= rs.getFloat("descuento");
+	            String tipoReserva= rs.getString("tipoReserva");
+	            int numNinos= rs.getInt("numNinos");
+	            int numAdultos= rs.getInt("numAdultos");
+	            
+                if(tipoReserva== "ADULTOS") {
+                	reserva = new ReservaAdultosDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numAdultos);
                 }
-            }
+                
+                else if(tipoReserva== "FAMILIAR") {
+                	reserva = new ReservaFamiliarDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numAdultos, numNinos);
+                }
+                
+                else {
+                	reserva = new ReservaInfantilDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numNinos);
+                }
+	            
+	        }
 
-            reader.close(); // Cerrar el archivo
-            System.out.println(" ERROR! No se encontró ninguna reserva con el ID proporcionado.");
-        } catch (IOException e) {
-            System.out.println(" ERROR! Hubo un problema al acceder al archivo: " + e.getMessage());
-        }
+	    } catch (SQLException e) {
+	        System.out.println("ERROR! Error al ejecutar la consulta: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        // Cerrar la conexión a la base de datos
+	        db.closeConnection();
+	    }
 
-        return null; // Devolver null si no se encontró la reserva
+        return reserva; // Devolver null si no se encontró la reserva
     }
 
 }

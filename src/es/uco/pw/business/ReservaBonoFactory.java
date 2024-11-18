@@ -52,7 +52,7 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaInfantil creado.
      */
     @Override
-    public ReservaInfantilDTO createReservaInfantil(int idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos) {
+    public ReservaInfantilDTO createReservaInfantil(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroNinos) {
         
         ReservaInfantilDTO reserva = new ReservaInfantilDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroNinos);
         reserva.setBonoId(bonoId); 
@@ -73,7 +73,7 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaFamiliar creado.
      */
     @Override
-    public ReservaFamiliarDTO createReservaFamiliar(int idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+    public ReservaFamiliarDTO createReservaFamiliar(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         
         ReservaFamiliarDTO reserva = new ReservaFamiliarDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos, numeroNinos);
         reserva.setBonoId(bonoId);
@@ -93,7 +93,7 @@ public class ReservaBonoFactory extends ReservaFactory {
      *  @return reserva Objeto de tipo ReservaAdultos creado.
      */
     @Override
-    public ReservaAdultosDTO createReservaAdultos(int idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos) {
+    public ReservaAdultosDTO createReservaAdultos(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroAdultos) {
         
         ReservaAdultosDTO reserva = new ReservaAdultosDTO(idUsuario, fecha, duracion, idPista, precio, descuento, numeroAdultos);
         reserva.setBonoId(bonoId); 

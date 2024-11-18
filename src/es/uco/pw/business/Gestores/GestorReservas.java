@@ -146,7 +146,7 @@ public class GestorReservas {
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
 	 */
-	public int modificarReserva(String idReserva, ReservaDTO nuevaReserva) throws IOException {
+	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) throws IOException {
 		return daoReserva.modificarReserva(idReserva, nuevaReserva);
     }
 	
@@ -157,7 +157,7 @@ public class GestorReservas {
 	 * @param idPista Identificador de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
+	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
 		return daoReserva.listarReservasPorFechaYPista(fechaBuscada, idPista);
 	}
 	
@@ -167,7 +167,7 @@ public class GestorReservas {
 	 * @param idReserva Identificador único de la reserva a cancelar.
 	 * @return Devuelve true si consiguió borrar la reserva del fichero correctamente, y devuelve false si hubo algún error.
 	 */
-	public boolean cancelarReserva(String idReserva) {
+	public boolean cancelarReserva(int idReserva) {
 		return daoReserva.cancelarReserva(idReserva);
 	}
 	
@@ -187,14 +187,19 @@ public class GestorReservas {
 	 * @param bonoId Es el identificador de bono.
 	 * @return Devuelve el string del tamaño del bono.
 	 */
-	public String obtenerTamanoBono(String bonoId) {
+	public String obtenerTamanoBono(int bonoId) {
 		return daoReserva.obtenerTamanoBono(bonoId);
 	}
 	
 	
 	
-	public ReservaDTO obtenerReservaPorId(String idReserva) {
+	public ReservaDTO obtenerReservaPorId(int idReserva) {
 		return daoReserva.obtenerReservaPorId(idReserva);
     }
+	
+	
+	public int buscarIdPista(String idPistaString) {
+		return daoReserva.buscarIdPista(idPistaString);
+	}
 
 }

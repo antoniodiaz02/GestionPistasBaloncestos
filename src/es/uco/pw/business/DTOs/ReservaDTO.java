@@ -32,7 +32,7 @@ public abstract class ReservaDTO {
     /**
      * Identificador de la pista reservada (debe existir).
      */
-    private String pistaId;
+    private int pistaId;
 
     /**
      * Precio de la reserva (en euros).
@@ -48,16 +48,7 @@ public abstract class ReservaDTO {
      * Bono de la reserva.
      */
     private int bonoId;  
-    
-    /**
-     * Numero de niños de la reserva.
-     */
-    int numNinos;
-    
-    /**
-     * Numero de adultos de la reserva.
-     */
-    int numAdultos;
+
     
     /**
      * Número de sesion del bono.
@@ -73,7 +64,7 @@ public abstract class ReservaDTO {
      * @param precio Precio.
      * @param descuento Descuento a aplicar.
      */
-    public ReservaDTO(int idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
+    public ReservaDTO(int idUsuario, Date fechaHora, int duracionMinutos, int idPista, float precio, float descuento) {
         this.usuarioId = idUsuario;
         this.fechaHora = fechaHora;
         this.duracion = duracionMinutos;
@@ -140,7 +131,7 @@ public abstract class ReservaDTO {
      * Devuelve el identificador de la pista reservada.
      * @return pistaId Identificador de la pista.
      */
-    public String getPistaId() {
+    public int getPistaId() {
         return pistaId;
     }
 
@@ -148,7 +139,7 @@ public abstract class ReservaDTO {
      * Modifica el identificador de la pista reservada.
      * @param pistaId Identificador de la pista.
      */
-    public void setPistaId(String pistaId) {
+    public void setPistaId(int pistaId) {
         this.pistaId = pistaId;
     }
 
