@@ -123,7 +123,7 @@ public class ReservaDAO {
             statement.setInt(3, duracion);
             statement.setInt(4, pistaId);
             statement.setFloat(5, precio);
-            statement.setBoolean(6, descuento > 0); // True si hay descuento
+            statement.setFloat(6, descuento); // True si hay descuento
             statement.setString(7, tipoReservaString);
             statement.setObject(8, numeroNinos > 0 ? numeroNinos : null); // NULL si no aplica
             statement.setObject(9, numeroAdultos > 0 ? numeroAdultos : null); // NULL si no aplica
@@ -222,6 +222,7 @@ public class ReservaDAO {
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
+        float descuentoTotal= 0.05f;
         try {
             // Usar transacción para asegurarse de que ambas operaciones (reserva y actualización del bono) sean atómicas
             connection.setAutoCommit(false);
@@ -233,7 +234,7 @@ public class ReservaDAO {
                 statement.setInt(3, duracion);
                 statement.setInt(4, pistaId);
                 statement.setFloat(5, precio);
-                statement.setBoolean(6, true); // Descuento aplicado siempre para bonos
+                statement.setFloat(6, descuentoTotal); // Descuento aplicado siempre para bonos
                 statement.setString(7, tipoReservaString);
                 statement.setObject(8, numeroNinos > 0 ? numeroNinos : null); // NULL si no aplica
                 statement.setObject(9, numeroAdultos > 0 ? numeroAdultos : null); // NULL si no aplica
@@ -497,8 +498,8 @@ public class ReservaDAO {
             stmt.setTimestamp(2, new java.sql.Timestamp(reserva.getFechaHora().getTime()));
             stmt.setInt(4, reserva.getPistaId());
             stmt.setInt(6, reserva.getDuracion());
-            stmt.setDouble(7, reserva.getPrecio());
-            stmt.setDouble(8, reserva.getDescuento());
+            stmt.setFloat(7, reserva.getPrecio());
+            stmt.setFloat(8, reserva.getDescuento());
             stmt.setString(7, tipoReserva);
 
             // Configurar parámetros específicos según el tipo de reserva
@@ -723,8 +724,8 @@ public class ReservaDAO {
                 int pistaId = rs.getInt("pistaId");
                 java.util.Date fechaReserva = rs.getTimestamp("fechaHora");
                 int duracion = rs.getInt("duracion");
-                double precio = rs.getDouble("precio");
-                double descuento = rs.getDouble("descuento");
+                float precio = rs.getFloat("precio");
+                float descuento = rs.getFloat("descuento");
                 
                 int numAdultos = rs.getInt("numAdultos");
                 int numNinos = rs.getInt("numNinos");
@@ -874,8 +875,8 @@ public class ReservaDAO {
                 int pistaId = rs.getInt("pistaId");
                 java.util.Date fechaReserva = rs.getTimestamp("fechaHora");
                 int duracion = rs.getInt("duracion");
-                double precio = rs.getDouble("precio");
-                double descuento = rs.getDouble("descuento");
+                float precio = rs.getFloat("precio");
+                float descuento = rs.getFloat("descuento");
                 
                 int numAdultos = rs.getInt("numAdultos");
                 int numNinos = rs.getInt("numNinos");
