@@ -557,7 +557,7 @@ public class ReservaDAO {
                 sesiones = rs.getInt("sesiones");
                 fechaBono = rs.getTimestamp("fechaCaducidad");  // Obtener la fecha de la primera sesión como Timestamp
                 
-                String tamanoString = rs.getString("tamanoPista");
+                String tamanoString = rs.getString("tipoPista");
                 TamanoPista tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
 
                 // Comprobar si el tamaño de la pista coincide con el del bono
@@ -594,11 +594,13 @@ public class ReservaDAO {
         }
 
         // Verificar que la fecha del bono no exceda en un año la fecha actual
-        if (plazoExcedido(fechaBono)) {
-            System.out.println(" ERROR! El bono está caducado.");
-            return false;
+        if(fechaBono!=null) {
+        	if (plazoExcedido(fechaBono)) {
+        		System.out.println(" ERROR! El bono está caducado.");
+        		return false;
+        	}        	
         }
-    	
+	    	
     	return true; // El bono es válido
     }
 
@@ -715,6 +717,10 @@ public class ReservaDAO {
             ResultSet rs = stmt.executeQuery();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
+            
+            System.out.println("\n───────────────────────────────────────");
+            System.out.println("---------- Lista de Reservas ----------");
+            System.out.println("───────────────────────────────────────");
 
             // Iterar sobre los resultados de la consulta
             while (rs.next()) {
@@ -722,7 +728,7 @@ public class ReservaDAO {
                 String tipoReserva= rs.getString("tipoReserva");
                 int usuarioId = rs.getInt("usuarioId");
                 int pistaId = rs.getInt("pistaId");
-                java.util.Date fechaReserva = rs.getTimestamp("fechaHora");
+                java.util.Date fechaHora = rs.getTimestamp("fechaHora");
                 int duracion = rs.getInt("duracion");
                 float precio = rs.getFloat("precio");
                 float descuento = rs.getFloat("descuento");
@@ -732,10 +738,10 @@ public class ReservaDAO {
 
                 // Imprimir los datos de la reserva
                 System.out.println("ID Reserva: " + idReserva);
-                System.out.println("Tipo de reserva" + tipoReserva);
+                System.out.println("Tipo de reserva: " + tipoReserva);
                 System.out.println("Usuario ID: " + usuarioId);
                 System.out.println("Pista ID: " + pistaId);
-                System.out.println("Fecha Reserva: " + sdf.format(fechaReserva));
+                System.out.println("Fecha Reserva: " + sdf.format(fechaHora));
                 System.out.println("Duración: " + duracion + " horas");
                 System.out.println("Precio: " + precio + " €");
                 System.out.println("Descuento: " + descuento);
@@ -856,16 +862,23 @@ public class ReservaDAO {
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
 	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
-		String query = properties.getProperty("modificar_reserva");
+		String query = properties.getProperty("buscar_fecha_pista");
 	    int codigo = 0;
 	    
 	    DBConnection db = new DBConnection();
 	    connection = db.getConnection();
         
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        	stmt.setInt(1, idPista);
+        	stmt.setDate(2, new java.sql.Date(fechaBuscada.getTime()));
+        	
             ResultSet rs = stmt.executeQuery();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
+            
+            System.out.println("\n───────────────────────────────────────");
+            System.out.println("---------- Lista de Reservas ----------");
+            System.out.println("───────────────────────────────────────");
 
             // Iterar sobre los resultados de la consulta
             while (rs.next()) {
@@ -883,7 +896,7 @@ public class ReservaDAO {
 
                 // Imprimir los datos de la reserva
                 System.out.println("ID Reserva: " + idReserva);
-                System.out.println("Tipo de reserva" + tipoReserva);
+                System.out.println("Tipo de reserva: " + tipoReserva);
                 System.out.println("Usuario ID: " + usuarioId);
                 System.out.println("Pista ID: " + pistaId);
                 System.out.println("Fecha Reserva: " + sdf.format(fechaReserva));
@@ -934,7 +947,7 @@ public class ReservaDAO {
 
 	        if (rs.next()) {
 	            // Obtener la fecha de la reserva
-	            Date fechaReserva = rs.getTimestamp("fechaReserva");
+	            Date fechaReserva = rs.getTimestamp("fechaHora");
 
 	            // Verificar si el plazo de 24 horas no ha sido excedido
 	            if (!plazoExcedido(fechaReserva)) {
@@ -1066,7 +1079,7 @@ public class ReservaDAO {
 	        // Verificar si se encontró el bono
 	        if (rs.next()) {
 	            // Obtener el tamaño de la pista del bono
-	            tamanoBono = rs.getString("tamanoPista");
+	            tamanoBono = rs.getString("tipoPista");
 	        } else {
 	            // Si no se encuentra el bono
 	            tamanoBono = "ERROR! Bono no encontrado.";

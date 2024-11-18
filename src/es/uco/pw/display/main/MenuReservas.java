@@ -144,6 +144,7 @@ public class MenuReservas {
     private static void hacerReservaBono(Scanner scanner) {    	
     	System.out.print("ID del bono: ");
     	int bonoId = scanner.nextInt();
+    	scanner.nextLine();
         System.out.print("Ingrese su correo: ");
         String correo = scanner.nextLine();
         System.out.print("Nombre de la pista: ");
