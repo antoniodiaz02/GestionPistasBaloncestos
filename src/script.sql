@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS `Reservas` (
   `precio` FLOAT NOT NULL,
   `descuento` BOOLEAN NOT NULL,
   `tipoReserva` VARCHAR(20) NOT NULL,  -- Cambiado de ENUM a VARCHAR
+  `numNinos` INT(11) NULL,
+  `numAdultos` INT(11) NULL
   PRIMARY KEY (`idReserva`),
   KEY `usuarioId` (`usuarioId`),
   KEY `pistaId` (`pistaId`),
@@ -58,8 +60,9 @@ CREATE TABLE IF NOT EXISTS `Reservas` (
 CREATE TABLE IF NOT EXISTS `Bonos` (
   `idBono` INT(11) NOT NULL AUTO_INCREMENT,
   `usuarioId` INT(11) NOT NULL,
-  `fechaInicio` DATE NOT NULL,
-  `fechaCaducidad` DATE NOT NULL,
+  `sesiones` INT(11) NOT NULL,
+  `fechaInicio` DATE NULL,
+  `fechaCaducidad` DATE NULL,
   `tipoPista` VARCHAR(20) NOT NULL,  -- Cambiado de ENUM a VARCHAR
   PRIMARY KEY (`idBono`),
   KEY `usuarioId` (`usuarioId`),

@@ -88,8 +88,8 @@ public class GestorReservas {
      * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    public JugadorDTO buscarJugador(String correoElectronico) {
-    	return daoReserva.buscarJugador(correoElectronico);
+    public int buscarIdJugador(String correoElectronico) {
+    	return daoReserva.buscarIdJugador(correoElectronico);
     }
     
     
@@ -126,7 +126,7 @@ public class GestorReservas {
 	 * @param bonoId Identificador único del bono.
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si ha habido algun error.
 	 */
-	public boolean actualizarSesionesBono(String bonoId) {
+	public boolean actualizarSesionesBono(int bonoId) {
 		return daoReserva.actualizarSesionesBono(bonoId);
 	}
 	
@@ -177,7 +177,7 @@ public class GestorReservas {
 	 * @param bonoId Identificador único del bono a buscar.
 	 * @return sesionesRestantes Es la cantidad de sesiones que le quedan al bono.
 	 */
-	public int obtenerSesionesRestantes(String bonoId) {
+	public int obtenerSesionesRestantes(int bonoId) {
 		return daoReserva.obtenerSesionesRestantes(bonoId);
 	}
 

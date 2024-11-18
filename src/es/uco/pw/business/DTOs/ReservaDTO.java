@@ -50,6 +50,16 @@ public abstract class ReservaDTO {
     private String bonoId;  
     
     /**
+     * Numero de niños de la reserva.
+     */
+    int numNinos;
+    
+    /**
+     * Numero de adultos de la reserva.
+     */
+    int numAdultos;
+    
+    /**
      * Número de sesion del bono.
      */
     private int sesion; 
@@ -218,4 +228,5 @@ public abstract class ReservaDTO {
         }
         return info;
     }
+
 }

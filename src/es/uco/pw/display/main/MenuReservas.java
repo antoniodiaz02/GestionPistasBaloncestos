@@ -249,8 +249,8 @@ public class MenuReservas {
             case 1:
                 System.out.print("\n Introduce el nuevo correo: ");
                 String correoUsuario = scanner.nextLine();
-                JugadorDTO user= gestorReservas.buscarJugador(correoUsuario);
-                if(user==null) {
+                int user= gestorReservas.buscarIdJugador(correoUsuario);
+                if(user==-1) {
                 	modificable= false;
                 	System.out.print(" ERROR! El usuario no existe.");
                 }
