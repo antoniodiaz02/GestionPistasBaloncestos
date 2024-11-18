@@ -36,10 +36,7 @@ import java.time.LocalDate;
  */
 public class ReservaDAO {
 	
-    private final String rutaArchivoJugadores = "src/es/uco/pw/files/users.txt";
-    private final String rutaArchivoPistas = "src/es/uco/pw/files/pistas.txt";
     private final String rutaArchivoReservas = "src/es/uco/pw/files/reservas.txt";
-    private final String rutaArchivoBonos = "src/es/uco/pw/files/bonos.txt";
 
 
 	/**
@@ -66,7 +63,9 @@ public class ReservaDAO {
     
     public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva) {
         int jugador = buscarIdJugador(correoUsuario);
+        
         PistaDTO pista = buscarPista(nombrePista);
+        int pistaId= buscarIdPista(nombrePista);     
         
         
         // Comprobación adicional para evitar reservas en la misma pista y hora
@@ -110,6 +109,7 @@ public class ReservaDAO {
         }
 
         if (reserva != null) {
+        	//GUARDAR EN SQL
             return true;
         }
         
@@ -131,8 +131,9 @@ public class ReservaDAO {
 	 */
     public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, int bonoId) {
     	int jugador = buscarIdJugador(correoUsuario);
-        PistaDTO pista = buscarPista(nombrePista);
         
+    	PistaDTO pista = buscarPista(nombrePista);
+        int pistaId= buscarIdPista(nombrePista);     
         
         // Comprobación adicional para evitar reservas en la misma pista y hora
         if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
@@ -187,6 +188,7 @@ public class ReservaDAO {
         // 3. Modificacion del número de reservas de bono y adición de la fecha si es su primera reserva.
         if (reserva != null) {
             return actualizarSesionesBono(bonoId);
+            //GUARDAR EN SQL
         }
         
         System.out.println(" ERROR! Tipo incorrecto de reserva. El tipo del bono es distinto al de la reserva.");
@@ -361,30 +363,12 @@ public class ReservaDAO {
 	 * @param idReserva Identificador único de la reserva.
 	 */
     private void guardarReservaEnArchivo(ReservaDTO reserva, String idReserva) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        Properties propiedadesSQL = new Properties();
+    	String query= properties.getProperty("insert_reserva");
         
-        // Cargar las propiedades SQL desde el archivo sql.properties
-        try (FileInputStream fis = new FileInputStream("sql.properties")) {
-            propiedadesSQL.load(fis);
-        } catch (IOException e) {
-            System.out.println(" ERROR! No se pudo cargar el archivo sql.properties: " + e.getMessage());
-            return;
-        }
-        
-        // Obtener la consulta INSERT INTO desde el archivo de propiedades
-        String insert_reserva = propiedadesSQL.getProperty("insert_reserva");
+    	DBConnection db = new DBConnection();
+        connection = db.getConnection();
 
-        // Usar la clase DBConnection para obtener la conexión
-        DBConnection dbConnection = new DBConnection();
-        Connection conexion = dbConnection.getConnection();
-
-        if(conexion == null) {
-            System.out.println(" ERROR! No se pudo establecer la conexión con la base de datos.");
-            return;
-        }
-
-        try (PreparedStatement stmt = conexion.prepareStatement(insert_reserva)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             String tipoReserva;
             if (reserva instanceof ReservaInfantilDTO) {
                 tipoReserva = "INFANTIL";
@@ -397,14 +381,13 @@ public class ReservaDAO {
             }
 
             // Configurar los parámetros de la consulta SQL
-            stmt.setString(1, idReserva);
-            stmt.setString(2, tipoReserva);
-            stmt.setString(3, reserva.getUsuarioId());
+            stmt.setInt(1, reserva.getUsuarioId());            
+            stmt.setTimestamp(2, new java.sql.Timestamp(reserva.getFechaHora().getTime()));
             stmt.setString(4, reserva.getPistaId());
-            stmt.setString(5, sdf.format(reserva.getFechaHora()));
             stmt.setInt(6, reserva.getDuracion());
             stmt.setDouble(7, reserva.getPrecio());
             stmt.setDouble(8, reserva.getDescuento());
+            stmt.setString(7, tipoReserva);
 
             // Configurar parámetros específicos según el tipo de reserva
             if (reserva instanceof ReservaInfantilDTO) {
@@ -439,7 +422,7 @@ public class ReservaDAO {
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si contradice una de las condiciones
 	 * 		   o si ha habido un error.
 	 */
-    public boolean comprobarBono(String bonoId, String correoUsuario, TamanoPista tamano) {
+    public boolean comprobarBono(int bonoId, String correoUsuario, TamanoPista tamano) {
     	String query = properties.getProperty("buscar_bono");
     	
     	DBConnection db = new DBConnection();
@@ -451,7 +434,7 @@ public class ReservaDAO {
     	int idPropietario = -1;
     	
     	try (PreparedStatement stmt = conexion.prepareStatement(query)) {
-            stmt.setString(1, bonoId);  // Asigna el id del bono al parámetro de la consulta
+            stmt.setInt(1, bonoId);  // Asigna el id del bono al parámetro de la consulta
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {

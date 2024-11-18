@@ -17,7 +17,7 @@ public abstract class ReservaDTO {
     /**
      * Identificador del usuario que realiza la reserva (previamente registrado).
      */
-    private String usuarioId;
+    private int usuarioId;
 
     /**
      * Fecha y hora de la reserva.
@@ -47,7 +47,7 @@ public abstract class ReservaDTO {
     /**
      * Bono de la reserva.
      */
-    private String bonoId;  
+    private int bonoId;  
     
     /**
      * Numero de niños de la reserva.
@@ -73,13 +73,14 @@ public abstract class ReservaDTO {
      * @param precio Precio.
      * @param descuento Descuento a aplicar.
      */
-    public ReservaDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
+    public ReservaDTO(int idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento) {
         this.usuarioId = idUsuario;
         this.fechaHora = fechaHora;
         this.duracion = duracionMinutos;
         this.pistaId = idPista;
         this.precio = precio;
         this.descuento = descuento;
+        this.bonoId= -1;
     }
     
     /**
@@ -91,7 +92,7 @@ public abstract class ReservaDTO {
      * Devuelve el identificador del usuario.
      * @return usuarioId Identificador del usuario.
      */
-    public String getUsuarioId() {
+    public int getUsuarioId() {
         return usuarioId;
     }
 
@@ -99,7 +100,7 @@ public abstract class ReservaDTO {
      * Modifica el identificador del usuario.
      * @param usuarioId Identificador del usuario.
      */
-    public void setUsuarioId(String usuarioId) {
+    public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;
     }
 
@@ -187,7 +188,7 @@ public abstract class ReservaDTO {
      * Devuelve el identificador del bono.
      * @return bonoID Identificador del bono.
      */
-    public String getBonoId() {
+    public int getBonoId() {
         return bonoId;
     }
 
@@ -195,7 +196,7 @@ public abstract class ReservaDTO {
      * Modifica el identificador del bono.
      * @param bonoId Identificador del bono.
      */
-    public void setBonoId(String bonoId) {
+    public void setBonoId(int bonoId) {
         this.bonoId = bonoId;
     }
 
@@ -223,7 +224,7 @@ public abstract class ReservaDTO {
     public String toString() {
         String info = "Reserva [Usuario: " + usuarioId + ", Fecha y hora: " + fechaHora + ", Duración: " + duracion 
                       + " minutos, Pista: " + pistaId + ", Precio: " + precio + " €, Descuento: " + descuento + " €]";
-        if (bonoId != null) {
+        if (bonoId == -1) {
             info += ", Bono: " + bonoId + ", Sesión: " + sesion;
         }
         return info;
