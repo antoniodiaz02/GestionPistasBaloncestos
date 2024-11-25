@@ -770,89 +770,91 @@ public class ReservaDAO {
 	 * Función que modifica una reserva buscada por identificador único.
 	 * @param idReserva Identificador único de la reserva a modificar.
 	 * @param nuevaReserva Clase Reserva con todos los nuevos detalles modificados.
-	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
-	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
+	 * @return codigo Devuelve un número distinto dependiendo del error que haya habido. 
+	 *               -1: Error en la fecha (pasada o fuera de plazo).
+	 *                0: Reserva no encontrada.
+	 *                1: Reserva modificada correctamente.
 	 */
-	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) throws IOException {
-		String query = properties.getProperty("modificar_reserva");
-		int codigo= -1;
-		int numNinos= -1;
-		int numAdultos= -1;
-        
-        DBConnection db = new DBConnection();
-        connection = db.getConnection();
-        
-        // Comprobación adicional para asegurar que la nueva fecha es futura
-        if (!esReservaFutura(nuevaReserva.getFechaHora())) {
-            System.out.println(" ERROR! No se puede modificar la reserva a una fecha pasada.");
-            return -1; // Código de error indicando que la fecha es pasada
-        }
-        
-        if(plazoExcedido(nuevaReserva.getFechaHora())) return -1;
+	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) {
+	    String query = properties.getProperty("modificar_reserva");
+	    int codigo = -1;
 
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            // Determinar el tipo de reserva (INFANTIL, FAMILIAR, ADULTOS)
-            String tipoReserva = (nuevaReserva instanceof ReservaInfantilDTO) ? "INFANTIL"
-                    : (nuevaReserva instanceof ReservaFamiliarDTO) ? "FAMILIAR"
-                    : "ADULTOS";
+	    DBConnection db = new DBConnection();
+	    connection = db.getConnection();
 
-            // Establecer los parámetros en la consulta SQL
-            statement.setInt(1, nuevaReserva.getUsuarioId());  											// Usuario ID
-            statement.setTimestamp(2, new java.sql.Timestamp(nuevaReserva.getFechaHora().getTime()));   // Fecha y hora
-            statement.setInt(3, nuevaReserva.getDuracion());  											// Duración
-            statement.setInt(4, nuevaReserva.getPistaId());  							// Pista ID
-            statement.setFloat(5, calcularPrecio(nuevaReserva.getDuracion()));  						// Precio calculado
-            statement.setFloat(6, nuevaReserva.getDescuento());  										// Descuento aplicado
-            statement.setString(7, tipoReserva);  														// Tipo de reserva
-            
-            
-            if (nuevaReserva instanceof ReservaInfantilDTO) {
-                // Si es una reserva infantil, obtenemos el número de niños
-                numNinos = ((ReservaInfantilDTO) nuevaReserva).getNumNinos();
-            } else if (nuevaReserva instanceof ReservaFamiliarDTO) {
-                // Si es una reserva familiar, sumamos niños y adultos
-                numNinos = ((ReservaFamiliarDTO) nuevaReserva).getNumNinos();
-                numAdultos= ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos();
-            } else if (nuevaReserva instanceof ReservaAdultosDTO) {
-                // Si es una reserva de adultos, obtenemos el número de adultos
-                numAdultos = ((ReservaAdultosDTO) nuevaReserva).getNumAdultos();
-            }
-            
-            // Determinar el número de personas según el tipo de reserva
-            if(tipoReserva== "INFANTIL" ) {
-            	statement.setInt(8, numNinos); 
-            	statement.setNull(9, java.sql.Types.INTEGER);
-            	
-            }
-            else if(tipoReserva== "FAMILIAR") {
-            	statement.setInt(8, numNinos); 
-            	statement.setNull(9, numAdultos);
-            }
-            else {
-            	statement.setInt(8, java.sql.Types.INTEGER);
-            	statement.setNull(9, numAdultos);
-            }
+	    try {
+	        // Comprobación de fecha futura y dentro del plazo permitido
+	        if (!esReservaFutura(nuevaReserva.getFechaHora())) {
+	            System.out.println(" ERROR! No se puede modificar la reserva a una fecha pasada.");
+	            return -1;
+	        }
+	        if (plazoExcedido(nuevaReserva.getFechaHora())) {
+	            System.out.println(" ERROR! No se puede modificar la reserva porque excede el plazo permitido.");
+	            return -1;
+	        }
 
-            // Ejecutar la actualización
-            int rowsUpdated = statement.executeUpdate();
-            
-            // Comprobar si se actualizó alguna fila
-            if (rowsUpdated > 0) {
-                codigo = 1; // La reserva fue modificada correctamente
-            } else {
-                codigo = 0; // No se encontró la reserva
-            }
+	        try (PreparedStatement statement = connection.prepareStatement(query)) {
+	            // Determinar el tipo de reserva
+	            String tipoReserva = nuevaReserva instanceof ReservaInfantilDTO ? "INFANTIL" :
+	                                 nuevaReserva instanceof ReservaFamiliarDTO ? "FAMILIAR" : "ADULTOS";
 
-        } catch (SQLException e) {
-            System.err.println("Error al modificar la reserva en la base de datos: " + e.getMessage());
-            e.printStackTrace();
-            codigo = -1; // Error durante la modificación
-        } finally {
-            db.closeConnection();
-        }
+	            // Inicializar los valores de adultos y niños
+	            Integer numNinos = null;
+	            Integer numAdultos = null;
 
-        return codigo;
-    }
+	            if (nuevaReserva instanceof ReservaInfantilDTO) {
+	                numNinos = ((ReservaInfantilDTO) nuevaReserva).getNumNinos();
+	            } else if (nuevaReserva instanceof ReservaFamiliarDTO) {
+	                numNinos = ((ReservaFamiliarDTO) nuevaReserva).getNumNinos();
+	                numAdultos = ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos();
+	            } else if (nuevaReserva instanceof ReservaAdultosDTO) {
+	                numAdultos = ((ReservaAdultosDTO) nuevaReserva).getNumAdultos();
+	            }
+
+	            // Establecer los parámetros de la consulta SQL
+	            statement.setInt(1, nuevaReserva.getUsuarioId());
+	            statement.setTimestamp(2, new java.sql.Timestamp(nuevaReserva.getFechaHora().getTime()));
+	            statement.setInt(3, nuevaReserva.getDuracion());
+	            statement.setInt(4, nuevaReserva.getPistaId());
+	            statement.setFloat(5, calcularPrecio(nuevaReserva.getDuracion()));
+	            statement.setFloat(6, nuevaReserva.getDescuento());
+	            statement.setString(7, tipoReserva);
+	            
+	            // Manejo de valores nulos en numNinos y numAdultos
+	            if (numNinos != null) {
+	                statement.setInt(8, numNinos);
+	            } else {
+	                statement.setNull(8, java.sql.Types.INTEGER);
+	            }
+
+	            if (numAdultos != null) {
+	                statement.setInt(9, numAdultos);
+	            } else {
+	                statement.setNull(9, java.sql.Types.INTEGER);
+	            }
+
+	            statement.setInt(10, idReserva); // ID de la reserva que se va a modificar
+
+	            // Ejecutar la actualización
+	            int rowsUpdated = statement.executeUpdate();
+
+	            if (rowsUpdated > 0) {
+	                codigo = 1; // Reserva modificada correctamente
+	            } else {
+	                System.out.println(" ERROR! No se encontró la reserva con ID: " + idReserva);
+	                codigo = 0; // Reserva no encontrada
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println(" ERROR! Error al modificar la reserva en la base de datos: " + e.getMessage());
+	        e.printStackTrace();
+	        codigo = -1; // Error durante la modificación
+	    } finally {
+	        db.closeConnection();
+	    }
+
+	    return codigo;
+	}
 	
 	
 	/**
@@ -1051,7 +1053,7 @@ public class ReservaDAO {
 	 * @param fechaReserva Fecha de la reserva a verificar.
 	 * @return Devuelve true si la fecha es futura, y false si la fecha ya ha pasado.
 	 */
-	private boolean esReservaFutura(Date fechaReserva) {
+	public boolean esReservaFutura(Date fechaReserva) {
 	    Date fechaActual = new Date();
 	    return fechaReserva.after(fechaActual);
 	}
@@ -1116,7 +1118,7 @@ public class ReservaDAO {
 	            // Obtener el tamaño de la pista del bono
 	        	int usuarioId = rs.getInt("usuarioId");
 	            int duracion= rs.getInt("duracion");
-	            java.sql.Date fechaReserva= rs.getDate("fechaHora");
+	            java.sql.Timestamp fechaReserva = rs.getTimestamp("fechaHora");
 	            int pistaId= rs.getInt("pistaId");
 	            float precio = rs.getFloat("precio");
 	            float descuento= rs.getFloat("descuento");

@@ -228,103 +228,136 @@ public class MenuReservas {
         }
     }
 
-    private static void modificarReserva() {    	
+    private static void modificarReserva() {
         System.out.print("Ingrese el ID de la reserva a modificar: ");
         int idReserva = scanner.nextInt();
-        
-        // Pedir al usuario que seleccione el tipo de reserva
-        ReservaDTO nuevaReserva= gestorReservas.obtenerReservaPorId(idReserva);
-        
-        boolean modificable= true;
-        
-        System.out.println("\n  ¿Qué deseas modificar?");
-        System.out.println("    1. Correo del reservante");
-        System.out.println("    2. Fecha de reserva");
-        System.out.println("    3. Duracion de reserva");
-        System.out.println("    4. Pista");
-        System.out.print("Elige una opción: ");
-        int opcionModificar = scanner.nextInt();
-        scanner.nextLine(); // Consumir el salto de línea
 
-        switch (opcionModificar) {
-            case 1:
-                System.out.print("\n Introduce el nuevo correo: ");
-                String correoUsuario = scanner.nextLine();
-                int user= gestorReservas.buscarIdJugador(correoUsuario);
-                if(user==-1) {
-                	modificable= false;
-                	System.out.print(" ERROR! El usuario no existe.");
-                }
-                int id_user= gestorReservas.buscarIdJugador(correoUsuario);
-                nuevaReserva.setUsuarioId(id_user);
-                break;
+        // Obtener la reserva actual por ID
+        ReservaDTO nuevaReserva = gestorReservas.obtenerReservaPorId(idReserva);
 
-            case 2:
-                System.out.print("\n Introduce la nueva fecha de reserva (dd/MM/yyyy HH:mm): ");
-                Date nuevaFecha = leerFechaHora(scanner);
-                nuevaReserva.setFechaHora(nuevaFecha);
-                break;
-
-            case 3:
-                System.out.print("\n Introduce la nueva duracion de reserva: ");
-                int duracion = scanner.nextInt();
-                nuevaReserva.setDuracion(duracion);
-                break;
-            case 4:
-                System.out.print("\n Introduce el identificador de la nueva pista: ");
-                String pistaString = scanner.nextLine();
-                PistaDTO pista= gestorReservas.buscarPista(pistaString);
-                int pista_id= gestorReservas.buscarIdPista(pistaString);
-                
-                if(pista==null) {
-                	System.out.print(" ERROR! No existe la pista que se quiere introducir.");
-                }
-                
-//                if((tipo== 1 && tamano==TamanoPista.TRES_VS_TRES) || (tipo== 1 && tamano==TamanoPista.ADULTOS)) {
-//                	System.out.print(" ERROR! Pista no compatible con el tipo de reserva.");
-//                	modificable= false;
-//                }
-//                
-//                else if((tipo== 2 && tamano==TamanoPista.ADULTOS)) {
-//                	System.out.print(" ERROR! Pista no compatible con el tipo de reserva.");
-//                	modificable= false;
-//                }
-//                
-//                else if((tipo== 3 && tamano==TamanoPista.MINIBASKET) || (tipo== 3 && tamano==TamanoPista.TRES_VS_TRES)) {
-//                	System.out.print(" ERROR! Pista no compatible con el tipo de reserva.");
-//                	modificable= false;
-//                }
-                
-                nuevaReserva.setPistaId(pista_id);
-                break;
-
-            default:
-                System.out.println("\n ERROR! Opción no válida.");
-                return;
+        if (nuevaReserva == null) {
+            System.out.println(" ERROR! No se encontró una reserva con el ID proporcionado.");
+            return;
         }
 
+        boolean modificable = true;
+        boolean continuar = true;
 
-        // Intentar modificar la reserva
-        if(modificable) {
-	        try {
-	            int resultado = gestorReservas.modificarReserva(idReserva, nuevaReserva);
-	            switch (resultado) {
-	                case -1:
-	                    System.out.println(" ERROR! No se puede modificar la reserva, ha pasado el plazo de 24 horas.");
-	                    break;
-	                case 0:
-	                    System.out.println(" ERROR! Reserva no encontrada.");
-	                    break;
-	                case 1:
-	                    System.out.println("Reserva modificada correctamente.");
-	                    break;
-	                default:
-	                    System.out.println(" ERROR! Error inesperado al modificar la reserva.");
-	                    break;
-	            }
-	        } catch (IOException e) {
-	            System.out.println(" ERROR! Error al modificar la reserva: " + e.getMessage());
-	        }
+        while (continuar) {
+            System.out.println("\n  ¿Qué deseas modificar?");
+            System.out.println("    1. Correo del reservante");
+            System.out.println("    2. Fecha de reserva");
+            System.out.println("    3. Duración de reserva");
+            System.out.println("    4. Pista");
+            System.out.println("    5. Confirmar y guardar cambios");
+            System.out.println("    6. Cancelar modificaciones");
+            System.out.print("Elige una opción: ");
+            int opcionModificar = scanner.nextInt();
+            scanner.nextLine(); // Consumir el salto de línea
+
+            switch (opcionModificar) {
+                case 1:
+                    System.out.print("\n Introduce el nuevo correo: ");
+                    String correoUsuario = scanner.nextLine();
+                    int user = gestorReservas.buscarIdJugador(correoUsuario);
+                    if (user == -1) {
+                        modificable = false;
+                        System.out.println(" ERROR! El usuario no existe.");
+                    } else {
+                        nuevaReserva.setUsuarioId(user);
+                    }
+                    break;
+
+                case 2:
+                    System.out.print("\n Introduce la nueva fecha de reserva (dd/MM/yyyy HH:mm): ");
+                    Date nuevaFecha = leerFechaHora(scanner);
+                    nuevaReserva.setFechaHora(nuevaFecha);
+                    break;
+
+                case 3:
+                    System.out.print("\n Introduce la nueva duración de reserva (en minutos): ");
+                    int duracion = scanner.nextInt();
+                    nuevaReserva.setDuracion(duracion);
+                    break;
+
+                case 4:
+                    System.out.print("\n Introduce el nombre de la nueva pista: ");
+                    String pistaString = scanner.nextLine();
+                    PistaDTO pista = gestorReservas.buscarPista(pistaString);
+                    int pistaId = gestorReservas.buscarIdPista(pistaString);
+
+                    if (pista == null) {
+                        modificable = false;
+                        System.out.println(" ERROR! No existe la pista que se quiere introducir.");
+                    } else if (!pista.isDisponible()) {
+                        modificable = false;
+                        System.out.println(" ERROR! La pista seleccionada no está disponible.");
+                    //} else if ((nuevaReserva instanceof ReservaAdultosDTO && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) ||
+                    //           (nuevaReserva instanceof ReservaInfantilDTO && pista.getTamanoPista() == PistaDTO.TamanoPista.ADULTOS) ||
+                    //           (nuevaReserva instanceof ReservaInfantilDTO && pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)||
+                    //           (nuevaReserva instanceof ReservaFamiliarDTO && pista.getTamanoPista() == PistaDTO.TamanoPista.ADULTOS)) {
+                    //    modificable = false;
+                    //    System.out.println(" ERROR! La pista seleccionada no es compatible con el tipo de reserva.");
+                    } else {
+                        nuevaReserva.setPistaId(pistaId);
+                        System.out.println(" Pista asignada correctamente.");
+                    }
+                    break;
+
+                case 5:
+                    // Confirmar y guardar cambios
+                    confirmarYGuardarCambios(idReserva, nuevaReserva, modificable);
+                    continuar = false;
+                    break;
+
+                case 6:
+                    // Cancelar modificaciones
+                    System.out.println("Modificación cancelada.");
+                    continuar = false;
+                    break;
+
+                default:
+                    System.out.println("\n ERROR! Opción no válida.");
+            }
+        }
+    }
+
+    private static void confirmarYGuardarCambios(int idReserva, ReservaDTO nuevaReserva, boolean modificable) {
+        if (!modificable) {
+            System.out.println(" ERROR! Hay inconsistencias en los cambios realizados. No se puede proceder.");
+            return;
+        }
+
+        System.out.println("\n Resumen de la modificación:");
+        System.out.println("  ID de la Reserva: " + idReserva);
+        System.out.println("  Usuario ID: " + nuevaReserva.getUsuarioId());
+        System.out.println("  Fecha y hora: " + nuevaReserva.getFechaHora());
+        System.out.println("  Duración: " + nuevaReserva.getDuracion());
+        System.out.println("  ID de la Pista: " + nuevaReserva.getPistaId());
+        System.out.println("\n ¿Deseas confirmar los cambios? (S/N): ");
+        String confirmacion = scanner.nextLine().trim().toUpperCase();
+
+        if (confirmacion.equals("S")) {
+            try {
+                int resultado = gestorReservas.modificarReserva(idReserva, nuevaReserva);
+                switch (resultado) {
+                    case -1:
+                        System.out.println(" ERROR! No se puede modificar la reserva, ha pasado el plazo de 24 horas.");
+                        break;
+                    case 0:
+                        System.out.println(" ERROR! Reserva no encontrada.");
+                        break;
+                    case 1:
+                        System.out.println("Reserva modificada correctamente.");
+                        break;
+                    default:
+                        System.out.println(" ERROR! Error inesperado al modificar la reserva.");
+                }
+            } catch (IOException e) {
+                System.out.println(" ERROR! Error al modificar la reserva: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Cambios descartados.");
         }
     }
 
