@@ -154,11 +154,11 @@ public class GestorReservas {
 	/**
 	 * Función que calcula si muestra todos los detalles de las reservas con una fecha y pista exacta.
 	 * @param fechaBuscada Fecha de la reserva a filtrar.
-	 * @param idPista Identificador de la pista a filtrar.
+	 * @param nombrePista Nombre de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
-		return daoReserva.listarReservasPorFechaYPista(fechaBuscada, idPista);
+	public int listarReservasPorFechaYPista(Date fechaBuscada, String nombrePista) {
+		return daoReserva.listarReservasPorFechaYPista(fechaBuscada, nombrePista);
 	}
 	
 	

@@ -218,6 +218,17 @@ public class MenuReservas {
             }
         }
     }
+    
+    private static Date leerFecha(Scanner scanner) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        while (true) {
+            try {
+                return sdf.parse(scanner.nextLine());
+            } catch (ParseException e) {
+                System.out.print(" ERROR! Formato incorrecto. Intente de nuevo (dd/MM/yyyy): ");
+            }
+        }
+    }
 
     private static void listarReservasFuturas() {
         int resultado = gestorReservas.listarReservasFuturas();
@@ -329,24 +340,17 @@ public class MenuReservas {
     }
 
     private static void listarReservasPorFechaYPista() {
-        try {
             System.out.print("Ingrese la fecha de la reserva (dd/MM/yyyy): ");
-            String fechaInput = scanner.nextLine();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date fechaBuscada = sdf.parse(fechaInput);
+            Date fechaHora = leerFecha(scanner);
+            System.out.print("Ingrese el nombre de la pista: ");
+            String idPista = scanner.nextLine();
 
-            System.out.print("Ingrese el ID de la pista: ");
-            int idPista = scanner.nextInt();
-
-            int resultado = gestorReservas.listarReservasPorFechaYPista(fechaBuscada, idPista);
+            int resultado = gestorReservas.listarReservasPorFechaYPista(fechaHora, idPista);
             if (resultado == -1) {
                 System.out.println("No hay reservas registradas para la fecha y pista indicadas.");
             } else if (resultado == -2) {
                 System.out.println(" ERROR! Error al listar reservas para la fecha y pista.");
             }
-        } catch (ParseException e) {
-            System.out.println(" ERROR! Formato de fecha incorrecto.");
-        }
     }
 
     private static void cancelarReserva() {

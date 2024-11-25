@@ -1,7 +1,5 @@
 package es.uco.pw.data.DAOs;
 
-import es.uco.pw.business.ReservaBonoFactory;
-import es.uco.pw.business.DTOs.JugadorDTO;
 import es.uco.pw.business.DTOs.PistaDTO;
 import es.uco.pw.business.DTOs.ReservaAdultosDTO;
 import es.uco.pw.business.DTOs.ReservaDTO;
@@ -11,34 +9,19 @@ import es.uco.pw.business.DTOs.PistaDTO.TamanoPista;
 import es.uco.pw.common.DBConnection;
 
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
 
 
 /**
  * Clase que gestiona las pistas en la base de datos.
  */
 public class ReservaDAO {
-	
-    private final String rutaArchivoReservas = "src/es/uco/pw/files/reservas.txt";
-
 
 	/**
      * Objeto connection para crear la conexión con la base de datos.
@@ -68,7 +51,7 @@ public class ReservaDAO {
 
         // Comprobación adicional para evitar reservas en la misma pista y hora
         if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
-            System.out.println("ERROR! Ya existe una reserva para la misma pista y horario.");
+            System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
             return false;
         }
 
@@ -111,7 +94,7 @@ public class ReservaDAO {
         }
 
         // Inserción en la base de datos
-        String query = "INSERT INTO Reservas (usuarioId, fechaHora, duracion, pistaId, precio, descuento, tipoReserva, numNinos, numAdultos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = properties.getProperty("insert_reserva");
         boolean respuesta = false;
 
         DBConnection db = new DBConnection();
@@ -215,14 +198,12 @@ public class ReservaDAO {
         }
 
         // Inserción en la base de datos
-        String queryInsertReserva = "INSERT INTO Reservas (usuarioId, fechaHora, duracion, pistaId, precio, descuento, tipoReserva, numNinos, numAdultos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        String queryUpdateBono = "UPDATE Bonos SET sesiones = sesiones - 1, fechaInicio = IFNULL(fechaInicio, ?) WHERE idBono = ?";
+        String queryInsertReserva = properties.getProperty("insert_reserva");
         boolean respuesta = false;
 
         DBConnection db = new DBConnection();
         connection = db.getConnection();
 
-        float descuentoTotal= 0.05f;
         try {
             // Usar transacción para asegurarse de que ambas operaciones (reserva y actualización del bono) sean atómicas
             connection.setAutoCommit(false);
@@ -234,34 +215,22 @@ public class ReservaDAO {
                 statement.setInt(3, duracion);
                 statement.setInt(4, pistaId);
                 statement.setFloat(5, precio);
-                statement.setFloat(6, descuentoTotal); // Descuento aplicado siempre para bonos
+                statement.setFloat(6, descuento); // Descuento aplicado siempre para bonos
                 statement.setString(7, tipoReservaString);
                 statement.setObject(8, numeroNinos > 0 ? numeroNinos : null); // NULL si no aplica
                 statement.setObject(9, numeroAdultos > 0 ? numeroAdultos : null); // NULL si no aplica
 
                 int rowsInserted = statement.executeUpdate();
                 if (rowsInserted <= 0) {
-                    connection.rollback(); // Revertir cambios si falla
-                    System.out.println("ERROR! No se pudo insertar la reserva.");
+                    System.out.println(" ERROR! No se pudo insertar la reserva.");
                     return false;
                 }
             }
 
             // Actualizar el bono
-            try (PreparedStatement statement = connection.prepareStatement(queryUpdateBono)) {
-                statement.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Fecha de inicio (hoy)
-                statement.setInt(2, bonoId);
-
-                int rowsUpdated = statement.executeUpdate();
-                if (rowsUpdated <= 0) {
-                    connection.rollback(); // Revertir cambios si falla
-                    System.out.println("ERROR! No se pudo actualizar el bono.");
-                    return false;
-                }
-            }
+            actualizarSesionesBono(bonoId);
 
             // Confirmar transacción
-            connection.commit();
             respuesta = true;
 
         } catch (SQLException e) {
@@ -280,12 +249,17 @@ public class ReservaDAO {
         return respuesta;
     }
    
+    
+    /**
+	 * Genera un nuevo bono de usuario.
+	 * @param correoElectronico Correo del usuario que pide el bono.
+	 * @return Devuelve el codigo de error del proceso.
+	 */
     public int calcularAntiguedadJugador(String correoElectronico) {
     	String queryBuscar = properties.getProperty("buscar_por_correo");
         DBConnection db = new DBConnection();
         connection = db.getConnection();
         java.sql.Date fechaInscripcion;
-        String nombreCompleto;
 
         try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
 
@@ -468,63 +442,7 @@ public class ReservaDAO {
     	PistaDAO pista = new PistaDAO();
     	return pista.findPistaByNombre(nombre);
     }
-    
-    
-    /**
-	 * Guarda la reserva en el archivo reservas.txt
-	 * @param reserva Clase Reserva que tiene todos los datos de la reserva.
-	 * @param idReserva Identificador único de la reserva.
-	 */
-    private void guardarReserva(ReservaDTO reserva, int idReserva) {
-    	String query= properties.getProperty("insert_reserva");
-        
-    	DBConnection db = new DBConnection();
-        connection = db.getConnection();
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            String tipoReserva;
-            if (reserva instanceof ReservaInfantilDTO) {
-                tipoReserva = "INFANTIL";
-            } else if (reserva instanceof ReservaFamiliarDTO) {
-                tipoReserva = "FAMILIAR";
-            } else if (reserva instanceof ReservaAdultosDTO) {
-                tipoReserva = "ADULTOS";
-            } else {
-                throw new IllegalArgumentException(" ERROR! Tipo de reserva desconocido");
-            }
-
-            // Configurar los parámetros de la consulta SQL
-            stmt.setInt(1, reserva.getUsuarioId());            
-            stmt.setTimestamp(2, new java.sql.Timestamp(reserva.getFechaHora().getTime()));
-            stmt.setInt(4, reserva.getPistaId());
-            stmt.setInt(6, reserva.getDuracion());
-            stmt.setFloat(7, reserva.getPrecio());
-            stmt.setFloat(8, reserva.getDescuento());
-            stmt.setString(7, tipoReserva);
-
-            // Configurar parámetros específicos según el tipo de reserva
-            if (reserva instanceof ReservaInfantilDTO) {
-                stmt.setInt(9, ((ReservaInfantilDTO) reserva).getNumNinos());
-                stmt.setNull(10, java.sql.Types.INTEGER); // No hay adultos en la reserva infantil
-            } else if (reserva instanceof ReservaFamiliarDTO) {
-                stmt.setInt(9, ((ReservaFamiliarDTO) reserva).getNumNinos());
-                stmt.setInt(10, ((ReservaFamiliarDTO) reserva).getNumAdultos());
-            } else if (reserva instanceof ReservaAdultosDTO) {
-                stmt.setNull(9, java.sql.Types.INTEGER); // No hay niños en la reserva de adultos
-                stmt.setInt(10, ((ReservaAdultosDTO) reserva).getNumAdultos());
-            }
-
-            // Ejecutar la consulta SQL
-            stmt.executeUpdate();
-            System.out.println("Reserva guardada exitosamente en la base de datos.");
-        } catch (SQLException e) {
-            System.out.println(" ERROR! Error al guardar la reserva en la base de datos: " + e.getMessage());
-        } finally {
-            // Cerrar la conexión usando el método de DBConnection
-            db.closeConnection();
-        }
-    }
-    
+ 
     
     /**
 	 * Comprueba si el bono tiene sesiones disponibles, si no está caducado, si el bono es de la persona que intenta aceder a él 
@@ -742,7 +660,7 @@ public class ReservaDAO {
                 System.out.println("Usuario ID: " + usuarioId);
                 System.out.println("Pista ID: " + pistaId);
                 System.out.println("Fecha Reserva: " + sdf.format(fechaHora));
-                System.out.println("Duración: " + duracion + " horas");
+                System.out.println("Duración: " + duracion + " minutos");
                 System.out.println("Precio: " + precio + " €");
                 System.out.println("Descuento: " + descuento);
                 
@@ -858,10 +776,12 @@ public class ReservaDAO {
 	/**
 	 * Función que calcula si muestra todos los detalles de las reservas con una fecha y pista exacta.
 	 * @param fechaBuscada Fecha de la reserva a filtrar.
-	 * @param idPista Identificador de la pista a filtrar.
+	 * @param nombrePista Nombre de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
+	public int listarReservasPorFechaYPista(Date fechaBuscada, String nombrePista) {
+		
+		int pistaId = buscarIdPista(nombrePista);
 		String query = properties.getProperty("buscar_fecha_pista");
 	    int codigo = 0;
 	    
@@ -869,7 +789,7 @@ public class ReservaDAO {
 	    connection = db.getConnection();
         
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-        	stmt.setInt(1, idPista);
+        	stmt.setInt(1, pistaId);
         	stmt.setDate(2, new java.sql.Date(fechaBuscada.getTime()));
         	
             ResultSet rs = stmt.executeQuery();
@@ -885,7 +805,6 @@ public class ReservaDAO {
                 String idReserva = rs.getString("idReserva");
                 String tipoReserva= rs.getString("tipoReserva");
                 int usuarioId = rs.getInt("usuarioId");
-                int pistaId = rs.getInt("pistaId");
                 java.util.Date fechaReserva = rs.getTimestamp("fechaHora");
                 int duracion = rs.getInt("duracion");
                 float precio = rs.getFloat("precio");
@@ -900,7 +819,7 @@ public class ReservaDAO {
                 System.out.println("Usuario ID: " + usuarioId);
                 System.out.println("Pista ID: " + pistaId);
                 System.out.println("Fecha Reserva: " + sdf.format(fechaReserva));
-                System.out.println("Duración: " + duracion + " horas");
+                System.out.println("Duración: " + duracion + " minutos");
                 System.out.println("Precio: " + precio + " €");
                 System.out.println("Descuento: " + descuento);
                 
