@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.BufferedReader;
@@ -36,10 +37,7 @@ import java.time.LocalDate;
  */
 public class ReservaDAO {
 	
-    private final String rutaArchivoJugadores = "src/es/uco/pw/files/users.txt";
-    private final String rutaArchivoPistas = "src/es/uco/pw/files/pistas.txt";
     private final String rutaArchivoReservas = "src/es/uco/pw/files/reservas.txt";
-    private final String rutaArchivoBonos = "src/es/uco/pw/files/bonos.txt";
 
 
 	/**
@@ -65,97 +63,83 @@ public class ReservaDAO {
     }
     
     public boolean hacerReservaIndividual(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva) {
-        
-        // Validar que los datos iniciales no sean nulos o incorrectos
-        if (correoUsuario == null || correoUsuario.isEmpty()) {
-            System.out.println(" ERROR! El correo no puede estar vacío.");
+        int jugador = buscarIdJugador(correoUsuario); // Obtener el ID del jugador
+        int pistaId = buscarIdPista(nombrePista); // Obtener el ID de la pista
+
+        // Comprobación adicional para evitar reservas en la misma pista y hora
+        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
+            System.out.println("ERROR! Ya existe una reserva para la misma pista y horario.");
             return false;
         }
-        if (nombrePista == null || nombrePista.isEmpty()) {
-            System.out.println(" ERROR! El nombre de la pista no puede estar vacío.");
+
+        // Validaciones de existencia y disponibilidad
+        if (jugador == -1) {
+            System.out.println("ERROR! El usuario no existe.");
             return false;
         }
-        if (fechaHora == null) {
-            System.out.println(" ERROR! La fecha y hora no pueden estar vacías.");
-            return false;
-        }
-        if (duracion != 60 && duracion != 90 && duracion != 120) {
-            System.out.println(" ERROR! Duración no válida. Solo se permiten 60, 90 o 120 minutos.");
-            return false;
-        }
-        if (tipoReserva == null) {
-            System.out.println(" ERROR! El tipo de reserva no puede estar vacío.");
-            return false;
-        }
-        
-        // Validar que el usuario exista
-        JugadorDTO jugador = buscarJugador(correoUsuario);
-        if (jugador == null) {
-            System.out.println(" ERROR! El usuario no existe.");
-            return false;
-        }
-        
-        // Validar que la pista exista y esté disponible
         PistaDTO pista = buscarPista(nombrePista);
         if (pista == null) {
-            System.out.println(" ERROR! La pista no existe.");
+            System.out.println("ERROR! La pista no existe.");
             return false;
         }
         if (!pista.isDisponible()) {
-            System.out.println(" ERROR! La pista no está disponible.");
+            System.out.println("ERROR! La pista no está disponible.");
             return false;
         }
-
-        // Validar que no exista una reserva para la misma pista y hora
-        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
-            System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
-            return false;
-        }
-        
-        // Validar que no se reserve la pista con menos de 24 horas de anticipación
         if (plazoExcedido(fechaHora)) {
-            System.out.println(" ERROR! No se puede reservar una pista con menos de 24 horas de antelación.");
-            return false;
-        }
-        
-        // Validar que los números de adultos y niños sean coherentes con el tipo de reserva
-        if (tipoReserva == ReservaInfantilDTO.class && numeroNinos <= 0) {
-            System.out.println(" ERROR! Para reservas infantiles, debe haber al menos un niño.");
-            return false;
-        }
-        if (tipoReserva == ReservaFamiliarDTO.class && (numeroAdultos <= 0 || numeroNinos <= 0)) {
-            System.out.println(" ERROR! Para reservas familiares, debe haber al menos un adulto y un niño.");
-            return false;
-        }
-        if (tipoReserva == ReservaAdultosDTO.class && numeroAdultos <= 0) {
-            System.out.println(" ERROR! Para reservas de adultos, debe haber al menos un adulto.");
+            System.out.println("ERROR! No se puede reservar una pista antes de 24 horas.");
             return false;
         }
 
-        String idReserva= generarIdentificadorUnicoReservas();
-        
-        ReservaDTO reserva = null;
+        // Calcular precio y descuento
         float precio = calcularPrecio(duracion);
-        float descuento = jugador.calcularAntiguedad() > 2 ? precio * 0.1f : 0;
+        float descuento = calcularAntiguedadJugador(correoUsuario) > 2 ? precio * 0.1f : 0;
 
-        // Crear la instancia de la reserva de acuerdo con el tipo
+        String tipoReservaString = null;
+
+        // Determinar el tipo de reserva
         if (tipoReserva == ReservaInfantilDTO.class && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) {
-            reserva = new ReservaInfantilDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroNinos);
-        } else if (tipoReserva == ReservaFamiliarDTO.class && (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
-            reserva = new ReservaFamiliarDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
+            tipoReservaString = "INFANTIL";
+        } else if (tipoReserva == ReservaFamiliarDTO.class && 
+                   (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
+            tipoReservaString = "FAMILIAR";
         } else if (tipoReserva == ReservaAdultosDTO.class) {
-            reserva = new ReservaAdultosDTO(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
+            tipoReservaString = "ADULTOS";
+        } else {
+            System.out.println("ERROR! Tipo incorrecto de reserva.");
+            return false;
         }
 
-        if (reserva != null) {
-            guardarReservaEnArchivo(reserva, idReserva);
-            return true;
+        // Inserción en la base de datos
+        String query = "INSERT INTO Reservas (usuarioId, fechaHora, duracion, pistaId, precio, descuento, tipoReserva, numNinos, numAdultos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        boolean respuesta = false;
+
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, jugador);
+            statement.setTimestamp(2, new java.sql.Timestamp(fechaHora.getTime()));
+            statement.setInt(3, duracion);
+            statement.setInt(4, pistaId);
+            statement.setFloat(5, precio);
+            statement.setFloat(6, descuento); // True si hay descuento
+            statement.setString(7, tipoReservaString);
+            statement.setObject(8, numeroNinos > 0 ? numeroNinos : null); // NULL si no aplica
+            statement.setObject(9, numeroAdultos > 0 ? numeroAdultos : null); // NULL si no aplica
+
+            int rowsInserted = statement.executeUpdate();
+            respuesta = rowsInserted > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al insertar la reserva: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.closeConnection();
         }
-        
-        System.out.println(" ERROR! Tipo incorrecto de reserva.\nADULTOS->Pistas ADULTOS.\nFAMILIAR-> Pistas MINIBASKET y 3v3.\nINFANTIL-> Pistas MINIBASKET");
-        return false;
-        
+
+        return respuesta;
     }
+
     
     /**
 	 * Realiza una reserva con bono.
@@ -169,89 +153,163 @@ public class ReservaDAO {
 	 * @param bonoId El identificador del bono con el que se va a realizar la reserva.
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
-    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, String bonoId) {
+    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, int bonoId) {
+        int jugador = buscarIdJugador(correoUsuario); // Obtener ID del jugador
+        int pistaId = buscarIdPista(nombrePista); // Obtener ID de la pista
 
-        // Buscar el jugador
-        JugadorDTO jugador = buscarJugador(correoUsuario);
-        if (jugador == null) {
-            System.out.println(" ERROR! El usuario no existe.");
+        // Comprobación adicional para evitar reservas en la misma pista y hora
+        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
+            System.out.println("ERROR! Ya existe una reserva para la misma pista y horario.");
             return false;
         }
 
-        // Buscar la pista
+        // Validaciones de existencia y disponibilidad
+        if (jugador == -1) {
+            System.out.println("ERROR! El usuario no existe.");
+            return false;
+        }
         PistaDTO pista = buscarPista(nombrePista);
         if (pista == null) {
-            System.out.println(" ERROR! La pista no existe.");
+            System.out.println("ERROR! La pista no existe.");
             return false;
         }
-
-        // Comprobación de disponibilidad de la pista
         if (!pista.isDisponible()) {
-            System.out.println(" ERROR! La pista no está disponible.");
+            System.out.println("ERROR! La pista no está disponible.");
             return false;
         }
-        
-        
-        // Verificar si ya existe una reserva para esa pista y horario
-        if (existeReservaParaPistaYHora(nombrePista, fechaHora)) {
-            System.out.println(" ERROR! Ya existe una reserva para la misma pista y horario.");
-            return false;
-        }
-
-        // Verificar que no se intenta reservar con menos de 24 horas de antelación
         if (plazoExcedido(fechaHora)) {
-            System.out.println(" ERROR! No se puede reservar una pista antes de 24 horas.");
+            System.out.println("ERROR! No se puede reservar una pista antes de 24 horas.");
             return false;
         }
-        
-        // 1. Comprobar que el bono es válido y compatible con el tipo de reserva
-        if (!comprobarBono(bonoId, correoUsuario, pista.getTamanoPista())) {
-            System.out.println(" ERROR! Bono no válido o incompatible con el tipo de pista.");
-            return false;
-        }      
 
-        int sesion;
-        try {
-            sesion = obtenerSesionesRestantes(bonoId);
-            if (sesion <= 0) {
-                System.out.println(" ERROR! No quedan sesiones disponibles en el bono.");
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println(" ERROR! No se pudo verificar las sesiones del bono: " + e.getMessage());
+        // Comprobación del bono
+        if (!comprobarBono(bonoId, correoUsuario, pista.getTamanoPista())) {
+            System.out.println("ERROR! El bono no es válido para esta reserva.");
             return false;
         }
-        
-        // 2. Realización de la reserva.
-        String idReserva= generarIdentificadorUnicoReservas();
-        
-        ReservaDTO reserva = null;
-        ReservaBonoFactory reservaBono = new ReservaBonoFactory(bonoId, sesion);
-    	
-        float precio = calcularPrecio(duracion);
-        float descuento = 0.05f;
-        
-        
-        if (tipoReserva == ReservaInfantilDTO.class && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) {
-        	reserva= reservaBono.createReservaInfantil(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroNinos);
-        } else if (tipoReserva == ReservaFamiliarDTO.class && (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
-            reserva= reservaBono.createReservaFamiliar(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos, numeroNinos);
-        } else if (tipoReserva == ReservaAdultosDTO.class) {
-            reserva= reservaBono.createReservaAdultos(correoUsuario, fechaHora, duracion, nombrePista, precio, descuento, numeroAdultos);
-        } 
-        
-        
-        // 3. Modificacion del número de reservas de bono y adición de la fecha si es su primera reserva.
-        if (reserva != null) {                
-            guardarReservaEnArchivo(reserva, idReserva);
-            return actualizarSesionesBono(bonoId);
+
+        int sesionesRestantes = obtenerSesionesRestantes(bonoId);
+
+        // Validar que queden sesiones disponibles
+        if (sesionesRestantes <= 0) {
+            System.out.println("ERROR! No quedan sesiones disponibles en el bono.");
+            return false;
         }
-        
-        System.out.println(" ERROR! Tipo incorrecto de reserva. El tipo del bono es distinto al de la reserva.");
-        return false;
-        
-    }	
-    
+
+        float precio = calcularPrecio(duracion);
+        float descuento = 0.05f; // Descuento fijo del bono
+
+        String tipoReservaString = null;
+
+        // Determinar el tipo de reserva
+        if (tipoReserva == ReservaInfantilDTO.class && pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET) {
+            tipoReservaString = "INFANTIL";
+        } else if (tipoReserva == ReservaFamiliarDTO.class && 
+                   (pista.getTamanoPista() == PistaDTO.TamanoPista.MINIBASKET || pista.getTamanoPista() == PistaDTO.TamanoPista.TRES_VS_TRES)) {
+            tipoReservaString = "FAMILIAR";
+        } else if (tipoReserva == ReservaAdultosDTO.class) {
+            tipoReservaString = "ADULTOS";
+        } else {
+            System.out.println("ERROR! Tipo incorrecto de reserva.");
+            return false;
+        }
+
+        // Inserción en la base de datos
+        String queryInsertReserva = "INSERT INTO Reservas (usuarioId, fechaHora, duracion, pistaId, precio, descuento, tipoReserva, numNinos, numAdultos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String queryUpdateBono = "UPDATE Bonos SET sesiones = sesiones - 1, fechaInicio = IFNULL(fechaInicio, ?) WHERE idBono = ?";
+        boolean respuesta = false;
+
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        float descuentoTotal= 0.05f;
+        try {
+            // Usar transacción para asegurarse de que ambas operaciones (reserva y actualización del bono) sean atómicas
+            connection.setAutoCommit(false);
+
+            // Insertar reserva
+            try (PreparedStatement statement = connection.prepareStatement(queryInsertReserva)) {
+                statement.setInt(1, jugador);
+                statement.setTimestamp(2, new java.sql.Timestamp(fechaHora.getTime()));
+                statement.setInt(3, duracion);
+                statement.setInt(4, pistaId);
+                statement.setFloat(5, precio);
+                statement.setFloat(6, descuentoTotal); // Descuento aplicado siempre para bonos
+                statement.setString(7, tipoReservaString);
+                statement.setObject(8, numeroNinos > 0 ? numeroNinos : null); // NULL si no aplica
+                statement.setObject(9, numeroAdultos > 0 ? numeroAdultos : null); // NULL si no aplica
+
+                int rowsInserted = statement.executeUpdate();
+                if (rowsInserted <= 0) {
+                    connection.rollback(); // Revertir cambios si falla
+                    System.out.println("ERROR! No se pudo insertar la reserva.");
+                    return false;
+                }
+            }
+
+            // Actualizar el bono
+            try (PreparedStatement statement = connection.prepareStatement(queryUpdateBono)) {
+                statement.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Fecha de inicio (hoy)
+                statement.setInt(2, bonoId);
+
+                int rowsUpdated = statement.executeUpdate();
+                if (rowsUpdated <= 0) {
+                    connection.rollback(); // Revertir cambios si falla
+                    System.out.println("ERROR! No se pudo actualizar el bono.");
+                    return false;
+                }
+            }
+
+            // Confirmar transacción
+            connection.commit();
+            respuesta = true;
+
+        } catch (SQLException e) {
+            System.err.println("Error al realizar la reserva con bono: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                connection.rollback(); // Revertir cambios en caso de error
+            } catch (SQLException rollbackEx) {
+                System.err.println("Error al hacer rollback: " + rollbackEx.getMessage());
+                rollbackEx.printStackTrace();
+            }
+        } finally {
+            db.closeConnection();
+        }
+
+        return respuesta;
+    }
+   
+    public int calcularAntiguedadJugador(String correoElectronico) {
+    	String queryBuscar = properties.getProperty("buscar_por_correo");
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+        java.sql.Date fechaInscripcion;
+        String nombreCompleto;
+
+        try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
+
+            // Comprobar si el usuario ya existe mediante el correo electrónico.
+            statementBuscar.setString(1, correoElectronico);
+            ResultSet rs = statementBuscar.executeQuery();
+
+            if (rs.next()) {
+            	fechaInscripcion= rs.getDate("fechaInscripcion");
+            	if (fechaInscripcion == null) {
+            		return 0;
+            	}
+                long diffInMillis = new Date().getTime() - fechaInscripcion.getTime();
+                return (int) TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS) / 365;
+            	
+            }
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
+	        return -1; // Código para indicar error general de base de datos.
+	    } finally {
+	        db.closeConnection();
+	    }
+        return -1;
+    }
     
     /**
 	 * Genera un nuevo bono de usuario.
@@ -260,122 +318,59 @@ public class ReservaDAO {
 	 * @return Devuelve true si el procedimiento de creacion del bono se ha hecho de manera correcta, y false si hay algo que falla.
 	 */
     public boolean hacerNuevoBono(String correoUsuario, TamanoPista tamano){
-        // Validar que el jugador exista
-        JugadorDTO jugador = buscarJugador(correoUsuario);
-        if (jugador == null) {
-            System.out.println(" ERROR! El usuario no existe.");
-            return false;
-        }
-
-        // Validar que el tamaño de la pista no sea nulo
-        if (tamano == null) {
-            System.out.println(" ERROR! El tamaño de la pista no puede ser nulo.");
-            return false;
-        }
+    	    	
+    	JugadorDAO jugador= new JugadorDAO();
+    	int idUsuario= -1;
     	
+    	String queryInsert = properties.getProperty("insert_bono");   
+    	String queryJugador= properties.getProperty("buscar_por_correo");
+    	
+    	DBConnection dbConnection = new DBConnection();
+    	connection = dbConnection.getConnection();
+ 	
+        if(jugador.buscarUsuarioPorCorreo(correoUsuario) != 1) {
+        	return false;
+        }
+  
     	// Valor por defecto para las sesiones de un bono nuevo
     	int sesiones = 5;
     	
-    	// La fecha de la primera sesión será un valor vacío
-    	String fechaPrimeraSesion = "";
-    	
-    	// Generar identificador único para el bono
-    	String bonoId = generarIdentificadorUnicoBonos();
-    	
-    	try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoBonos, true))) {
-    		writer.write(bonoId + ";" + correoUsuario + ";" + tamano.toString() + ";" + sesiones + ";" + fechaPrimeraSesion);
-    		writer.newLine();  // Añadir una nueva línea al final
-    	} catch (IOException e) {
-            System.out.println(" ERROR! No se pudo guardar el bono en el archivo: " + e.getMessage());
+    	try (PreparedStatement stmtJugador = connection.prepareStatement(queryJugador)) {
+    		stmtJugador.setString(1, correoUsuario);
+    		
+    		ResultSet rs = stmtJugador.executeQuery();
+
+            // Si la consulta devuelve un resultado
+            if (rs.next()) {
+                // Obtener el valor de id_usuario del ResultSet
+                idUsuario = rs.getInt("idUsuario"); // Asegúrate de que "id_usuario" es el nombre correcto de la columna en tu base de datos
+            }
+            try (PreparedStatement stmtInsert = connection.prepareStatement(queryInsert)) {
+            	// Establecer los parámetros de la consulta
+            	stmtInsert.setInt(1, idUsuario);                // ID del usuario
+            	stmtInsert.setInt(2, sesiones);                 // Número de sesiones
+            	stmtInsert.setString(3, tamano.toString());     // Tamaño de la pista (usamos toString() para convertir a texto)
+            	
+            	// Ejecutar la consulta
+            	stmtInsert.executeUpdate();
+            	System.out.println("Bono creado exitosamente");
+            } catch (SQLException e) {
+            	System.out.println("ERROR! No se pudo insertar el nuevo bono en la base de datos: " + e.getMessage());
+            	e.printStackTrace();
+            	return false;
+            }
+    		
+    	} catch (SQLException e) {
+    		System.out.println(" ERROR! No se pudo acceder a la base de datos del Jugador: " + e.getMessage());
     		e.printStackTrace();
     		return false;
+    	} finally {		
+    		// Cerrar la conexión a la base de datos
+    		dbConnection.closeConnection();
     	}
-    	
     	// Si todo fue bien, retornamos true
     	return true;
-    }
-    
-
-    
-    /**
-	 * Genera un identificador unico respecto al último identificador del archivo bonos.txt
-	 * @return Devuelve true si el procedimiento de generar el código único es correcto, y false si ha habido algún error.
-	 */
-    private String generarIdentificadorUnicoBonos() {
-    	String ultimoId = "B_0000";  // Identificador inicial si el archivo está vacío o no existe
-    	String patron = "B_(\\d{4})"; // Expresión regular para identificar el formato B_XXXX
-    	
-    	try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoBonos))) {
-    		String linea;
-    		String ultimoBono = null;
-    		
-    		while ((linea = reader.readLine()) != null) {
-    			ultimoBono = linea;
-    		}
-    		
-    		if (ultimoBono != null) {
-    			
-    			String[] partes = ultimoBono.split(";");
-    			String idBonoActual = partes[0];
-    			
-    			
-    			Pattern pattern = Pattern.compile(patron);
-    			Matcher matcher = pattern.matcher(idBonoActual);
-    			
-    			if (matcher.matches()) {
-    				// Extraer el número actual y convertirlo a entero
-    				int numero = Integer.parseInt(matcher.group(1));
-    				// Incrementar en 1 el número y formatearlo como B_XXXX
-    				ultimoId = String.format("B_%04d", numero + 1);
-    			}
-    		}
-    	} catch (IOException e) {
-    		System.out.println(" ERROR! Error al generar el identificador unico: " + e.getMessage());
-    		e.printStackTrace();
-    	}
-    	
-    	return ultimoId;
-    }
-    
-    
-    /**
-	 * Genera un identificador unico respecto al último identificador del archivo reservas.txt
-	 * @return Devuelve true si el procedimiento de generar el código único es correcto, y false si ha habido algún error.
-	 */
-    private String generarIdentificadorUnicoReservas() {
-    	String ultimoId = "R_0000";  // Identificador inicial si el archivo está vacío o no existe
-    	String patron = "R_(\\d{4})"; // Expresión regular para identificar el formato B_XXXX
-    	
-    	try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
-    		String linea;
-    		String ultimoBono = null;
-    		
-    		while ((linea = reader.readLine()) != null) {
-    			ultimoBono = linea;
-    		}
-    		
-    		if (ultimoBono != null) {
-    			
-    			String[] partes = ultimoBono.split(";");
-    			String idBonoActual = partes[0];
-    			
-    			
-    			Pattern pattern = Pattern.compile(patron);
-    			Matcher matcher = pattern.matcher(idBonoActual);
-    			
-    			if (matcher.matches()) {
-    				// Extraer el número actual y convertirlo a entero
-    				int numero = Integer.parseInt(matcher.group(1));
-    				// Incrementar en 1 el número y formatearlo como B_XXXX
-    				ultimoId = String.format("R_%04d", numero + 1);
-    			}
-    		}
-    	} catch (IOException e) {
-    		System.out.println(" ERROR! Error al generar el identificador unico: " + e.getMessage());
-    		e.printStackTrace();
-    	}
-    	
-    	return ultimoId;
+        	
     }
 
     
@@ -399,43 +394,64 @@ public class ReservaDAO {
     
     
     /**
-     * Busca y devuelve un objeto Jugador a partir de su correo electrónico.
-     * Lee el archivo de jugadores línea por línea hasta encontrar el correo electrónico solicitado.
-     * Luego, convierte los datos en un objeto Jugador.
+     * Busca y devuelve el identificador del jugador con el correo descrito.
      *
      * @param correoElectronico Correo electrónico del jugador a buscar.
-     * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
-     *         o si ocurre algún error.
+     * @return El valor de su identificador.
      */
-    public JugadorDTO buscarJugador(String correoElectronico) {
-        if (correoElectronico == null || correoElectronico.isEmpty()) {
-            System.out.println(" ERROR! El correo electrónico proporcionado es nulo o está vacío.");
-            return null;
-        }
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoJugadores))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(";");
-                if (datos[2].equals(correoElectronico)) {
-                    // Ajustamos la conversión de fecha
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Ajusta el formato según cómo esté almacenada la fecha en el archivo
-                    Date fechaNacimiento;
-                    try {
-                        fechaNacimiento = sdf.parse(datos[1]);  // Convertimos la fecha de nacimiento a Date
-                    } catch (ParseException e) {
-                        System.out.println(" ERROR! Error al parsear la fecha de nacimiento: " + e.getMessage());
-                        return null;
-                    }
-                    
-                    // Creamos el objeto Jugador con los datos adaptados
-                    return new JugadorDTO(datos[0], fechaNacimiento, datos[2]); // nombreCompleto, fechaNacimiento, correoElectronico
-                }
-            }           
-        } catch (IOException e) {
-            System.out.println(" ERROR! Error al buscar jugador: " + e.getMessage());
-        }
-        return null;
+    public int buscarIdJugador(String correoElectronico) {
+        String queryBuscar = properties.getProperty("buscar_por_correo");
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+        int idJugador= -1;
+
+        try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
+
+            // Comprobar si el usuario ya existe mediante el correo electrónico.
+            statementBuscar.setString(1, correoElectronico);
+            ResultSet rs = statementBuscar.executeQuery();
+
+            if (rs.next()) {
+            	idJugador= rs.getInt("idUsuario");
+            }
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
+	        return -1; // Código para indicar error general de base de datos.
+	    } finally {
+	        db.closeConnection();
+	    }
+        return idJugador;
+    }
+    
+    
+    /**
+     * Busca y devuelve el identificador de la pista con el nombre a buscar.
+     *
+     * @param nombre Nombre de la pista a buscar.
+     * @return El identificador de la pista con el nombre de pista nombre.
+     */
+    public int buscarIdPista(String nombre) {
+    	String queryBuscar = properties.getProperty("find_pista_by_nombre");
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+        int idPista= -1;
+
+        try (PreparedStatement statementBuscar = connection.prepareStatement(queryBuscar)) {
+
+            // Comprobar si el usuario ya existe mediante el correo electrónico.
+            statementBuscar.setString(1, nombre);
+            ResultSet rs = statementBuscar.executeQuery();
+
+            if (rs.next()) {
+            	idPista= rs.getInt("idPista");
+            }
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
+	        return -1; // Código para indicar error general de base de datos.
+	    } finally {
+	        db.closeConnection();
+	    }
+        return idPista;
     }
     
     
@@ -449,19 +465,8 @@ public class ReservaDAO {
      *         o si ocurre algún error.
      */
     public PistaDTO buscarPista(String nombre) {
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivoPistas))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(";");
-                if (datos[0].equals(nombre)) {
-                    return new PistaDTO(datos[0], Boolean.parseBoolean(datos[2]), Boolean.parseBoolean(datos[3]), PistaDTO.TamanoPista.valueOf(datos[1]), Integer.parseInt(datos[4]));
-
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(" ERROR! Error al buscar pista: " + e.getMessage());
-        }
-        return null;
+    	PistaDAO pista = new PistaDAO();
+    	return pista.findPistaByNombre(nombre);
     }
     
     
@@ -470,9 +475,13 @@ public class ReservaDAO {
 	 * @param reserva Clase Reserva que tiene todos los datos de la reserva.
 	 * @param idReserva Identificador único de la reserva.
 	 */
-    private void guardarReservaEnArchivo(ReservaDTO reserva, String idReserva) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivoReservas, true))) {
+    private void guardarReserva(ReservaDTO reserva, int idReserva) {
+    	String query= properties.getProperty("insert_reserva");
+        
+    	DBConnection db = new DBConnection();
+        connection = db.getConnection();
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             String tipoReserva;
             if (reserva instanceof ReservaInfantilDTO) {
                 tipoReserva = "INFANTIL";
@@ -481,20 +490,38 @@ public class ReservaDAO {
             } else if (reserva instanceof ReservaAdultosDTO) {
                 tipoReserva = "ADULTOS";
             } else {
-                throw new IllegalArgumentException("Tipo de reserva desconocido");
+                throw new IllegalArgumentException(" ERROR! Tipo de reserva desconocido");
             }
 
-            String linea = idReserva + ";" + tipoReserva + ";" + reserva.getUsuarioId() + ";" + reserva.getPistaId() + ";" 
-                           + sdf.format(reserva.getFechaHora()) + ";" + reserva.getDuracion() + ";" 
-                           + reserva.getPrecio() + ";" + reserva.getDescuento() + ";" 
-                           + ((reserva instanceof ReservaInfantilDTO) ? ((ReservaInfantilDTO) reserva).getNumNinos()
-                           : (reserva instanceof ReservaFamiliarDTO) ? ((ReservaFamiliarDTO) reserva).getNumNinos() + ";" + ((ReservaFamiliarDTO) reserva).getNumAdultos()
-                           : ((ReservaAdultosDTO) reserva).getNumAdultos());
+            // Configurar los parámetros de la consulta SQL
+            stmt.setInt(1, reserva.getUsuarioId());            
+            stmt.setTimestamp(2, new java.sql.Timestamp(reserva.getFechaHora().getTime()));
+            stmt.setInt(4, reserva.getPistaId());
+            stmt.setInt(6, reserva.getDuracion());
+            stmt.setFloat(7, reserva.getPrecio());
+            stmt.setFloat(8, reserva.getDescuento());
+            stmt.setString(7, tipoReserva);
 
-            bw.write(linea);
-            bw.newLine();
-        } catch (IOException e) {
-            System.out.println(" ERROR! Error al guardar reserva en el archivo: " + e.getMessage());
+            // Configurar parámetros específicos según el tipo de reserva
+            if (reserva instanceof ReservaInfantilDTO) {
+                stmt.setInt(9, ((ReservaInfantilDTO) reserva).getNumNinos());
+                stmt.setNull(10, java.sql.Types.INTEGER); // No hay adultos en la reserva infantil
+            } else if (reserva instanceof ReservaFamiliarDTO) {
+                stmt.setInt(9, ((ReservaFamiliarDTO) reserva).getNumNinos());
+                stmt.setInt(10, ((ReservaFamiliarDTO) reserva).getNumAdultos());
+            } else if (reserva instanceof ReservaAdultosDTO) {
+                stmt.setNull(9, java.sql.Types.INTEGER); // No hay niños en la reserva de adultos
+                stmt.setInt(10, ((ReservaAdultosDTO) reserva).getNumAdultos());
+            }
+
+            // Ejecutar la consulta SQL
+            stmt.executeUpdate();
+            System.out.println("Reserva guardada exitosamente en la base de datos.");
+        } catch (SQLException e) {
+            System.out.println(" ERROR! Error al guardar la reserva en la base de datos: " + e.getMessage());
+        } finally {
+            // Cerrar la conexión usando el método de DBConnection
+            db.closeConnection();
         }
     }
     
@@ -508,93 +535,72 @@ public class ReservaDAO {
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si contradice una de las condiciones
 	 * 		   o si ha habido un error.
 	 */
-    public boolean comprobarBono(String bonoId, String correoUsuario, TamanoPista tamano) {
-    	File archivoBonos = new File(rutaArchivoBonos);
+    public boolean comprobarBono(int bonoId, String correoUsuario, TamanoPista tamano) {
+    	String query = properties.getProperty("buscar_bono");
+    	
+    	DBConnection db = new DBConnection();
+    	connection = db.getConnection();
     	
     	boolean bonoFound = false;
     	int sesiones = 0;
     	Date fechaBono = null;
-    	String correoPropietario = "";
+    	int idPropietario = -1;
     	
-    	try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos))) {
-    		String line;
-    		
-    		while ((line = reader.readLine()) != null) {
-    			String[] fields = line.split(";");
-    			if (fields.length >= 4 && fields[0].equals(bonoId)) {
-    				bonoFound = true;
-    				correoPropietario = fields[1].trim();
-    				
-                    try {
-                        sesiones = Integer.parseInt(fields[3].trim());
-                    } catch (NumberFormatException e) {
-                        System.out.println(" ERROR! El formato del número de sesiones no es válido.");
-                        return false;
-                    }
-    				
-    				//Si hay fecha se guarda
-    				if (fields.length >= 5) {
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                            fechaBono = sdf.parse(fields[4].trim());
-                        } catch (ParseException e) {
-                            System.out.println(" ERROR! El formato de la fecha no es válido.");
-                            return false;
-                        }
-    				}
-    				
-    				String tamanoString= fields[2];
-    				TamanoPista tamanoBono;
-    				
-                    try {
-                        tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.out.println(" ERROR! El tamaño del bono no es válido.");
-                        return false;
-                    }
-    				
-    				//Comprueba si se realiza una reserva del mismo tamaño de pista que el del bono.
-    				if(tamanoBono!=tamano) {
-    					System.out.println(" ERROR! La reserva que se intenta hacer no es del mismo tipo de tamaño de pista que el del bono.");
-    					return false;
-    				}
-    				break;
-    			}
-    			
-    		}
-        } catch (IOException e) {
-            System.out.println(" ERROR! Error al leer el archivo de bonos: " + e.getMessage());
+    	try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, bonoId);  // Asigna el id del bono al parámetro de la consulta
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Se encontró el bono
+                bonoFound = true;
+                idPropietario = rs.getInt("usuarioId");
+                sesiones = rs.getInt("sesiones");
+                fechaBono = rs.getTimestamp("fechaCaducidad");  // Obtener la fecha de la primera sesión como Timestamp
+                
+                String tamanoString = rs.getString("tipoPista");
+                TamanoPista tamanoBono = TamanoPista.valueOf(tamanoString.toUpperCase());
+
+                // Comprobar si el tamaño de la pista coincide con el del bono
+                if (!tamanoBono.equals(tamano)) {
+                    System.out.println(" ERROR! La reserva que se intenta hacer no es del mismo tipo de tamaño de pista que el del bono.");
+                    return false;
+                }
+            } 
+            
+            else {
+                System.out.println(" ERROR! El bono utilizado no existe.");
+                return bonoFound;
+            }
+
+        } catch (SQLException e) {
+            System.out.println(" ERROR! Error al acceder a la base de datos: " + e.getMessage());
             e.printStackTrace();
             return false;
+        } finally {
+            db.closeConnection();
         }
-    	
-    	// Comprobar que el bono existe, y tiene sesiones disponibles.
-    	if (!bonoFound) {
-    		System.out.println(" ERROR! El bono utiizado no existe.");
-    		return false;
-    	}
-    	
-    	if (sesiones <= 0) {
-    		System.out.println(" ERROR! El bono ya no le quedan sesiones");
-    	}
-    	
-    	// Comprobar que el bono pertenece al usuario que intenta acceder a él.
-    	if (!correoPropietario.equals(correoUsuario)) {
-    		System.out.println(" ERROR! El bono no es del propietario que intenta hacer la reserva.");
-    		return false;
-    	}
-    	
-    	// Verificar que la fecha del bono no exceda en un año la fecha actual
-    	if (fechaBono != null) {
-    	    Calendar cal = Calendar.getInstance();
-    	    cal.setTime(fechaBono);
-    	    cal.add(Calendar.YEAR, 1);
-    	    if (new Date().after(cal.getTime())) {
-    	    	System.out.println(" ERROR! El bono está caducado.");
-    	    	return false;
-    	    }
-    	}
-    	
+
+        // Comprobar que el bono tiene sesiones disponibles
+        if (sesiones == 0) {
+            System.out.println(" ERROR! El bono ya no tiene sesiones disponibles.");
+            return false;
+        }
+
+        int idComprobar= buscarIdJugador(correoUsuario);
+        // Comprobar que el bono pertenece al usuario que intenta acceder a él
+        if (idComprobar!=idPropietario) {
+            System.out.println(" ERROR! El bono no pertenece al usuario que intenta hacer la reserva.");
+            return false;
+        }
+
+        // Verificar que la fecha del bono no exceda en un año la fecha actual
+        if(fechaBono!=null) {
+        	if (plazoExcedido(fechaBono)) {
+        		System.out.println(" ERROR! El bono está caducado.");
+        		return false;
+        	}        	
+        }
+	    	
     	return true; // El bono es válido
     }
 
@@ -604,64 +610,76 @@ public class ReservaDAO {
 	 * @param bonoId Identificador único del bono.
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si ha habido algun error.
 	 */
-	public boolean actualizarSesionesBono(String bonoId) {
-	    File archivoBonos = new File(rutaArchivoBonos);
-	    File tempFile = new File(archivoBonos.getAbsolutePath() + ".tmp");
-	
-	    try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos));
-	         PrintWriter writer = new PrintWriter(new FileWriter(tempFile))) {
-	
-	        String line;
-	        boolean bonoFound = false;
-	
-	        while ((line = reader.readLine()) != null) {
-	            String[] fields = line.split(";");
-	            if (fields.length >= 4 && fields[0].equals(bonoId)) {
-	                // Se encontró el bono
-	                int sesiones = Integer.parseInt(fields[3].trim());
-	                bonoFound = true;
-	
-	                // Verificar si es la primera reserva que realiza el bono.
+	public boolean actualizarSesionesBono(int bonoId) {
+		
+		String queryBuscarBono = properties.getProperty("buscar_bono");
+		String queryActualizarBono= properties.getProperty("update_bono");
+	    
+	    DBConnection db = new DBConnection();
+	    connection = db.getConnection();
+	    
+	    try {
+	        // Paso 1: Buscar el bono por su ID
+	        try (PreparedStatement stmtBuscar = connection.prepareStatement(queryBuscarBono)) {
+	            stmtBuscar.setInt(1, bonoId);
+	            ResultSet rs = stmtBuscar.executeQuery();
+
+	            if (rs.next()) {
+	                int sesiones = rs.getInt("sesiones");
+	                java.sql.Date fechaInicio = rs.getDate("fechaInicio");
+	                java.sql.Date fechaCaducidad = rs.getDate("fechaCaducidad");
+
+	                // Verificar si es la primera reserva (sesiones = 5)
+	                
+	                java.sql.Date nuevaFechaPrimeraSesion;
+	                java.sql.Date nuevaFechaCaducidad;
 	                if (sesiones == 5) {
-	                	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-	                    String fechaActual = sdf.format(new Date());
-	                    writer.println(fields[0] + ";" + fields[1] + ";" + fields[2] + ";" + (sesiones - 1) + ";" + fechaActual);
-	                } else {
-	                    // Decrementar el número de sesiones
-	                    writer.println(fields[0] + ";" + fields[1] + ";" + fields[2] + ";" + (sesiones - 1) + ";" + fields[4]);
+	                	nuevaFechaPrimeraSesion = new java.sql.Date(new Date().getTime());
+	                	
+	                	Calendar calendar = Calendar.getInstance();
+	                    calendar.setTime(nuevaFechaPrimeraSesion);
+	                    calendar.add(Calendar.YEAR, 1);
+	                    nuevaFechaCaducidad = new java.sql.Date(calendar.getTimeInMillis());
+	                    
+	                }
+	                else {
+	                	nuevaFechaPrimeraSesion= fechaInicio;
+	                	nuevaFechaCaducidad= fechaCaducidad;
+	                }
+
+	                // Paso 2: Decrementar el número de sesiones
+	                int nuevasSesiones = sesiones - 1;
+	                if (nuevasSesiones < 0) {
+	                    System.out.println(" ERROR! El bono no tiene más sesiones disponibles.");
+	                    return false;
+	                }
+
+	                // Paso 3: Actualizar el bono en la base de datos
+	                try (PreparedStatement stmtActualizar = connection.prepareStatement(queryActualizarBono)) {
+	                    stmtActualizar.setInt(1, nuevasSesiones);
+	                    stmtActualizar.setDate(2, nuevaFechaPrimeraSesion); // Actualizar la fecha de la primera sesión si es necesario
+	                    stmtActualizar.setDate(3, nuevaFechaCaducidad);
+	                    stmtActualizar.setInt(4, bonoId);
+
+	                    int rowsUpdated = stmtActualizar.executeUpdate();
+	                    if (rowsUpdated <= 0) {
+	                        System.out.println(" ERROR! No se pudo actualizar el bono.");
+	                        return false;
+	                    }
 	                }
 	            } else {
-	                // Escribir la línea original si no es la del bono
-	                writer.println(line);
-	            }
-	        }
-	
-	        // Si se encontró el bono, renombrar el archivo temporal
-	        if (bonoFound) {
-	            boolean archivoEliminado = archivoBonos.delete();
-	            if (!archivoEliminado) {
-	                System.out.println(" ERROR! No se pudo eliminar el archivo original.");
+	                System.out.println(" ERROR! No se encontró el bono con ID: " + bonoId);
 	                return false;
 	            }
-
-	            boolean archivoRenombrado = tempFile.renameTo(archivoBonos);
-	            if (!archivoRenombrado) {
-	                System.out.println(" ERROR! No se pudo renombrar el archivo temporal.");
-	                return false;
-	            }
-	        } else {
-	            // Si no se encontró el bono, eliminar el archivo temporal
-	            boolean archivoEliminadoTemp = tempFile.delete();
-	            if (!archivoEliminadoTemp) {
-	                System.out.println(" ERROR! No se pudo eliminar el archivo temporal.");
-	            }
 	        }
-	
-	    } catch (IOException e) {
+	    } catch (SQLException e) {
+	        System.out.println(" ERROR! No se pudo actualizar las sesiones del bono: " + e.getMessage());
 	        e.printStackTrace();
 	        return false;
+	    } finally {
+	        db.closeConnection();
 	    }
-	
+
 	    return true;
 	}
 	
@@ -672,30 +690,16 @@ public class ReservaDAO {
 	 * @return Devuelve true si se excedió el plazo, y devuelve false si no se ha excedido el plazo. 
 	 */
 	public static boolean plazoExcedido(Date fechaRecibida) {
-	    try {
-	        // Validar que la fecha recibida no sea nula
-	        if (fechaRecibida == null) {
-	            System.out.println(" ERROR! La fecha recibida es nula.");
-	            return true; // Consideramos que está excedido el plazo si la fecha es inválida
-	        }
 
-	        Date fechaActual = new Date();
-	
-	        // Crear una instancia de calendario para manipular la fecha
-	        Calendar cal = Calendar.getInstance();
-	        cal.setTime(fechaRecibida);
-	
-	        // Restar 24 horas a la fecha recibida
-	        cal.add(Calendar.HOUR_OF_DAY, -24);
-	
-	        return fechaActual.after(cal.getTime());
-	        
-	    } catch (Exception e) {
-	        System.out.println(" ERROR! Ocurrió un error al comprobar el plazo excedido: " + e.getMessage());
-	        e.printStackTrace();
-	        return true; // Por precaución, considerar que el plazo está excedido si hay un error
-	    }
-    }
+		Date fechaActual = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fechaRecibida);
+
+        cal.add(Calendar.HOUR_OF_DAY, -24);
+
+        return fechaActual.after(cal.getTime());
+	}
 	
 	
 	/**
@@ -704,88 +708,58 @@ public class ReservaDAO {
 	 */
 	public int listarReservasFuturas() {
         int codigo = 0;
+        String query = properties.getProperty("select_futuras");
+        
+        DBConnection db = new DBConnection();
+        connection = db.getConnection();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
 
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
             
-            String linea;
-            Date fecha;
-            boolean hayReservas = false;
-            boolean esFutura= false;
+            System.out.println("\n───────────────────────────────────────");
+            System.out.println("---------- Lista de Reservas ----------");
+            System.out.println("───────────────────────────────────────");
 
-            // Verificamos si el archivo contiene usuarios
-            System.out.println("\n Reservas realizadas:");
-            System.out.println("----------------------------");
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                // Cada línea tiene el formato: nombreCompleto, dd/MM/yyyy, correoElectronico
-                String[] datos = linea.split(";");
+            // Iterar sobre los resultados de la consulta
+            while (rs.next()) {
+                String idReserva = rs.getString("idReserva");
+                String tipoReserva= rs.getString("tipoReserva");
+                int usuarioId = rs.getInt("usuarioId");
+                int pistaId = rs.getInt("pistaId");
+                java.util.Date fechaHora = rs.getTimestamp("fechaHora");
+                int duracion = rs.getInt("duracion");
+                float precio = rs.getFloat("precio");
+                float descuento = rs.getFloat("descuento");
+                
+                int numAdultos = rs.getInt("numAdultos");
+                int numNinos = rs.getInt("numNinos");
 
-                if (datos.length == 9 || datos.length == 10) {
-                	hayReservas = true; // Se encontró al menos un usuario
-
-                    String id= datos[0];
-                    String tamano = datos[1];
-                    String correoUsuario = datos[2];
-                    String pistaId = datos[3];
-                    String fechaHoraString = datos[4];
-                    
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                        fecha = sdf.parse(fechaHoraString);
-                        Date fechaActual = new Date();
-                        esFutura = fecha.after(fechaActual);
-                    } catch (ParseException e) {
-                        System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
-                                           "Formato esperado: dd/MM/yyyy HH:mm.");
-                        continue; // Saltar a la siguiente línea en caso de error
-                    }
-                    
-                    if(esFutura) {
-                    	String duracion= datos[5];
-                    	String precio= datos[6];
-                    	String descuento= datos[7];
-                    	String numParticipantes= datos[8];
-                    	
-                    	// Mostramos la información del usuario
-                    	System.out.println("ID de reserva: " + id);
-                    	System.out.println("Tamaño de pista: " + tamano);
-                    	System.out.println("Correo del reservante: " + correoUsuario);
-                    	System.out.println("ID de pista: " + pistaId);
-                    	System.out.println("Fecha de reserva: " + fechaHoraString);
-                    	System.out.println("Duración: " + duracion + " mins.");
-                    	System.out.println("Precio: " + precio);
-                    	System.out.println("Descuento: " + descuento);
-                    	
-                    	if(datos.length == 9) {
-                    		System.out.println("Numero de participantes: " + numParticipantes);
-                    		
-                    	}
-                    	else if(datos.length == 10){
-                    		String numAdultos= datos[9];
-                    		System.out.println("Numero de niños: " + numParticipantes);
-                    		System.out.println("Numero de adultos: " + numAdultos);
-                    	}
-                    	
-                    	System.out.println("----------------------------");
-                    }
-                    	
-                 }
-                    
+                // Imprimir los datos de la reserva
+                System.out.println("ID Reserva: " + idReserva);
+                System.out.println("Tipo de reserva: " + tipoReserva);
+                System.out.println("Usuario ID: " + usuarioId);
+                System.out.println("Pista ID: " + pistaId);
+                System.out.println("Fecha Reserva: " + sdf.format(fechaHora));
+                System.out.println("Duración: " + duracion + " horas");
+                System.out.println("Precio: " + precio + " €");
+                System.out.println("Descuento: " + descuento);
+                
+                if(tipoReserva=="ADULTOS" || tipoReserva=="FAMILIAR") {
+                	System.out.println("Numero de adultos: " + numAdultos);
+                }
+                else if(tipoReserva=="INFANTIL" || tipoReserva=="FAMILIAR"){
+                	System.out.println("Numero de niños: " + numNinos);
+                	
+                }
+                System.out.println("───────────────────────────────────────");
             }
-
-            reader.close(); // Cerramos el archivo
-
-            if (!hayReservas) {
-                codigo = -1; // No hay usuarios registrados
-                System.out.println("No hay reservas registradas.");
-            } else {
-                codigo = 1; // Usuarios listados correctamente
-            }
-        } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
-            codigo = -2; // Error al intentar listar usuarios
+        } catch (SQLException e) {
+            System.out.println("ERROR! No se pudo obtener las reservas futuras: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.closeConnection();
         }
 
         return codigo;
@@ -796,85 +770,91 @@ public class ReservaDAO {
 	 * Función que modifica una reserva buscada por identificador único.
 	 * @param idReserva Identificador único de la reserva a modificar.
 	 * @param nuevaReserva Clase Reserva con todos los nuevos detalles modificados.
-	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
-	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
+	 * @return codigo Devuelve un número distinto dependiendo del error que haya habido. 
+	 *               -1: Error en la fecha (pasada o fuera de plazo).
+	 *                0: Reserva no encontrada.
+	 *                1: Reserva modificada correctamente.
 	 */
-	public int modificarReserva(String idReserva, ReservaDTO nuevaReserva) throws IOException {
-        int codigo = 0;
-        List<String> lineas = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        
-        // Comprobación adicional para asegurar que la nueva fecha es futura
-        if (!esReservaFutura(nuevaReserva.getFechaHora())) {
-            System.out.println(" ERROR! No se puede modificar la reserva a una fecha pasada.");
-            return -1; // Código de error indicando que la fecha es pasada
-        }
-        
-        // Verificación adicional de plazo
-        if (plazoExcedido(nuevaReserva.getFechaHora())) {
-            System.out.println("ERROR! No se puede modificar la reserva, el plazo permitido ha expirado.");
-            return -1; // Código de error indicando plazo excedido
-        }
+	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) {
+	    String query = properties.getProperty("modificar_reserva");
+	    int codigo = -1;
 
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
-            String linea;
-            boolean reservaModificada = false;
-            
+	    DBConnection db = new DBConnection();
+	    connection = db.getConnection();
 
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                
-                String[] datos = linea.split(";");
+	    try {
+	        // Comprobación de fecha futura y dentro del plazo permitido
+	        if (!esReservaFutura(nuevaReserva.getFechaHora())) {
+	            System.out.println(" ERROR! No se puede modificar la reserva a una fecha pasada.");
+	            return -1;
+	        }
+	        if (plazoExcedido(nuevaReserva.getFechaHora())) {
+	            System.out.println(" ERROR! No se puede modificar la reserva porque excede el plazo permitido.");
+	            return -1;
+	        }
 
-                if (datos.length >= 9) {
-                    String id = datos[0];
+	        try (PreparedStatement statement = connection.prepareStatement(query)) {
+	            // Determinar el tipo de reserva
+	            String tipoReserva = nuevaReserva instanceof ReservaInfantilDTO ? "INFANTIL" :
+	                                 nuevaReserva instanceof ReservaFamiliarDTO ? "FAMILIAR" : "ADULTOS";
 
-                    // Si encontramos la reserva, lo actualizamos
-                    if (id.equals(idReserva)) {
-                        String nuevaLinea = idReserva + ";" 
-                        		+ ((nuevaReserva instanceof ReservaInfantilDTO) ? "INFANTIL"
-                                : (nuevaReserva instanceof ReservaFamiliarDTO) ? "FAMILIAR"
-                                : "ADULTOS")
-                        		+ ";" + nuevaReserva.getUsuarioId() + ";" + nuevaReserva.getPistaId() + ";" 
-                                + sdf.format(nuevaReserva.getFechaHora()) + ";" + nuevaReserva.getDuracion() + ";" 
-                                + calcularPrecio(nuevaReserva.getDuracion()) + ";" + nuevaReserva.getDescuento() + ";" 
-                                + ((nuevaReserva instanceof ReservaInfantilDTO) ? ((ReservaInfantilDTO) nuevaReserva).getNumNinos()
-                                : (nuevaReserva instanceof ReservaFamiliarDTO) ? ((ReservaFamiliarDTO) nuevaReserva).getNumNinos() + ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos()
-                                : ((ReservaAdultosDTO) nuevaReserva).getNumAdultos());
-                        lineas.add(nuevaLinea);
-                        reservaModificada = true;
-                    } else {
-                        // Si no es la reserva, simplemente añadimos la línea tal como está
-                        lineas.add(linea);
-                    }
-                }
-            }
+	            // Inicializar los valores de adultos y niños
+	            Integer numNinos = null;
+	            Integer numAdultos = null;
 
-            reader.close(); // Cerramos el archivo de lectura
+	            if (nuevaReserva instanceof ReservaInfantilDTO) {
+	                numNinos = ((ReservaInfantilDTO) nuevaReserva).getNumNinos();
+	            } else if (nuevaReserva instanceof ReservaFamiliarDTO) {
+	                numNinos = ((ReservaFamiliarDTO) nuevaReserva).getNumNinos();
+	                numAdultos = ((ReservaFamiliarDTO) nuevaReserva).getNumAdultos();
+	            } else if (nuevaReserva instanceof ReservaAdultosDTO) {
+	                numAdultos = ((ReservaAdultosDTO) nuevaReserva).getNumAdultos();
+	            }
 
-            if (!reservaModificada) {
-                return 0; // Reserva no encontrada
-            }
+	            // Establecer los parámetros de la consulta SQL
+	            statement.setInt(1, nuevaReserva.getUsuarioId());
+	            statement.setTimestamp(2, new java.sql.Timestamp(nuevaReserva.getFechaHora().getTime()));
+	            statement.setInt(3, nuevaReserva.getDuracion());
+	            statement.setInt(4, nuevaReserva.getPistaId());
+	            statement.setFloat(5, calcularPrecio(nuevaReserva.getDuracion()));
+	            statement.setFloat(6, nuevaReserva.getDescuento());
+	            statement.setString(7, tipoReserva);
+	            
+	            // Manejo de valores nulos en numNinos y numAdultos
+	            if (numNinos != null) {
+	                statement.setInt(8, numNinos);
+	            } else {
+	                statement.setNull(8, java.sql.Types.INTEGER);
+	            }
 
-            // Reescribimos todo el archivo con las líneas actualizadas
-            BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoReservas, false)); // Sobrescribimos el archivo
+	            if (numAdultos != null) {
+	                statement.setInt(9, numAdultos);
+	            } else {
+	                statement.setNull(9, java.sql.Types.INTEGER);
+	            }
 
-            for (String nuevaLinea : lineas) {
-                writer.write(nuevaLinea);
-                writer.newLine();
-            }
+	            statement.setInt(10, idReserva); // ID de la reserva que se va a modificar
 
-            writer.close(); // Cerramos el archivo de escritura
-            codigo = 1; // Usuario modificado correctamente
-        } catch (IOException e) {
-            System.out.println("Error al modificar el archivo: " + e.getMessage());
-            codigo = -1; // Error durante la modificación
-        }
+	            // Ejecutar la actualización
+	            int rowsUpdated = statement.executeUpdate();
 
-        return codigo;
-    }
+	            if (rowsUpdated > 0) {
+	                codigo = 1; // Reserva modificada correctamente
+	            } else {
+	                System.out.println(" ERROR! No se encontró la reserva con ID: " + idReserva);
+	                codigo = 0; // Reserva no encontrada
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println(" ERROR! Error al modificar la reserva en la base de datos: " + e.getMessage());
+	        e.printStackTrace();
+	        codigo = -1; // Error durante la modificación
+	    } finally {
+	        db.closeConnection();
+	    }
+
+	    return codigo;
+	}
 	
 	
 	/**
@@ -883,104 +863,64 @@ public class ReservaDAO {
 	 * @param idPista Identificador de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
+	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
+		String query = properties.getProperty("buscar_fecha_pista");
 	    int codigo = 0;
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Solo la fecha, sin hora
-
-	    // Crear un calendario para establecer el tiempo a medianoche
-	    Calendar calBuscada = Calendar.getInstance();
-	    calBuscada.setTime(fechaBuscada);
-	    calBuscada.set(Calendar.HOUR_OF_DAY, 0);
-	    calBuscada.set(Calendar.MINUTE, 0);
-	    calBuscada.set(Calendar.SECOND, 0);
-	    calBuscada.set(Calendar.MILLISECOND, 0);
 	    
-	    try {
-	        // Abrimos el archivo en modo lectura
-	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
-	        String linea;
-	        boolean hayReservas = false;
+	    DBConnection db = new DBConnection();
+	    connection = db.getConnection();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        	stmt.setInt(1, idPista);
+        	stmt.setDate(2, new java.sql.Date(fechaBuscada.getTime()));
+        	
+            ResultSet rs = stmt.executeQuery();
 
-	        // Verificamos si el archivo contiene reservas
-	        System.out.println("\n Reservas realizadas para la fecha: " + sdf.format(fechaBuscada) + " y la pista ID: " + idPista);
-	        System.out.println("-----------------------------------");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Formato de fecha requerido
+            
+            System.out.println("\n───────────────────────────────────────");
+            System.out.println("---------- Lista de Reservas ----------");
+            System.out.println("───────────────────────────────────────");
 
-	        // Leemos cada línea del archivo
-	        while ((linea = reader.readLine()) != null) {
-	            // Cada línea tiene el formato esperado
-	            String[] datos = linea.split(";");
+            // Iterar sobre los resultados de la consulta
+            while (rs.next()) {
+                String idReserva = rs.getString("idReserva");
+                String tipoReserva= rs.getString("tipoReserva");
+                int usuarioId = rs.getInt("usuarioId");
+                int pistaId = rs.getInt("pistaId");
+                java.util.Date fechaReserva = rs.getTimestamp("fechaHora");
+                int duracion = rs.getInt("duracion");
+                float precio = rs.getFloat("precio");
+                float descuento = rs.getFloat("descuento");
+                
+                int numAdultos = rs.getInt("numAdultos");
+                int numNinos = rs.getInt("numNinos");
 
-	            if (datos.length == 9 || datos.length == 10) {
-	                String id = datos[0];
-	                String tamano = datos[1];
-	                String correoUsuario = datos[2];
-	                String pistaId = datos[3];
-	                String fechaHoraString = datos[4];
-
-	                // Intentamos parsear la fecha de la reserva
-	                Date fechaReserva;
-	                try {
-	                    // Aquí se asume que la fecha en el archivo incluye la hora
-	                    SimpleDateFormat sdfReserva = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-	                    fechaReserva = sdfReserva.parse(fechaHoraString);
-
-	                    // Ajustar la fecha de la reserva a medianoche
-	                    Calendar calReserva = Calendar.getInstance();
-	                    calReserva.setTime(fechaReserva);
-	                    calReserva.set(Calendar.HOUR_OF_DAY, 0);
-	                    calReserva.set(Calendar.MINUTE, 0);
-	                    calReserva.set(Calendar.SECOND, 0);
-	                    calReserva.set(Calendar.MILLISECOND, 0);
-	                    
-	                    // Comprobar si la fecha de la reserva coincide y si el ID de pista coincide
-	                    if (calReserva.getTime().equals(calBuscada.getTime()) && pistaId.equals(idPista)) {
-	                        hayReservas = true; // Se encontró al menos una reserva
-
-	                        String duracion = datos[5];
-	                        String precio = datos[6];
-	                        String descuento = datos[7];
-	                        String numParticipantes = datos[8];
-
-	                        // Mostramos la información de la reserva
-	                        System.out.println("ID de reserva: " + id);
-	                        System.out.println("Tamaño de pista: " + tamano);
-	                        System.out.println("Correo del reservante: " + correoUsuario);
-	                        System.out.println("ID de pista: " + pistaId);
-	                        System.out.println("Fecha de reserva: " + fechaHoraString);
-	                        System.out.println("Duración: " + duracion + " mins.");
-	                        System.out.println("Precio: " + precio);
-	                        System.out.println("Descuento: " + descuento);
-
-	                        if (datos.length == 9) {
-	                            System.out.println("Número de participantes: " + numParticipantes);
-	                        } else if (datos.length == 10) {
-	                            String numAdultos = datos[9];
-	                            System.out.println("Número de niños: " + numParticipantes);
-	                            System.out.println("Número de adultos: " + numAdultos);
-	                        }
-
-	                        System.out.println("-----------------------------------");
-	                    }
-	                } catch (ParseException e) {
-	                    System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
-	                                       "Formato esperado: dd-MM-yyyy HH:mm:ss.");
-	                    continue; // Saltar a la siguiente línea en caso de error
-	                }
-	            }
-	        }
-
-	        reader.close(); // Cerramos el archivo
-
-	        if (!hayReservas) {
-	            codigo = -1; // No hay reservas para la fecha y pista especificadas
-	            System.out.println("No hay reservas registradas para la fecha y pista indicadas.");
-	        } else {
-	            codigo = 1; // Reservas listadas correctamente
-	        }
-	    } catch (IOException e) {
-	        System.out.println("Error al leer el archivo: " + e.getMessage());
-	        codigo = -2; // Error al intentar listar reservas
-	    }
+                // Imprimir los datos de la reserva
+                System.out.println("ID Reserva: " + idReserva);
+                System.out.println("Tipo de reserva: " + tipoReserva);
+                System.out.println("Usuario ID: " + usuarioId);
+                System.out.println("Pista ID: " + pistaId);
+                System.out.println("Fecha Reserva: " + sdf.format(fechaReserva));
+                System.out.println("Duración: " + duracion + " horas");
+                System.out.println("Precio: " + precio + " €");
+                System.out.println("Descuento: " + descuento);
+                
+                if(tipoReserva=="ADULTOS" || tipoReserva=="FAMILIAR") {
+                	System.out.println("Numero de adultos: " + numAdultos);
+                }
+                else if(tipoReserva=="INFANTIL" || tipoReserva=="FAMILIAR"){
+                	System.out.println("Numero de niños: " + numNinos);
+                	
+                }
+                System.out.println("───────────────────────────────────────");
+            }
+        } catch (SQLException e) {
+            System.out.println("ERROR! No se pudo obtener las reservas futuras: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.closeConnection();
+        }
 
 	    return codigo;
 	}
@@ -991,66 +931,55 @@ public class ReservaDAO {
 	 * @param idReserva Identificador único de la reserva a cancelar.
 	 * @return Devuelve true si consiguió borrar la reserva del fichero correctamente, y devuelve false si hubo algún error.
 	 */
-	public boolean cancelarReserva(String idReserva) {
-	    String rutaArchivoTemporal = "src/es/uco/pw/files/temp.txt"; // Archivo temporal para copiar el contenido
-	    boolean reservaEliminada = false;
+	public boolean cancelarReserva(int idReserva) {
+		boolean eliminada= false;
+		
+		String queryBuscarReserva = properties.getProperty("buscar_reserva"); // Consulta para buscar la reserva
+	    String queryEliminarReserva = properties.getProperty("eliminar_reserva"); // Consulta para eliminar la reserva
+	    
+	    DBConnection db = new DBConnection();
+	    connection = db.getConnection();
 
-	    try {
-	        BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
-	        BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivoTemporal));
-	        String linea;
-	        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	    try (PreparedStatement stmtBuscar = connection.prepareStatement(queryBuscarReserva)) {
+	        // Establecer el parámetro para la consulta de búsqueda de la reserva
+	        stmtBuscar.setInt(1, idReserva);
 
-	        while ((linea = reader.readLine()) != null) {
-	            String[] datos = linea.split(";");
-	            if (datos.length >= 9) {
-	                String id = datos[0]; // Identificador de la reserva
-	                String fechaHoraString = datos[4]; // FechaHora de la reserva
+	        // Ejecutar la consulta para obtener la reserva
+	        ResultSet rs = stmtBuscar.executeQuery();
 
-	                if (id.equals(idReserva)) {
-	                    try {
-	                        Date fechaReserva = sdf.parse(fechaHoraString);
+	        if (rs.next()) {
+	            // Obtener la fecha de la reserva
+	            Date fechaReserva = rs.getTimestamp("fechaHora");
 
-	                        // Comprobar si la fecha de la reserva es dentro de las últimas 24 horas
+	            // Verificar si el plazo de 24 horas no ha sido excedido
+	            if (!plazoExcedido(fechaReserva)) {
+	                // Si el plazo no ha sido excedido, procedemos con la eliminación de la reserva
 
-	                        if (!plazoExcedido(fechaReserva)) {
-	                            // Si la reserva es válida para eliminar (aún no ha pasado 24 horas antes), no copiar la línea
-	                            reservaEliminada = true;
-	                            System.out.println("<La reserva con ID " + id + " ha sido eliminada.>");
-	                            continue;
-	                        } else {
-	                            // Si ya pasó el plazo de 24 horas, mantenemos la línea en el archivo
-	                            System.out.println("No se puede eliminar la reserva, ya ha pasado el plazo de 24 horas.");
-	                        }
-	                    } catch (ParseException e) {
-	                        System.out.println("Error al parsear la fecha de la reserva: " + fechaHoraString);
-	                        writer.write(linea); // En caso de error en la fecha, no eliminar la reserva
+	                try (PreparedStatement stmtEliminar = connection.prepareStatement(queryEliminarReserva)) {
+	                    // Establecer el parámetro para la consulta de eliminación
+	                    stmtEliminar.setInt(1, idReserva);
+
+	                    // Ejecutar la eliminación
+	                    int filasAfectadas = stmtEliminar.executeUpdate();
+	                    if (filasAfectadas > 0) {
+	                        eliminada = true;  // Si la eliminación fue exitosa, se marca como verdadera
 	                    }
-	                } else {
-	                    // Si no es la reserva buscada, copiamos la línea al archivo temporal
-	                    writer.write(linea);
 	                }
-
-	                writer.newLine(); // Añadir la nueva línea después de escribir en el archivo
+	            } else {
+	                System.out.println("ERROR! No se puede eliminar la reserva porque el plazo de 24 horas ha sido excedido.");
 	            }
+	        } else {
+	            System.out.println("ERROR! No se encontró una reserva con el id proporcionado.");
 	        }
 
-	        reader.close();
-	        writer.close();
-
-	        // Reemplazamos el archivo original con el archivo temporal
-	        File archivoOriginal = new File(rutaArchivoReservas);
-	        File archivoTemporal = new File(rutaArchivoTemporal);
-	        if (archivoOriginal.delete()) {
-	            archivoTemporal.renameTo(archivoOriginal);
-	        }
-
-	    } catch (IOException e) {
-	        System.out.println("Error al procesar el archivo: " + e.getMessage());
-	        return false;
+	    } catch (SQLException e) {
+	        System.out.println("ERROR! Error al ejecutar la consulta: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        // Cerrar la conexión a la base de datos
+	        db.closeConnection();
 	    }
-
-	    return reservaEliminada;
+	    return eliminada;
 	}
 	
 	
@@ -1059,36 +988,30 @@ public class ReservaDAO {
 	 * @param bonoId Identificador único del bono a buscar.
 	 * @return sesionesRestantes Es la cantidad de sesiones que le quedan al bono.
 	 */
-	public int obtenerSesionesRestantes(String bonoId) {
-	    File archivoBonos = new File(rutaArchivoBonos);
-	    int sesionesRestantes = -1; // Inicializamos con un valor de error por defecto (-1)
-
-	    try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos))) {
-	        String linea;
-
-	        // Leemos línea por línea
-	        while ((linea = reader.readLine()) != null) {
-	            String[] datos = linea.split(";"); // Asumimos que los campos están separados por ';'
-
-	            if (datos.length >= 4 && datos[0].equals(bonoId)) {
-	                // Si encontramos el bono con el ID correcto
-	                try {
-	                    sesionesRestantes = Integer.parseInt(datos[3].trim()); // El cuarto elemento es el número de sesiones
-	                } catch (NumberFormatException e) {
-	                    System.out.println("ERROR! El formato del número de sesiones no es válido.");
-	                }
-	                break; // Salimos del bucle si encontramos el bono
-	            }
-	        }
-
-	    } catch (IOException e) {
-	        System.out.println(" ERROR! No se pudo leer el archivo de bonos: " + e.getMessage());
-	    }
-
-	    if (sesionesRestantes == -1) {
-	        System.out.println(" ERROR! No se encontró el bono con ID: " + bonoId);
-	    }
-
+	public int obtenerSesionesRestantes(int bonoId) {
+		String query = properties.getProperty("buscar_bono");
+		int sesionesRestantes=0;
+		
+		DBConnection db = new DBConnection();
+        connection = db.getConnection();
+		
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, bonoId);
+            
+            ResultSet rs= statement.executeQuery();
+            
+            if (rs.next()) {
+            	sesionesRestantes = rs.getInt("sesiones"); 
+            }
+            
+            
+        } catch (SQLException e) {
+            System.err.println("Error inserting pista: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.closeConnection();
+        }
+        
 	    return sesionesRestantes;
 	}
 	
@@ -1100,33 +1023,28 @@ public class ReservaDAO {
 	 * @return Devuelve true si ya existe una reserva para la misma pista y horario, y false si no existe.
 	 */
 	private boolean existeReservaParaPistaYHora(String nombrePista, Date fechaHora) {
-	    try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas))) {
-	        String linea;
-
-	        while ((linea = reader.readLine()) != null) {
-	            String[] datos = linea.split(";");
-	            String pistaId = datos[3];
-	            String fechaHoraString = datos[4];
-	            Date fechaReserva;
-	            
-	            try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                    fechaReserva = sdf.parse(fechaHoraString);
-                } catch (ParseException e) {
-                    System.out.println("Error al parsear la fecha: " + fechaHoraString + ". " +
-                                       "Formato esperado: dd/MM/yyyy HH:mm.");
-                    continue; // Saltar a la siguiente línea en caso de error
-                }
-
-	            // Compara la pista y la hora
-	            if (pistaId.equals(nombrePista) && fechaReserva.equals(fechaHora)) {
-	                return true; // Ya existe una reserva para la misma pista y hora
-	            }
-	        }
-	    } catch (IOException e) {
-	        System.out.println(" ERROR! Error al comprobar reservas existentes: " + e.getMessage());
-	    }
-	    return false;
+		String query = properties.getProperty("buscar_reserva_existente");
+	
+		DBConnection db = new DBConnection();
+		Connection connection = db.getConnection();
+	
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+		     // Establecer los parámetros
+		     statement.setString(1, nombrePista);
+		     statement.setTimestamp(2, new Timestamp(fechaHora.getTime())); // Convertir Date a Timestamp
+		
+		     // Ejecutar la consulta
+		     ResultSet resultSet = statement.executeQuery();
+		     if (resultSet.next()) {
+		         int count = resultSet.getInt(1);
+		         return count > 0; // Si ya existe una reserva para la pista y la hora
+		     }
+		 } catch (SQLException e) {
+		     System.out.println("ERROR! Error al comprobar reservas existentes en la base de datos: " + e.getMessage());
+		 } finally {
+		     db.closeConnection();
+		 }
+		return false; // No existe una reserva
 	}
 	
 	
@@ -1135,7 +1053,7 @@ public class ReservaDAO {
 	 * @param fechaReserva Fecha de la reserva a verificar.
 	 * @return Devuelve true si la fecha es futura, y false si la fecha ya ha pasado.
 	 */
-	private boolean esReservaFutura(Date fechaReserva) {
+	public boolean esReservaFutura(Date fechaReserva) {
 	    Date fechaActual = new Date();
 	    return fechaReserva.after(fechaActual);
 	}
@@ -1146,100 +1064,91 @@ public class ReservaDAO {
 	 * @param bonoId Es el identificador de bono.
 	 * @return Devuelve el string del tamaño del bono.
 	 */
-	public String obtenerTamanoBono(String bonoId) {
+	public String obtenerTamanoBono(int bonoId) {
+		String tamanoBono= " ERROR!";
+		String query= properties.getProperty("buscar_bono");
+		
+		DBConnection db = new DBConnection();
+		connection = db.getConnection();
 	    
-	    File archivoBonos = new File(rutaArchivoBonos);
-	    
-	    try (BufferedReader reader = new BufferedReader(new FileReader(archivoBonos))) {
-	        String linea;
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        // Establecer el parámetro de la consulta
+	        stmt.setInt(1, bonoId);
 
-	        // Leer línea por línea
-	        while ((linea = reader.readLine()) != null) {
-	            // Dividir la línea en partes (separadas por ";")
-	            String[] datos = linea.split(";");
-	            
-	            // Verificar que la línea tiene al menos 3 elementos
-	            if (datos.length >= 3) {
-	                // Comparar el id del bono (primer campo) con el bonoId pasado por parámetro
-	                if (datos[0].trim().equals(bonoId)) {
-	                    // Devolver el valor del tamaño de pista (tercer campo)
-	                    return datos[2].trim();
-	                }
-	            }
+	        // Ejecutar la consulta
+	        ResultSet rs = stmt.executeQuery();
+
+	        // Verificar si se encontró el bono
+	        if (rs.next()) {
+	            // Obtener el tamaño de la pista del bono
+	            tamanoBono = rs.getString("tipoPista");
+	        } else {
+	            // Si no se encuentra el bono
+	            tamanoBono = "ERROR! Bono no encontrado.";
 	        }
-	    } catch (IOException e) {
-	        System.out.println(" ERROR! No se pudo leer el archivo: " + e.getMessage());
-	    }
 
-	    // Si no se encuentra el bono o ocurre algún error
-	    return " ERROR! Bono no encontrado o archivo inválido.";
+	    } catch (SQLException e) {
+	        System.out.println("ERROR! Error al ejecutar la consulta: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        // Cerrar la conexión a la base de datos
+	        db.closeConnection();
+	    }
+	    return tamanoBono;
 	}
 	
 	
 	
-	public ReservaDTO obtenerReservaPorId(String idReserva) {
-        try {
-            // Abrimos el archivo en modo lectura
-            BufferedReader reader = new BufferedReader(new FileReader(rutaArchivoReservas));
-            String linea;
+	public ReservaDTO obtenerReservaPorId(int idReserva) {
+		String query= properties.getProperty("buscar_reserva");
+		
+		DBConnection db = new DBConnection();
+		connection = db.getConnection();
+		ReservaDTO reserva= null;
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        // Establecer el parámetro de la consulta
+	        stmt.setInt(1, idReserva);
 
-            // Leemos cada línea del archivo
-            while ((linea = reader.readLine()) != null) {
-                // Cada línea tiene el formato:
-                // R_0000;ADULTOS;carlosdelatorrefrias@gmail.com;Baloncesto0;30/11/2024 19:30;90;30.0;0.0;10
-                String[] datos = linea.split(";");
+	        // Ejecutar la consulta
+	        ResultSet rs = stmt.executeQuery();
 
-                // Comprobar si el identificador de la reserva coincide con el proporcionado
-                if (datos.length >= 9 && datos[0].equals(idReserva)) {
-                    // Extraer los datos de la reserva
-                    String tamanoPista = datos[1];
-                    String usuarioId = datos[2];
-                    String pistaId = datos[3];
-                    String fechaHoraString = datos[4];
-                    int duracion = Integer.parseInt(datos[5]);
-                    float precio = Float.parseFloat(datos[6]);
-                    float descuento = Float.parseFloat(datos[7]);
-                    int particip = Integer.parseInt(datos[8]);
-
-                    // Intentar parsear la fecha y hora
-                    Date fechaHora = null;
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                        fechaHora = sdf.parse(fechaHoraString);
-                    } catch (ParseException e) {
-                        System.out.println(" ERROR! No se pudo parsear la fecha de la reserva: " + fechaHoraString);
-                        continue; // Saltar esta línea si la fecha no es válida
-                    }
-
-                    ReservaDTO reserva;
-                    if(tamanoPista== "ADULTOS") {
-                    	reserva = new ReservaAdultosDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
-                    }
-                    
-                    else if(tamanoPista== "FAMILIAR") {
-                    	int numadultos = Integer.parseInt(datos[9]);
-                    	reserva = new ReservaFamiliarDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,numadultos,particip);
-                    }
-                    
-                    else {
-                    	reserva = new ReservaInfantilDTO(usuarioId, fechaHora, duracion, pistaId, precio, descuento,particip);
-                    }
-                    // Crear una nueva instancia de Reserva con los datos
-
-                    reader.close(); // Cerrar el archivo
-                    return reserva; // Devolver la reserva encontrada
+	        // Verificar si se encontró el bono
+	        if (rs.next()) {
+	            // Obtener el tamaño de la pista del bono
+	        	int usuarioId = rs.getInt("usuarioId");
+	            int duracion= rs.getInt("duracion");
+	            java.sql.Timestamp fechaReserva = rs.getTimestamp("fechaHora");
+	            int pistaId= rs.getInt("pistaId");
+	            float precio = rs.getFloat("precio");
+	            float descuento= rs.getFloat("descuento");
+	            String tipoReserva= rs.getString("tipoReserva");
+	            int numNinos= rs.getInt("numNinos");
+	            int numAdultos= rs.getInt("numAdultos");
+	            
+                if(tipoReserva== "ADULTOS") {
+                	reserva = new ReservaAdultosDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numAdultos);
                 }
-            }
+                
+                else if(tipoReserva== "FAMILIAR") {
+                	reserva = new ReservaFamiliarDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numAdultos, numNinos);
+                }
+                
+                else {
+                	reserva = new ReservaInfantilDTO(usuarioId, fechaReserva, duracion, pistaId, precio, descuento, numNinos);
+                }
+	            
+	        }
 
-            reader.close(); // Cerrar el archivo
-            System.out.println(" ERROR! No se encontró ninguna reserva con el ID proporcionado.");
-        } catch (IOException e) {
-            System.out.println(" ERROR! Hubo un problema al acceder al archivo: " + e.getMessage());
-        }
+	    } catch (SQLException e) {
+	        System.out.println("ERROR! Error al ejecutar la consulta: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        // Cerrar la conexión a la base de datos
+	        db.closeConnection();
+	    }
 
-        return null; // Devolver null si no se encontró la reserva
+        return reserva; // Devolver null si no se encontró la reserva
     }
 
 }
-
-

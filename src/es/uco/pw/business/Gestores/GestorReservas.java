@@ -64,7 +64,7 @@ public class GestorReservas {
 	 * @param bonoId El identificador del bono con el que se va a realizar la reserva.
 	 * @return Devuelve true si el procedimiento de reserva se ha hecho de manera correcta, y false si hay algo que se incumple.
 	 */
-    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, String bonoId) {
+    public boolean hacerReservaBono(String correoUsuario, String nombrePista, Date fechaHora, int duracion, int numeroAdultos, int numeroNinos, Class<? extends ReservaDTO> tipoReserva, int bonoId) {
     	return daoReserva.hacerReservaBono(correoUsuario, nombrePista, fechaHora, duracion, numeroAdultos, numeroNinos, tipoReserva, bonoId);
     }	
     
@@ -88,8 +88,8 @@ public class GestorReservas {
      * @return Un objeto Jugador si el correo existe en el archivo, o null si no se encuentra
      *         o si ocurre algún error.
      */
-    public JugadorDTO buscarJugador(String correoElectronico) {
-    	return daoReserva.buscarJugador(correoElectronico);
+    public int buscarIdJugador(String correoElectronico) {
+    	return daoReserva.buscarIdJugador(correoElectronico);
     }
     
     
@@ -116,7 +116,7 @@ public class GestorReservas {
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si contradice una de las condiciones
 	 * 		   o si ha habido un error.
 	 */
-    public boolean comprobarBono(String bonoId, String correoUsuario, TamanoPista tamano) {
+    public boolean comprobarBono(int bonoId, String correoUsuario, TamanoPista tamano) {
     	return daoReserva.comprobarBono(bonoId, correoUsuario, tamano);
     }
 
@@ -126,7 +126,7 @@ public class GestorReservas {
 	 * @param bonoId Identificador único del bono.
 	 * @return Si se ha realizado el procedimiento correctamente devuelve true, y devuelve false si ha habido algun error.
 	 */
-	public boolean actualizarSesionesBono(String bonoId) {
+	public boolean actualizarSesionesBono(int bonoId) {
 		return daoReserva.actualizarSesionesBono(bonoId);
 	}
 	
@@ -146,7 +146,7 @@ public class GestorReservas {
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 * @throws IOException Si ocurre un error de entrada/salida al modificar el archivo de reservas.
 	 */
-	public int modificarReserva(String idReserva, ReservaDTO nuevaReserva) throws IOException {
+	public int modificarReserva(int idReserva, ReservaDTO nuevaReserva) throws IOException {
 		return daoReserva.modificarReserva(idReserva, nuevaReserva);
     }
 	
@@ -157,7 +157,7 @@ public class GestorReservas {
 	 * @param idPista Identificador de la pista a filtrar.
 	 * @return codigo Devuelve un numero distinto dependiendo del error que haya habido. 
 	 */
-	public int listarReservasPorFechaYPista(Date fechaBuscada, String idPista) {
+	public int listarReservasPorFechaYPista(Date fechaBuscada, int idPista) {
 		return daoReserva.listarReservasPorFechaYPista(fechaBuscada, idPista);
 	}
 	
@@ -167,7 +167,7 @@ public class GestorReservas {
 	 * @param idReserva Identificador único de la reserva a cancelar.
 	 * @return Devuelve true si consiguió borrar la reserva del fichero correctamente, y devuelve false si hubo algún error.
 	 */
-	public boolean cancelarReserva(String idReserva) {
+	public boolean cancelarReserva(int idReserva) {
 		return daoReserva.cancelarReserva(idReserva);
 	}
 	
@@ -177,7 +177,7 @@ public class GestorReservas {
 	 * @param bonoId Identificador único del bono a buscar.
 	 * @return sesionesRestantes Es la cantidad de sesiones que le quedan al bono.
 	 */
-	public int obtenerSesionesRestantes(String bonoId) {
+	public int obtenerSesionesRestantes(int bonoId) {
 		return daoReserva.obtenerSesionesRestantes(bonoId);
 	}
 
@@ -187,14 +187,19 @@ public class GestorReservas {
 	 * @param bonoId Es el identificador de bono.
 	 * @return Devuelve el string del tamaño del bono.
 	 */
-	public String obtenerTamanoBono(String bonoId) {
+	public String obtenerTamanoBono(int bonoId) {
 		return daoReserva.obtenerTamanoBono(bonoId);
 	}
 	
 	
 	
-	public ReservaDTO obtenerReservaPorId(String idReserva) {
+	public ReservaDTO obtenerReservaPorId(int idReserva) {
 		return daoReserva.obtenerReservaPorId(idReserva);
     }
+	
+	
+	public int buscarIdPista(String idPistaString) {
+		return daoReserva.buscarIdPista(idPistaString);
+	}
 
 }

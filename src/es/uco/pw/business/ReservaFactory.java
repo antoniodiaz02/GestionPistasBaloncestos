@@ -35,7 +35,7 @@ public abstract class ReservaFactory {
      * @param descuento Descuento aplicado a la reserva.
      * @param numeroNinos Número de niños en la reserva.
      */
-    public abstract ReservaInfantilDTO createReservaInfantil(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroNinos);
+    public abstract ReservaInfantilDTO createReservaInfantil(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva familiar.
@@ -48,7 +48,7 @@ public abstract class ReservaFactory {
      * @param numeroAdultos Número de adultos en la reserva.
      * @param numeroNinos Número de niños en la reserva.
      */
-    public abstract ReservaFamiliarDTO createReservaFamiliar(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
+    public abstract ReservaFamiliarDTO createReservaFamiliar(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroAdultos, int numeroNinos);
     
     /**
      * Método abstracto para crear una reserva para adultos.
@@ -60,5 +60,6 @@ public abstract class ReservaFactory {
      * @param descuento Descuento aplicado a la reserva.
      * @param numeroAdultos Número de adultos en la reserva.
      */
-    public abstract ReservaAdultosDTO createReservaAdultos(String idUsuario, Date fecha, int duracion, String idPista, float precio, float descuento, int numeroAdultos);
+    public abstract ReservaAdultosDTO createReservaAdultos(int idUsuario, Date fecha, int duracion, int idPista, float precio, float descuento, int numeroAdultos);
+
 }

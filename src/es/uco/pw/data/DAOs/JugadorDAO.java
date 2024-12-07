@@ -118,7 +118,7 @@ public class JugadorDAO {
             	codigo = 1;
                 return codigo;
             
-        }
+            }
 	    } catch (SQLException e) {
 	        System.err.println("Error al buscar el usuario en la base de datos: " + e.getMessage());
 	        return -1; // Código para indicar error general de base de datos.

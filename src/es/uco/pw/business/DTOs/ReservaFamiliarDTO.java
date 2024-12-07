@@ -38,7 +38,7 @@ public class ReservaFamiliarDTO extends ReservaDTO {
      * @param numeroAdultos Número de adultos.
      * @param numeroNinos Número de ninos.
      */
-    public ReservaFamiliarDTO(String idUsuario, Date fechaHora, int duracionMinutos, String idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
+    public ReservaFamiliarDTO(int idUsuario, Date fechaHora, int duracionMinutos, int idPista, float precio, float descuento, int numeroAdultos, int numeroNinos) {
         super(idUsuario, fechaHora, duracionMinutos, idPista, precio, descuento);
         this.numAdultos = numeroAdultos;
         this.numNinos = numeroNinos;
